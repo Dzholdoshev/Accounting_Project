@@ -1,4 +1,4 @@
-# the-royal-pickles-project
+# The Royal Pickles Accounting Projet
 
 Accounting Project is a web-based application to manage accounting transactions of companies. 
 
