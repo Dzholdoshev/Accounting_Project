@@ -2,7 +2,7 @@
 
 Accounting Project is a web-based application to manage accounting transactions of companies. 
 
-The accounting application will operate below main capabilities:
+The accounting application will include main capabilities:
 
 Create products by category and set quantity of purchase and sale prices
 Create invoices by their purpose it may be purchase invoice or sale invoice
