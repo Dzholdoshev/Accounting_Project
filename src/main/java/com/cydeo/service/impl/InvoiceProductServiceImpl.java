@@ -39,6 +39,11 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
    }
 
     @Override
+    public List<InvoiceProductDto> updateProducts(List<InvoiceProductDto> updatedProductList) {
+
+    }
+
+    @Override
     public BigDecimal findPriceByInvoiceNo(String invoiceNo) {
 
 //        return  invoiceProductRepository.findPriceByInvoiceNumber(invoiceNo).stream()

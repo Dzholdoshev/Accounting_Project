@@ -47,6 +47,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         Invoice invoice = invoiceRepository.findById(invoiceDto.getId()).get();
         invoice.setCompany(updatedInvoice.getCompany());
 
+        invoiceProductService.updateProducts(invoiceDto.getInvoiceNo, invoiceDto.getInvoiceProducts());
         invoiceRepository.save(invoice);
 
     }
