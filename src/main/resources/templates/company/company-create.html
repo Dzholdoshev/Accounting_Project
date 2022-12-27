@@ -169,14 +169,15 @@
                                                                 <div class="controls">
                                                                     <label>Country</label>
                                                                     <input type="text" th:field="*{address.country}"
-                                                                           placeholder="Country"
+                                                                           placeholder="State"
                                                                            class="form-control">
-                                                                    <ul>
-                                                                        <li class="validation"
-                                                                            th:each="err : ${#fields.errors('address.country')}"
-                                                                            th:text="${err}"></li>
-                                                                    </ul>
-                                                                </div>
+                                                                    <div th:if="${#fields.hasErrors('address.country')}">
+                                                                        <ul>
+                                                                            <li class="validation"
+                                                                                th:each="err : ${#fields.errors('address.country')}"
+                                                                                th:text="${err}"></li>
+                                                                        </ul>
+                                                                    </div>
                                                             </div>
                                                         </div>
                                                     </div>
