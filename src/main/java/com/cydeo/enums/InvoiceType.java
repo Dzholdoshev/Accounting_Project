@@ -1,5 +1,8 @@
 package com.cydeo.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum InvoiceType {
     PURCHASE("purchase"),
     SALES("Sales");
