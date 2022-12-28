@@ -9,7 +9,7 @@ import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceRepository;
 import com.cydeo.service.InvoiceService;
 import org.springframework.stereotype.Service;
-
+import com.cydeo.service.SecurityService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -20,11 +20,14 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
     private final MapperUtil mapperUtil;
-    //invoiceProductService & SecuirtyService
+    private final ProductService productService;
+    private final SercurityService sercurityService;
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapperUtil) {
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapperUtil,ProductService productService,SercurityService sercurityService) {
         this.invoiceRepository = invoiceRepository;
         this.mapperUtil = mapperUtil;
+        this.productService=productService;
+        this.sercurityService=sercurityService;
     }
 
 
