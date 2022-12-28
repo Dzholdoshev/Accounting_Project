@@ -12,9 +12,8 @@ import java.util.List;
 public interface InvoiceProductRepository extends JpaRepository<InvoiceProduct, Long> {
 
 
-    @Query(value="SELECT * from InvoiceProduct i where i.invoice_id =?1", nativeQuery=true)
-    List<InvoiceProduct> findInvoiceProductByInvoiceid(@Param("invoiceId") Long invoiceId);
+    List<InvoiceProduct> findInvoiceProductByInvoice_IdAndIsDeleted(Long id, Boolean deleted);
 
-    List<InvoiceProduct> findInvoiceProductByInvoice_Id(Long id);
+    List<InvoiceProduct> findAllByIsDeleted(Boolean deleted);
 
 }
