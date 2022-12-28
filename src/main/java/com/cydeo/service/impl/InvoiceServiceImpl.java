@@ -59,7 +59,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public void deleteInvoice(Long id) {
         Invoice invoice = invoiceRepository.findById(id).get();
-        if (invoice.getInvoiceStatus().equals("Awaiting Approval")) {
+        if (invoice.getInvoiceStatus().getValue().equals("Awaiting Approval")) {
             invoice.setIsDeleted(true);
             invoiceRepository.save(invoice);
         }
