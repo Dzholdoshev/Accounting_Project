@@ -6,10 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Getter
 @Setter
@@ -17,12 +16,16 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @Entity
 @Table(name = "products")
+@Where(clause = "is_deleted=false")
 public class Product extends BaseEntity {
 
     private String name;
     private int quantityInStock;
     private int lowLimitAlert;
+
+    @Enumerated(EnumType.STRING)
     private ProductUnit productUnit;
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     private Category category;
 }
