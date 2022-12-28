@@ -1,6 +1,7 @@
 package com.cydeo.service.impl;
 
 import com.cydeo.dto.InvoiceDto;
+import com.cydeo.dto.InvoiceProductDto;
 import com.cydeo.entity.Invoice;
 import com.cydeo.enums.InvoiceStatus;
 import com.cydeo.enums.InvoiceType;
@@ -34,8 +35,9 @@ public class InvoiceServiceImpl implements InvoiceService {
         List<Invoice> invoicesList = invoiceRepository.findAllByInvoiceType(invoiceType);
         return invoicesList.stream().map(invoice -> {
             InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
-            BigDecimal price = invoiceProductService.findPriceByInvoiceNo(invoice.getInvoiceNo());
+            BigDecimal price = invoiceDto.getInvoiceProducts().stream().map(InvoiceProductDto::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
             invoiceDto.setPrice(price);
+
             //tax
 
             return invoiceDto;
