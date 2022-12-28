@@ -44,7 +44,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public InvoiceProductDto createInvoiceProducts(Long id, InvoiceProductDto invoiceProductDto) {
-        InvoiceDto invoiceDto = mapperUtil.convert(invoiceRepository.findByIdAndIsDeleted(id, false).get(), new InvoiceDto());
+        InvoiceDto invoiceDto = mapperUtil.convert(invoiceRepository.findByIdAndIsDeleted(id, false), new InvoiceDto());
         invoiceProductDto.setInvoice(invoiceDto);
         // Call productService to get quantity?
         // InvoiceProductDto.setRemainingQuantity();
