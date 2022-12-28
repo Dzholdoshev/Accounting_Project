@@ -3,6 +3,7 @@ package com.cydeo.service.impl;
 import com.cydeo.dto.InvoiceDto;
 import com.cydeo.entity.Invoice;
 import com.cydeo.enums.InvoiceStatus;
+import com.cydeo.enums.InvoiceType;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceRepository;
 import com.cydeo.service.InvoiceProductService;
@@ -10,6 +11,7 @@ import com.cydeo.service.InvoiceService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,16 +30,16 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 
     @Override
-    public List<InvoiceDto> listAllInvoices() {
-        List<Invoice> invoicesList = invoiceRepository.findAll();
+    public List<InvoiceDto> listAllInvoices(InvoiceType invoiceType) {
+        List<Invoice> invoicesList = invoiceRepository.findAllByInvoiceType(invoiceType);
         return invoicesList.stream().map(invoice -> {
-                    InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
-                    BigDecimal price = invoiceProductService.findPriceByInvoiceNo(invoice.getInvoiceNo());
-                    invoiceDto.setPrice(price);
-    //tax
+            InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
+            BigDecimal price = invoiceProductService.findPriceByInvoiceNo(invoice.getInvoiceNo());
+            invoiceDto.setPrice(price);
+            //tax
 
-                    return invoiceDto;
-                }).collect(Collectors.toList());
+            return invoiceDto;
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -55,21 +57,26 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public void deleteInvoice(Long id) {
         Invoice invoice = invoiceRepository.findById(id).get();
-        if (invoice.getInvoiceStatus().getValue().equals("Awaiting Approval")) {
+        if (invoice.getInvoiceStatus().equals("Awaiting Approval")) {
             invoice.setIsDeleted(true);
+            invoiceRepository.save(invoice);
         }
-
+        //InvoiceProduct? how will the quanitity change?
     }
 
     @Override
     public void approveInvoice(Long id) {
-
+        Invoice invoice=invoiceRepository.findById(id).get();
+        invoice.setInvoiceStatus(InvoiceStatus.APPROVED);
+        invoiceRepository.save(invoice);
     }
 
     @Override
     public InvoiceDto create(InvoiceDto invoiceDto) {
         invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
-     return invoiceDto;
+        Invoice invoice = mapperUtil.convert(invoiceDto, new Invoice());
+        invoiceRepository.save(invoice);
+        return invoiceDto;
     }
 
     @Override
@@ -78,5 +85,11 @@ public class InvoiceServiceImpl implements InvoiceService {
       return mapperUtil.convert(invoice, new InvoiceDto());
     }
 
-
+    @Override
+    public InvoiceDto createNewInvoiceDto() {
+        Invoice invoice= new Invoice();
+        invoice.setInvoiceNo("P-"+invoice.getId());
+        invoice.setDate(LocalDate.now());
+        return mapperUtil.convert(invoice, new InvoiceDto());
+    }
 }
