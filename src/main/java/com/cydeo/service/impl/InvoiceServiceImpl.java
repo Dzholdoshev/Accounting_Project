@@ -20,6 +20,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
     private final MapperUtil mapperUtil;
+    //invoiceProductService & SecuirtyService
 
     public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapperUtil) {
         this.invoiceRepository = invoiceRepository;
@@ -79,7 +80,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public InvoiceDto findById(Long id) {
+    public InvoiceDto findInvoiceById(long id) {
       Invoice invoice= invoiceRepository.findByIdAndIsDeleted(id, false);
       return mapperUtil.convert(invoice, new InvoiceDto());
     }

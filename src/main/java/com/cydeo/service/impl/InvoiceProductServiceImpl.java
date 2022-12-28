@@ -5,11 +5,11 @@ import com.cydeo.dto.InvoiceProductDto;
 import com.cydeo.entity.InvoiceProduct;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceProductRepository;
-import com.cydeo.repository.InvoiceRepository;
 import com.cydeo.service.InvoiceProductService;
+import com.cydeo.service.InvoiceService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,15 +17,16 @@ import java.util.stream.Collectors;
 public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     private final InvoiceProductRepository invoiceProductRepository;
-    private final InvoiceRepository invoiceRepository;
+    private final InvoiceService invoiceService;
     private final MapperUtil mapperUtil;
+    private final ProductService productService;
 
-    public InvoiceProductServiceImpl(InvoiceProductRepository invoiceProductRepository, InvoiceRepository invoiceRepository, MapperUtil mapperUtil) {
+    public InvoiceProductServiceImpl(InvoiceProductRepository invoiceProductRepository, @Lazy InvoiceService invoiceService, MapperUtil mapperUtil, ProductService productService) {
         this.invoiceProductRepository = invoiceProductRepository;
-        this.invoiceRepository = invoiceRepository;
+        this.invoiceService = invoiceService;
         this.mapperUtil = mapperUtil;
+        this.productService = productService;
     }
-
 
     @Override
     public List<InvoiceProductDto> listAllInvoiceProduct() {
@@ -36,15 +37,15 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     @Override
-    public List<InvoiceProductDto> findByInvoiceId(Long id) {
+    public List<InvoiceProductDto> findAllInvoiceProductsByProductId(long id) {
         return invoiceProductRepository.findInvoiceProductByInvoice_IdAndIsDeleted(id, false).stream()
                 .map(invoiceProduct -> mapperUtil.convert(invoiceProduct, new InvoiceProductDto()))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public InvoiceProductDto createInvoiceProducts(Long id, InvoiceProductDto invoiceProductDto) {
-        InvoiceDto invoiceDto = mapperUtil.convert(invoiceRepository.findByIdAndIsDeleted(id, false), new InvoiceDto());
+    public InvoiceProductDto save(Long id, InvoiceProductDto invoiceProductDto) {
+        InvoiceDto invoiceDto = mapperUtil.convert(invoiceService.findInvoiceById(id), new InvoiceDto());
         invoiceProductDto.setInvoice(invoiceDto);
         // Call productService to get quantity?
         // InvoiceProductDto.setRemainingQuantity();
@@ -52,6 +53,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         invoiceProductRepository.save(mapperUtil.convert(invoiceProductDto, new InvoiceProduct()));
         return invoiceProductDto;
     }
+    @Override
     public void delete(Long invoiceId, Long invoiceProductId) {
         List<InvoiceProduct> invoiceProductList= invoiceProductRepository.findInvoiceProductByInvoice_IdAndIsDeleted(invoiceId, false);
         InvoiceProduct invoiceProduct = invoiceProductList.stream().filter(p -> p.getId().equals(invoiceProductId)).findFirst().orElseThrow();

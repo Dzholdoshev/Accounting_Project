@@ -17,6 +17,6 @@ public interface InvoiceService {
     void approveInvoice(Long id);
 
     InvoiceDto create(InvoiceDto invoiceDto);
-    InvoiceDto findById(Long id);
+    InvoiceDto findInvoiceById(long id);
     InvoiceDto createNewInvoiceDto();
 }
