@@ -29,7 +29,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public List<InvoiceProductDto> listAllInvoiceProduct() {
-      List<InvoiceProductDto> InvoiceProductDto=invoiceProductRepository.findAll()
+      List<InvoiceProductDto> InvoiceProductDto=invoiceProductRepository.findAllByIsDeleted(false)
               .stream().map(invoiceP->mapperUtil.convert(invoiceP, new InvoiceProductDto()))
               .collect(Collectors.toList());
       return InvoiceProductDto;
@@ -37,14 +37,14 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public List<InvoiceProductDto> findByInvoiceId(Long id) {
-        return invoiceProductRepository.findInvoiceProductByInvoice_Id(id).stream()
+        return invoiceProductRepository.findInvoiceProductByInvoice_IdAndIsDeleted(id, false).stream()
                 .map(invoiceProduct -> mapperUtil.convert(invoiceProduct, new InvoiceProductDto()))
                 .collect(Collectors.toList());
     }
 
     @Override
     public InvoiceProductDto createInvoiceProducts(Long id, InvoiceProductDto invoiceProductDto) {
-        InvoiceDto invoiceDto = mapperUtil.convert(invoiceRepository.findById(id).get(), new InvoiceDto());
+        InvoiceDto invoiceDto = mapperUtil.convert(invoiceRepository.findByIdAndIsDeleted(id, false).get(), new InvoiceDto());
         invoiceProductDto.setInvoice(invoiceDto);
         // Call productService to get quantity?
         // InvoiceProductDto.setRemainingQuantity();
@@ -53,7 +53,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         return invoiceProductDto;
     }
     public void delete(Long invoiceId, Long invoiceProductId) {
-        List<InvoiceProduct> invoiceProductList = invoiceProductRepository.findInvoiceProductByInvoice_Id(invoiceId);
+        List<InvoiceProduct> invoiceProductList= invoiceProductRepository.findInvoiceProductByInvoice_IdAndIsDeleted(invoiceId, false);
         InvoiceProduct invoiceProduct = invoiceProductList.stream().filter(p -> p.getId().equals(invoiceProductId)).findFirst().orElseThrow();
         invoiceProduct.setIsDeleted(true);
         invoiceProductRepository.save(invoiceProduct);
