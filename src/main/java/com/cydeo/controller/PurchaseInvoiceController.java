@@ -53,5 +53,21 @@ public class PurchaseInvoiceController {
         //  model.addAttribute("clientVendor", )
         return "/invoice/purchase-invoice-create";
     }
+    @PostMapping("/create")
+    public String createInvoice( @ModelAttribute("invoiceDto") InvoiceDto invoiceDto,  Model model) {
+        invoiceDto.setInvoiceType(InvoiceType.PURCHASE);
+        invoiceService.create(invoiceDto);
+        return "redirect: /PurchaseInvoices/create/"+invoiceDto.getId();
+    }
+
+    @GetMapping("/create/{id}")
+    public String createInvoice(@PathVariable("id") Long id, Model model){
+        model.addAttribute("invoice", invoiceService.findById(id));
+        model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
+        model.addAttribute("newInvoiceProduct", new InvoiceProductDto());
+        //  model.addAttribute("clientVendor", )
+        //  model.addAttribute("products", );
+        return  "/invoice/purchase-invoice-create";
+    }
 
 }
