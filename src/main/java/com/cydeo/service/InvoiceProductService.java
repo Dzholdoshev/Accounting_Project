@@ -11,9 +11,8 @@ public interface InvoiceProductService {
 
     List<InvoiceProductDto> listAllInvoiceProduct();
 
-    BigDecimal findPriceByInvoiceNo(String invoiceNo);
+    List<InvoiceProductDto> findByInvoiceId(Long id);
 
-    List<InvoiceProductDto> findByInvoiceNo(String invoiceNo);
-
-    List<InvoiceProductDto> updateProducts(List<InvoiceProductDto> updatedProductList);
+    void delete(Long invoiceId, Long invoiceProductId);
+    InvoiceProductDto createInvoiceProducts(Long id, InvoiceProductDto invoiceProductDto);
 }

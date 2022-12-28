@@ -1,8 +1,11 @@
 package com.cydeo.service.impl;
 
+import com.cydeo.dto.InvoiceDto;
 import com.cydeo.dto.InvoiceProductDto;
+import com.cydeo.entity.InvoiceProduct;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceProductRepository;
+import com.cydeo.repository.InvoiceRepository;
 import com.cydeo.service.InvoiceProductService;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +17,12 @@ import java.util.stream.Collectors;
 public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     private final InvoiceProductRepository invoiceProductRepository;
+    private final InvoiceRepository invoiceRepository;
     private final MapperUtil mapperUtil;
 
-    public InvoiceProductServiceImpl(InvoiceProductRepository invoiceProductRepository, MapperUtil mapperUtil) {
+    public InvoiceProductServiceImpl(InvoiceProductRepository invoiceProductRepository, InvoiceRepository invoiceRepository, MapperUtil mapperUtil) {
         this.invoiceProductRepository = invoiceProductRepository;
+        this.invoiceRepository = invoiceRepository;
         this.mapperUtil = mapperUtil;
     }
 
@@ -31,23 +36,27 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     @Override
-    public List<InvoiceProductDto> findByInvoiceNo(String invoiceNo) {
-//      return  invoiceProductRepository.findByInvoiceNumber(invoiceNo).stream()
-//                .map(invoiceP->mapperUtil.convert(invoiceP, new InvoiceProductDto()))
-//              .collect(Collectors.toList());
-        return null;
-   }
-
-    @Override
-    public List<InvoiceProductDto> updateProducts(List<InvoiceProductDto> updatedProductList) {
-
+    public List<InvoiceProductDto> findByInvoiceId(Long id) {
+        return invoiceProductRepository.findInvoiceProductByInvoice_Id(id).stream()
+                .map(invoiceProduct -> mapperUtil.convert(invoiceProduct, new InvoiceProductDto()))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public BigDecimal findPriceByInvoiceNo(String invoiceNo) {
+    public InvoiceProductDto createInvoiceProducts(Long id, InvoiceProductDto invoiceProductDto) {
+        InvoiceDto invoiceDto = mapperUtil.convert(invoiceRepository.findById(id).get(), new InvoiceDto());
+        invoiceProductDto.setInvoice(invoiceDto);
+        // Call productService to get quantity?
+        // InvoiceProductDto.setRemainingQuantity();
 
-//        return  invoiceProductRepository.findPriceByInvoiceNumber(invoiceNo).stream()
-//                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        return null;
+        invoiceProductRepository.save(mapperUtil.convert(invoiceProductDto, new InvoiceProduct()));
+        return invoiceProductDto;
     }
+    public void delete(Long invoiceId, Long invoiceProductId) {
+        List<InvoiceProduct> invoiceProductList = invoiceProductRepository.findInvoiceProductByInvoice_Id(invoiceId);
+        InvoiceProduct invoiceProduct = invoiceProductList.stream().filter(p -> p.getId().equals(invoiceProductId)).findFirst().orElseThrow();
+        invoiceProduct.setIsDeleted(true);
+        invoiceProductRepository.save(invoiceProduct);
+    }
+
 }
