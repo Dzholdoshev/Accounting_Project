@@ -37,8 +37,8 @@ public class InvoiceServiceImpl implements InvoiceService {
             InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
             BigDecimal price = invoiceDto.getInvoiceProducts().stream().map(InvoiceProductDto::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
             invoiceDto.setPrice(price);
-
-            //tax
+           // invoiceDto.setTax();
+           // invoiceDto.setTotal();
 
             return invoiceDto;
         }).collect(Collectors.toList());
