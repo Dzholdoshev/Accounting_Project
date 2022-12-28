@@ -1,10 +1,10 @@
 package com.cydeo.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.math.BigDecimal;
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class InvoiceProductDto {
@@ -14,7 +14,7 @@ public class InvoiceProductDto {
     private Integer tax;
     private BigDecimal total;
     private BigDecimal profitLoss;
-    private Integer remainingQuantity;
+    private int remainingQuantity;
     private InvoiceDto invoice;
     private ProductDto product;
 }
