@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 public class PurchaseInvoiceController {
     private final InvoiceService invoiceService;
@@ -68,6 +69,19 @@ public class PurchaseInvoiceController {
         //  model.addAttribute("clientVendor", )
         //  model.addAttribute("products", );
         return  "/invoice/purchase-invoice-create";
+    }
+
+    @PostMapping("/addInvoiceProduct/{id}")
+    public String createInvoiceWithProduct(@PathVariable("id") Long id, @ModelAttribute("invoiceProduct") InvoiceProductDto invoiceProductDto, Model model){
+        invoiceProductService.createInvoiceProducts(id,invoiceProductDto);
+        return "redirect: /PurchaseInvoices/create/"+id;
+    }
+
+    @PostMapping("removeInvoiceProduct/{invoiceId}/{invoiceProductId}")
+    public String removeInvoiceProduct(@PathVariable("invoiceId") Long invoiceId, @PathVariable("invoiceProductId") Long invoiceProductId, RedirectAttributes redirectAttr){
+        invoiceProductService.delete(invoiceId, invoiceProductId);
+        redirectAttr.addAttribute("Id", invoiceId);// check if this works
+        return "redirect: /PurchaseInvoices/create/{id}";
     }
 
 }
