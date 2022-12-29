@@ -13,7 +13,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     List<Invoice> findAllByInvoiceTypeAndIsDeleted(InvoiceType invoiceType, Boolean deleted);
     Invoice findByIdAndIsDeleted(Long id, Boolean deleted);
 
-    @Query("SELECT coalesce(max(ch.id), 0) FROM Invoice ch where ch.invoiceType =?1")
+    @Query("SELECT coalesce(max(ch.id), 1) FROM Invoice ch where ch.invoiceType =?1")
     Long getMaxId(InvoiceType invoiceType);
 
 

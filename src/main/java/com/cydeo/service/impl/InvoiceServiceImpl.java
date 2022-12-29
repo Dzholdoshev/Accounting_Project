@@ -53,7 +53,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
                 return invoiceDto;
             }).sorted(Comparator.comparing(InvoiceDto::getInvoiceNo).reversed()).collect(Collectors.toList());
-        } else if (invoiceType.getValue().equals("Sales")){
+        } else if (invoiceType.getValue().equals("Sales")) {
             return invoicesList.stream().map(invoice -> {
                 InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
                 invoiceDto.setPrice(invoicePrice(invoiceDto));
@@ -73,6 +73,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .map(InvoiceProductDto::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
+
     @Override
     public Integer invoiceTax(InvoiceDto invoiceDto) { // Sum of the tax of the Invoice Product
         return invoiceDto.getInvoiceProducts().stream()
@@ -84,8 +85,9 @@ public class InvoiceServiceImpl implements InvoiceService {
     public BigDecimal invoiceTotalPrice(InvoiceDto invoiceDto) { // Invoice tax+ Invoice price
         BigDecimal price = invoicePrice(invoiceDto);
         Integer tax = invoiceTax(invoiceDto);
-        return  price.add(BigDecimal.valueOf(tax));
+        return price.add(BigDecimal.valueOf(tax));
     }
+
     @Override
     public void updateInvoice(InvoiceDto invoiceDto) {
 
@@ -110,8 +112,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         Invoice invoice = invoiceRepository.findByIdAndIsDeleted(id, false);
         invoice.setInvoiceStatus(InvoiceStatus.APPROVED);
         //Change product quantities
-
-       // productService.update(invoice.getInvoiceProduct());  to update stock values?
+        // productService.update(invoice.getInvoiceProduct());  to update stock values?
         invoiceRepository.save(invoice);
     }
 
@@ -151,9 +152,9 @@ public class InvoiceServiceImpl implements InvoiceService {
         return mapperUtil.convert(invoice, new InvoiceDto());
     }
 
-    public String InvoiceNo(InvoiceType invoiceType){
-       Long id= invoiceRepository.getMaxId(invoiceType);
-       String InvoiceNo=String.format("%03d",id+1 );
-       return InvoiceNo;
+    public String InvoiceNo(InvoiceType invoiceType) {
+        Long id = invoiceRepository.getMaxId(invoiceType);
+        String InvoiceNo = String.format("%03d", id + 1);
+        return InvoiceNo;
     }
 }
