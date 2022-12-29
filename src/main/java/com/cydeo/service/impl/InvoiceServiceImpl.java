@@ -157,4 +157,6 @@ public class InvoiceServiceImpl implements InvoiceService {
         String InvoiceNo = String.format("%03d", id + 1);
         return InvoiceNo;
     }
+
+    // check if invoice exists
 }
