@@ -3,6 +3,7 @@ package com.cydeo.service.impl;
 import com.cydeo.dto.InvoiceDto;
 import com.cydeo.dto.InvoiceProductDto;
 import com.cydeo.entity.Invoice;
+import com.cydeo.entity.User;
 import com.cydeo.enums.InvoiceStatus;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.mapper.MapperUtil;
@@ -10,8 +11,10 @@ import com.cydeo.repository.InvoiceRepository;
 import com.cydeo.service.InvoiceService;
 import org.springframework.stereotype.Service;
 import com.cydeo.service.SecurityService;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,26 +26,44 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final ProductService productService;
     private final SercurityService sercurityService;
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapperUtil,ProductService productService,SercurityService sercurityService) {
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapperUtil, ProductService productService, SercurityService sercurityService) {
         this.invoiceRepository = invoiceRepository;
         this.mapperUtil = mapperUtil;
-        this.productService=productService;
-        this.sercurityService=sercurityService;
+        this.productService = productService;
+        this.sercurityService = sercurityService;
     }
 
 
     @Override
     public List<InvoiceDto> listAllInvoices(InvoiceType invoiceType) {
-        List<Invoice> invoicesList = invoiceRepository.findAllByInvoiceTypeAndIsDeleted(invoiceType, false);
-        return invoicesList.stream().map(invoice -> {
-            InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
-            BigDecimal price = invoiceDto.getInvoiceProducts().stream().map(InvoiceProductDto::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
-            invoiceDto.setPrice(price);
-           // invoiceDto.setTax();
-           // invoiceDto.setTotal();
 
-            return invoiceDto;
-        }).collect(Collectors.toList());
+        User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
+
+        List<Invoice> invoicesList = invoiceRepository.findAllByInvoiceTypeAndIsDeleted(invoiceType, false);
+
+        if (invoiceType.getValue().equals("Purchase")) {
+
+            return invoicesList.stream().map(invoice -> {
+                InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
+                BigDecimal price = invoiceDto.getInvoiceProducts().stream().map(InvoiceProductDto::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+                invoiceDto.setPrice(price);
+                // invoiceDto.setTax();
+                // invoiceDto.setTotal();
+
+                return invoiceDto;
+            }).sorted(Comparator.comparing(InvoiceDto::getInvoiceNo).reversed()).collect(Collectors.toList());
+        } else {
+            return invoicesList.stream().map(invoice -> {
+                InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
+                BigDecimal price = invoiceDto.getInvoiceProducts().stream().map(InvoiceProductDto::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+                invoiceDto.setPrice(price);
+                // invoiceDto.setTax();
+                // invoiceDto.setTotal();
+
+                return invoiceDto;
+            }).collect(Collectors.toList());
+        }
+        return ?;
     }
 
     @Override
@@ -69,7 +90,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public void approveInvoice(Long id) {
-        Invoice invoice=invoiceRepository.findByIdAndIsDeleted(id, false);
+        Invoice invoice = invoiceRepository.findByIdAndIsDeleted(id, false);
         invoice.setInvoiceStatus(InvoiceStatus.APPROVED);
         invoiceRepository.save(invoice);
     }
@@ -84,14 +105,14 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public InvoiceDto findInvoiceById(long id) {
-      Invoice invoice= invoiceRepository.findByIdAndIsDeleted(id, false);
-      return mapperUtil.convert(invoice, new InvoiceDto());
+        Invoice invoice = invoiceRepository.findByIdAndIsDeleted(id, false);
+        return mapperUtil.convert(invoice, new InvoiceDto());
     }
 
     @Override
     public InvoiceDto createNewInvoiceDto() {
-        Invoice invoice= new Invoice();
-        invoice.setInvoiceNo("P-"+invoice.getId());
+        Invoice invoice = new Invoice();
+        invoice.setInvoiceNo("P-" + invoice.getId());
         invoice.setDate(LocalDate.now());
         return mapperUtil.convert(invoice, new InvoiceDto());
     }

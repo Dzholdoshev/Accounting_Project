@@ -3,6 +3,7 @@ package com.cydeo.service.impl;
 import com.cydeo.dto.InvoiceDto;
 import com.cydeo.dto.InvoiceProductDto;
 import com.cydeo.entity.InvoiceProduct;
+import com.cydeo.enums.InvoiceType;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceProductRepository;
 import com.cydeo.service.InvoiceProductService;
@@ -53,6 +54,12 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         invoiceProductRepository.save(mapperUtil.convert(invoiceProductDto, new InvoiceProduct()));
         return invoiceProductDto;
     }
+
+    @Override
+    public List<InvoiceProductDto> findByInvoiceTypesAndProductRemainingQuantity(InvoiceType invoiceType) {
+        return null;
+    }
+
     @Override
     public void delete(Long invoiceId, Long invoiceProductId) {
         List<InvoiceProduct> invoiceProductList= invoiceProductRepository.findInvoiceProductByInvoice_IdAndIsDeleted(invoiceId, false);
