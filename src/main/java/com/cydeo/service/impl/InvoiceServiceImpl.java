@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import com.cydeo.service.SecurityService;
 
 import java.math.BigDecimal;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -51,7 +53,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
                 return invoiceDto;
             }).sorted(Comparator.comparing(InvoiceDto::getInvoiceNo).reversed()).collect(Collectors.toList());
-        } else {
+        } else if (invoiceType.getValue().equals("Sales")){
             return invoicesList.stream().map(invoice -> {
                 InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
                 invoiceDto.setPrice(invoicePrice(invoiceDto));
@@ -61,6 +63,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 return invoiceDto;
             }).collect(Collectors.toList());
         }
+        return null;
     }
 
 
@@ -133,7 +136,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public InvoiceDto createNewPurchaseInvoiceDto() {
         Invoice invoice = new Invoice();
-        invoice.setInvoiceNo("P-" + invoice.getId());
+        invoice.setInvoiceNo("P-" + InvoiceNo(InvoiceType.PURCHASE));
         invoice.setDate(LocalDate.now());
         invoice.setInvoiceType(InvoiceType.PURCHASE);
         return mapperUtil.convert(invoice, new InvoiceDto());
@@ -142,9 +145,15 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public InvoiceDto createNewSalesInvoiceDto() {
         Invoice invoice = new Invoice();
-        invoice.setInvoiceNo("S-" + invoice.getId());
+        invoice.setInvoiceNo("S-" + InvoiceNo(InvoiceType.SALES));
         invoice.setDate(LocalDate.now());
         invoice.setInvoiceType(InvoiceType.SALES);
         return mapperUtil.convert(invoice, new InvoiceDto());
+    }
+
+    public String InvoiceNo(InvoiceType invoiceType){
+       Long id= invoiceRepository.getMaxId(invoiceType);
+       String InvoiceNo=String.format("%03d",id+1 );
+       return InvoiceNo;
     }
 }

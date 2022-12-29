@@ -50,7 +50,7 @@ public class PurchaseInvoiceController {
 
     @GetMapping("/create")
     public String createInvoice(Model model) {
-        model.addAttribute("newPurchaseInvoice", invoiceService.createNewInvoiceDto());
+        model.addAttribute("newPurchaseInvoice", invoiceService.createNewPurchaseInvoiceDto());
         return "/invoice/purchase-invoice-create";
     }
 
