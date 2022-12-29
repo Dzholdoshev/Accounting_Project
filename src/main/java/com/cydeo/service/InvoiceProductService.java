@@ -1,5 +1,6 @@
 package com.cydeo.service;
 
+import com.cydeo.dto.InvoiceDto;
 import com.cydeo.dto.InvoiceProductDto;
 import com.cydeo.entity.InvoiceProduct;
 import com.cydeo.enums.InvoiceType;
@@ -18,4 +19,5 @@ public interface InvoiceProductService {
     InvoiceProductDto save(Long id, InvoiceProductDto invoiceProductDto);
 
     List<InvoiceProductDto> findByInvoiceTypesAndProductRemainingQuantity(InvoiceType invoiceType,?);
+    InvoiceDto findInvoiceProductById(long id);
 }

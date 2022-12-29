@@ -61,6 +61,11 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     @Override
+    public InvoiceDto findInvoiceProductById(long id) {
+        invoiceProductRepository.findInvoiceProductByInvoice_IdAndIsDeleted(id, false);
+    }
+
+    @Override
     public void delete(Long invoiceId, Long invoiceProductId) {
         List<InvoiceProduct> invoiceProductList= invoiceProductRepository.findInvoiceProductByInvoice_IdAndIsDeleted(invoiceId, false);
         InvoiceProduct invoiceProduct = invoiceProductList.stream().filter(p -> p.getId().equals(invoiceProductId)).findFirst().orElseThrow();
