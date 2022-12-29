@@ -138,4 +138,13 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoice.setInvoiceType(InvoiceType.PURCHASE);
         return mapperUtil.convert(invoice, new InvoiceDto());
     }
+
+    @Override
+    public InvoiceDto createNewSalesInvoiceDto() {
+        Invoice invoice = new Invoice();
+        invoice.setInvoiceNo("S-" + invoice.getId());
+        invoice.setDate(LocalDate.now());
+        invoice.setInvoiceType(InvoiceType.SALES);
+        return mapperUtil.convert(invoice, new InvoiceDto());
+    }
 }

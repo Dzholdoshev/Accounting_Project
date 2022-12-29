@@ -57,7 +57,6 @@ public class PurchaseInvoiceController {
 
     @PostMapping("/create")
     public String createInvoice(@ModelAttribute("invoiceDto") InvoiceDto invoiceDto, Model model) {
-        invoiceDto.setInvoiceType(InvoiceType.PURCHASE);
         invoiceService.create(invoiceDto);
         return "redirect: /PurchaseInvoices/create/" + invoiceDto.getId();
     }

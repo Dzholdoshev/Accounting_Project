@@ -23,4 +23,5 @@ public interface InvoiceService {
     BigDecimal invoiceTotalPrice(InvoiceDto invoiceDto);
     BigDecimal invoicePrice(InvoiceDto invoiceDto);
     Integer invoiceTax(InvoiceDto invoiceDto);
+    InvoiceDto createNewSalesInvoiceDto();
 }
