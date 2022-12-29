@@ -72,8 +72,6 @@ public class InvoiceServiceImpl implements InvoiceService {
         Invoice updatedInvoice = mapperUtil.convert(invoiceDto, new Invoice());
         Invoice invoice = invoiceRepository.findByIdAndIsDeleted(invoiceDto.getId(), false);
         invoice.setCompany(updatedInvoice.getCompany());
-
-        invoiceProductService.updateProducts(invoiceDto.getInvoiceNo, invoiceDto.getInvoiceProducts());
         invoiceRepository.save(invoice);
 
     }
