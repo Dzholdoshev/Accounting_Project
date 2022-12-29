@@ -6,10 +6,8 @@ import com.cydeo.entity.ClientVendor;
 import com.cydeo.service.ClientVendorService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -46,6 +44,32 @@ public class ClientVendorController {
     public String updateClientVendor(@ModelAttribute ("clientVendor")ClientVendorDto clientVendorDto, Model model) {
         clientVendorService.save(clientVendorDto);
         return "redirect:/clientVendors/list";
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deleteClientVendor(@PathVariable("id") Long id) {
+
+        clientVendorService.delete(id);
+
+        return "redirect: clientVendors/list";
+    }
+
+    @GetMapping("/create")
+    public String createClientVendor(Model model) {
+        model.addAttribute("clientVendor", new ClientVendorDto());
+        model.addAttribute("clientVendorTypes", clientVendorService.)
+        return "clientVendor/clientVendor-create";
+    }
+    @PostMapping("/create")
+    public String insertClientVendor(@ModelAttribute("clientVendor") ClientVendorDto clientVendor,BindingResult bindingResult,Model model) {
+        if(bindingResult.hasErrors()){
+            model.addAttribute("clientVendor", new ClientVendorDto());
+            return "clientVendor/clientVendor-create";
+
+        }
+        clientVendorService.save(clientVendor);
+
+        return "redirect: clientVendors/list";
     }
 
 

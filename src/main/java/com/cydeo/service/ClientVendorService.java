@@ -12,7 +12,8 @@ public interface ClientVendorService {
     void complete(String name);
     void update(ClientVendorDto dto);
     void save(ClientVendorDto dto);
-    void delete(String name);
+    void delete(Long id);
+
 
     ClientVendorDto findByClientVendorId(Long id);
 }
