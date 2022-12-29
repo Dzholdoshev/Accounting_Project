@@ -3,6 +3,7 @@ package com.cydeo.service;
 import com.cydeo.dto.InvoiceDto;
 import com.cydeo.enums.InvoiceType;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface InvoiceService {
@@ -19,4 +20,5 @@ public interface InvoiceService {
     InvoiceDto create(InvoiceDto invoiceDto);
     InvoiceDto findInvoiceById(long id);
     InvoiceDto createNewInvoiceDto();
+    BigDecimal totalInvoicePrice(InvoiceDto invoiceDto);
 }

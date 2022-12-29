@@ -56,16 +56,36 @@ public class InvoiceServiceImpl implements InvoiceService {
             return invoicesList.stream().map(invoice -> {
                 InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
                 BigDecimal price = invoiceDto.getInvoiceProducts().stream().map(InvoiceProductDto::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
-                invoiceDto.setPrice(price);
-                // invoiceDto.setTax();
-                // invoiceDto.setTotal();
+                invoiceDto.setPrice(invoicePrice(invoiceDto));
+                invoiceDto.setTax(invoiceTax(invoiceDto));
+                invoiceDto.setTotal(totalInvoicePrice(invoiceDto));
 
                 return invoiceDto;
             }).collect(Collectors.toList());
         }
-        return ?;
+        return null;
     }
 
+
+    @Override
+    public BigDecimal invoicePrice(InvoiceDto invoiceDto) { // Sum of the Invoice Product price
+        return invoiceDto.getInvoiceProducts().stream()
+                .map(InvoiceProductDto::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public Integer invoiceTax(InvoiceDto invoiceDto) { // Sum of the tax of the Invoice Product
+        return invoiceDto.getInvoiceProducts().stream()
+                .map(InvoiceProductDto::getTax)
+                .reduce(0, Integer::sum);
+    }
+
+
+    public BigDecimal totalInvoicePrice(InvoiceDto invoiceDto) { // Invoice tax+ Invoice price
+        BigDecimal price = invoicePrice(invoiceDto);
+        Integer tax = invoiceTax(invoiceDto);
+        return  price.add(BigDecimal.valueOf(tax));
+    }
     @Override
     public void updateInvoice(InvoiceDto invoiceDto) {
 
