@@ -7,7 +7,9 @@ import com.cydeo.repository.CategoryRepository;
 import com.cydeo.service.CategoryService;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -22,7 +24,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     public List<CategoryDto> listAllCategories(){
 
-     return    mapperUtil.convert(categoryRepository.findAll(),new List<Category> categories);
+     return    mapperUtil.convert(categoryRepository.findAll() , Arrays.asList(new CategoryDto()));
 
+    }
+
+    @Override
+    public CategoryDto findById(Long id) {
+       Category category = categoryRepository.findById(id).get();
+        return mapperUtil.convert(category, new CategoryDto());
     }
 }

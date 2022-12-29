@@ -1,6 +1,7 @@
 package com.cydeo.converter;
 
 import com.cydeo.dto.CategoryDto;
+import com.cydeo.repository.CategoryRepository;
 import com.cydeo.service.CategoryService;
 import com.cydeo.service.UserService;
 import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationPropertiesBinding
 public class CategoryDtoConverter implements Converter<String, CategoryDto> {
 
+
     CategoryService categoryService;
 
 
@@ -19,6 +21,6 @@ public class CategoryDtoConverter implements Converter<String, CategoryDto> {
         if (source == null || source.equals("")){
             return  null;
         }
-        return categoryService.findById(Long.parseLong(source));;
+        return categoryService.findById(Long.parseLong(source));
     }
 }
