@@ -48,7 +48,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     public InvoiceProductDto save(Long id, InvoiceProductDto invoiceProductDto) {
         InvoiceDto invoiceDto = mapperUtil.convert(invoiceService.findInvoiceById(id), new InvoiceDto());
         invoiceProductDto.setInvoice(invoiceDto);
-        // Call productService to get quantity?
+        // Call productService to get quantity? productService.findRemainingQuantity(invoiceProductDto.getProduct().getQuantityInStock());
         // InvoiceProductDto.setRemainingQuantity();
 
         invoiceProductRepository.save(mapperUtil.convert(invoiceProductDto, new InvoiceProduct()));

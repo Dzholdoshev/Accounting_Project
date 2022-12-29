@@ -5,13 +5,12 @@ import com.cydeo.dto.InvoiceProductDto;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.service.InvoiceProductService;
 import com.cydeo.service.InvoiceService;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+@Controller
+@RequestMapping("/purchaseInvoices")
 public class PurchaseInvoiceController {
     private final InvoiceService invoiceService;
     private final InvoiceProductService invoiceProductService;
