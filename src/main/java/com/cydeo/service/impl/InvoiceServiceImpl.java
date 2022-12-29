@@ -45,25 +45,22 @@ public class InvoiceServiceImpl implements InvoiceService {
 
             return invoicesList.stream().map(invoice -> {
                 InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
-                BigDecimal price = invoiceDto.getInvoiceProducts().stream().map(InvoiceProductDto::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
-                invoiceDto.setPrice(price);
-                // invoiceDto.setTax();
-                // invoiceDto.setTotal();
+                invoiceDto.setPrice(invoicePrice(invoiceDto));
+                invoiceDto.setTax(invoiceTax(invoiceDto));
+                invoiceDto.setTotal(invoiceTotalPrice(invoiceDto));
 
                 return invoiceDto;
             }).sorted(Comparator.comparing(InvoiceDto::getInvoiceNo).reversed()).collect(Collectors.toList());
         } else {
             return invoicesList.stream().map(invoice -> {
                 InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
-                BigDecimal price = invoiceDto.getInvoiceProducts().stream().map(InvoiceProductDto::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
                 invoiceDto.setPrice(invoicePrice(invoiceDto));
                 invoiceDto.setTax(invoiceTax(invoiceDto));
-                invoiceDto.setTotal(totalInvoicePrice(invoiceDto));
+                invoiceDto.setTotal(invoiceTotalPrice(invoiceDto));
 
                 return invoiceDto;
             }).collect(Collectors.toList());
         }
-        return null;
     }
 
 
@@ -73,15 +70,15 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .map(InvoiceProductDto::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
-
+    @Override
     public Integer invoiceTax(InvoiceDto invoiceDto) { // Sum of the tax of the Invoice Product
         return invoiceDto.getInvoiceProducts().stream()
                 .map(InvoiceProductDto::getTax)
                 .reduce(0, Integer::sum);
     }
 
-
-    public BigDecimal totalInvoicePrice(InvoiceDto invoiceDto) { // Invoice tax+ Invoice price
+    @Override
+    public BigDecimal invoiceTotalPrice(InvoiceDto invoiceDto) { // Invoice tax+ Invoice price
         BigDecimal price = invoicePrice(invoiceDto);
         Integer tax = invoiceTax(invoiceDto);
         return  price.add(BigDecimal.valueOf(tax));
@@ -103,20 +100,26 @@ public class InvoiceServiceImpl implements InvoiceService {
             invoice.setIsDeleted(true);
             invoiceRepository.save(invoice);
         }
-        //InvoiceProduct? how will the quanitity change?
     }
 
     @Override
     public void approveInvoice(Long id) {
         Invoice invoice = invoiceRepository.findByIdAndIsDeleted(id, false);
         invoice.setInvoiceStatus(InvoiceStatus.APPROVED);
+        //Change product quantities
+
+       // productService.update(invoice.getInvoiceProduct());  to update stock values?
         invoiceRepository.save(invoice);
     }
 
     @Override
     public InvoiceDto create(InvoiceDto invoiceDto) {
+
+        User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
+
         invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
         Invoice invoice = mapperUtil.convert(invoiceDto, new Invoice());
+        invoice.setCompany(user.getCompany());
         invoiceRepository.save(invoice);
         return invoiceDto;
     }
@@ -128,10 +131,11 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public InvoiceDto createNewInvoiceDto() {
+    public InvoiceDto createNewPurchaseInvoiceDto() {
         Invoice invoice = new Invoice();
         invoice.setInvoiceNo("P-" + invoice.getId());
         invoice.setDate(LocalDate.now());
+        invoice.setInvoiceType(InvoiceType.PURCHASE);
         return mapperUtil.convert(invoice, new InvoiceDto());
     }
 }

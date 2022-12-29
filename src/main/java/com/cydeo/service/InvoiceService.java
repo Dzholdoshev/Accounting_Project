@@ -19,6 +19,8 @@ public interface InvoiceService {
 
     InvoiceDto create(InvoiceDto invoiceDto);
     InvoiceDto findInvoiceById(long id);
-    InvoiceDto createNewInvoiceDto();
-    BigDecimal totalInvoicePrice(InvoiceDto invoiceDto);
+    InvoiceDto createNewPurchaseInvoiceDto();
+    BigDecimal invoiceTotalPrice(InvoiceDto invoiceDto);
+    BigDecimal invoicePrice(InvoiceDto invoiceDto);
+    Integer invoiceTax(InvoiceDto invoiceDto);
 }
