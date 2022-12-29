@@ -61,8 +61,9 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     @Override
-    public InvoiceDto findInvoiceProductById(long id) {
-        invoiceProductRepository.findInvoiceProductByInvoice_IdAndIsDeleted(id, false);
+    public InvoiceProductDto findInvoiceProductById(long id) {
+        InvoiceProduct invoiceProduct = invoiceProductRepository.findById(id).orElseThrow();
+        return mapperUtil.convert(invoiceProduct, new InvoiceProductDto());
     }
 
     @Override

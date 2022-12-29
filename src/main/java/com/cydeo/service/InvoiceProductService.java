@@ -19,5 +19,5 @@ public interface InvoiceProductService {
     InvoiceProductDto save(Long id, InvoiceProductDto invoiceProductDto);
 
     List<InvoiceProductDto> findByInvoiceTypesAndProductRemainingQuantity(InvoiceType invoiceType,?);
-    InvoiceDto findInvoiceProductById(long id);
+    InvoiceProductDto findInvoiceProductById(long id);
 }

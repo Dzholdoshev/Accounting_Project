@@ -51,8 +51,7 @@ public class PurchaseInvoiceController {
 
     @GetMapping("/create")
     public String createInvoice(Model model) {
-        model.addAttribute("invoices", invoiceService.createNewInvoiceDto());
-        //  model.addAttribute("clientVendor", )
+        model.addAttribute("newPurchaseInvoice", invoiceService.createNewInvoiceDto());
         return "/invoice/purchase-invoice-create";
     }
 
