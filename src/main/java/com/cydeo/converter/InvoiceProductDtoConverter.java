@@ -1,11 +1,15 @@
 package com.cydeo.converter;
 
-import com.cydeo.dto.InvoiceDto;
+import com.cydeo.dto.InvoiceProductDto;
 import com.cydeo.service.InvoiceProductService;
+import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.stereotype.Component;
 
-public class InvoiceProductDtoConverter implements Converter<String, InvoiceDto> {
+@Component
+@ConfigurationPropertiesBinding
+public class InvoiceProductDtoConverter implements Converter<String, InvoiceProductDto> {
     InvoiceProductService invoiceProductService;
 
     public InvoiceProductDtoConverter(@Lazy InvoiceProductService invoiceProductService) {
@@ -13,7 +17,7 @@ public class InvoiceProductDtoConverter implements Converter<String, InvoiceDto>
     }
 
     @Override
-    public InvoiceDto convert(String id) {
+    public InvoiceProductDto convert(String id) {
         if (id == null || id.equals("")) {
             return null;
         }
