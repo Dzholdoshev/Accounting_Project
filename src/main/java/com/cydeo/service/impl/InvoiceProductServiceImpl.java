@@ -1,8 +1,12 @@
 package com.cydeo.service.impl;
 
+import com.cydeo.dto.CompanyDto;
 import com.cydeo.dto.InvoiceDto;
 import com.cydeo.dto.InvoiceProductDto;
+import com.cydeo.entity.Company;
+import com.cydeo.entity.Invoice;
 import com.cydeo.entity.InvoiceProduct;
+import com.cydeo.entity.Product;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceProductRepository;
@@ -30,48 +34,65 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     @Override
-    public List<InvoiceProductDto> listAllInvoiceProduct() {
-      List<InvoiceProductDto> InvoiceProductDto=invoiceProductRepository.findAllByIsDeleted(false)
-              .stream().map(invoiceP->mapperUtil.convert(invoiceP, new InvoiceProductDto()))
-              .collect(Collectors.toList());
-      return InvoiceProductDto;
-    }
-
-    @Override
-    public List<InvoiceProductDto> findAllInvoiceProductsByProductId(long id) {
-        return invoiceProductRepository.findInvoiceProductByInvoice_IdAndIsDeleted(id, false).stream()
-                .map(invoiceProduct -> mapperUtil.convert(invoiceProduct, new InvoiceProductDto()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public InvoiceProductDto save(Long id, InvoiceProductDto invoiceProductDto) {
-        InvoiceDto invoiceDto = mapperUtil.convert(invoiceService.findInvoiceById(id), new InvoiceDto());
-        invoiceProductDto.setInvoice(invoiceDto);
-        // Call productService to get quantity? productService.findRemainingQuantity(invoiceProductDto.getProduct().getQuantityInStock());
-        // InvoiceProductDto.setRemainingQuantity();
-
-        invoiceProductRepository.save(mapperUtil.convert(invoiceProductDto, new InvoiceProduct()));
-        return invoiceProductDto;
-    }
-
-    @Override
-    public List<InvoiceProductDto> findByInvoiceTypesAndProductRemainingQuantity(InvoiceType invoiceType) {
-        return null;
-    }
-
-    @Override
     public InvoiceProductDto findInvoiceProductById(long id) {
         InvoiceProduct invoiceProduct = invoiceProductRepository.findById(id).orElseThrow();
         return mapperUtil.convert(invoiceProduct, new InvoiceProductDto());
     }
 
+
+
     @Override
-    public void delete(Long invoiceId, Long invoiceProductId) {
-        List<InvoiceProduct> invoiceProductList= invoiceProductRepository.findInvoiceProductByInvoice_IdAndIsDeleted(invoiceId, false);
-        InvoiceProduct invoiceProduct = invoiceProductList.stream().filter(p -> p.getId().equals(invoiceProductId)).findFirst().orElseThrow();
+    public List<InvoiceProductDto> getInvoiceProductsOfInvoice(Long invoiceId) {
+        return invoiceProductRepository.findAllByInvoice_Id(invoiceId).stream().
+                map(invoiceProduct->mapperUtil.convert(invoiceProduct, new InvoiceProductDto()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void save(Long invoiceId, InvoiceProductDto invoiceProductDto) {
+        InvoiceDto invoiceDto = mapperUtil.convert(invoiceService.findInvoiceById(invoiceId), new InvoiceDto());
+        invoiceProductDto.setInvoice(invoiceDto);
+        //remaining quantity
+        //profitLoss
+        //price
+        //tax
+
+        invoiceProductRepository.save(mapperUtil.convert(invoiceProductDto, new InvoiceProduct()));
+    }
+
+    @Override
+    public void delete(Long invoiceProductId) {
+        InvoiceProduct invoiceProduct= invoiceProductRepository.findInvoiceProductById(invoiceProductId);
         invoiceProduct.setIsDeleted(true);
         invoiceProductRepository.save(invoiceProduct);
+    }
+
+    @Override
+    public void completeApprovalProcedures(Long invoiceId, InvoiceType type) {
+      InvoiceDto invoice=  invoiceService.findInvoiceById(invoiceId);
+      Company company= mapperUtil.convert(invoice.getCompany(), new CompanyDto());
+   List<InvoiceProduct> InvoiceProductForApproval= invoiceProductRepository.findAllByInvoice_InvoiceTypeAndInvoice_Company(type, company);
+   // What approval needs to be done?
+    }
+
+    @Override
+    public boolean checkProductQuantity(InvoiceProductDto salesInvoiceProduct) {
+
+        //Haven't started salesInvoices
+
+        return false;
+    }
+
+    @Override
+    public List<InvoiceProduct> findInvoiceProductsByInvoiceTypeAndProductRemainingQuantity(InvoiceType type, Product product, Integer remainingQuantity) {
+      return invoiceProductRepository.findInvoiceProductsByInvoiceInvoiceTypeAndProductAndRemainingQuantityNotOrderByIdAsc(type, product,remainingQuantity);
+    }
+
+    @Override
+    public List<InvoiceProductDto> findAllInvoiceProductsByProductId(Long id) {
+        return invoiceProductRepository.findAllInvoiceProductByProductId(id).stream()
+                .map(invoiceProduct -> mapperUtil.convert(invoiceProduct, new InvoiceProductDto()))
+                .collect(Collectors.toList());
     }
 
 }

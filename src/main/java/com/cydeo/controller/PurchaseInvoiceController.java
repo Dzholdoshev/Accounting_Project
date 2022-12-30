@@ -22,8 +22,8 @@ public class PurchaseInvoiceController {
 
     @GetMapping("/update/{invoiceId}")
     public String updateInvoice(@PathVariable("invoiceId") Long id, Model model) {
-        model.addAttribute("invoice", invoiceService.findById(id));
-        model.addAttribute("InvoiceProducts", invoiceProductService.findByInvoiceId(id));
+        model.addAttribute("invoice", invoiceService.findInvoiceById(id));
+        model.addAttribute("InvoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(id));
         model.addAttribute("newInvoiceProduct", new InvoiceProductDto());
         //client vendor model.addAttribute("clientVendor", )
         //product model.addAttribute("
@@ -62,8 +62,8 @@ public class PurchaseInvoiceController {
 
     @GetMapping("/create/{id}")
     public String createInvoice(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("invoice", invoiceService.findById(id));
-        model.addAttribute("invoiceProducts", invoiceProductService.findByInvoiceId(id));
+        model.addAttribute("invoice", invoiceService.findInvoiceById(id));
+        model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(id));
         model.addAttribute("newInvoiceProduct", new InvoiceProductDto());
         //  model.addAttribute("clientVendor", )
         //  model.addAttribute("products", );
@@ -72,13 +72,13 @@ public class PurchaseInvoiceController {
 
     @PostMapping("/addInvoiceProduct/{id}")
     public String createInvoiceWithProduct(@PathVariable("id") Long id, @ModelAttribute("invoiceProduct") InvoiceProductDto invoiceProductDto, Model model) {
-        invoiceProductService.createInvoiceProducts(id, invoiceProductDto);
+        invoiceProductService.save(id, invoiceProductDto);
         return "redirect: /PurchaseInvoices/create/" + id;
     }
 
     @PostMapping("removeInvoiceProduct/{invoiceId}/{invoiceProductId}")
     public String removeInvoiceProduct(@PathVariable("invoiceId") Long invoiceId, @PathVariable("invoiceProductId") Long invoiceProductId, RedirectAttributes redirectAttr) {
-        invoiceProductService.delete(invoiceId, invoiceProductId);
+        invoiceProductService.delete(invoiceProductId);
         redirectAttr.addAttribute("Id", invoiceId);// check if this works
         return "redirect: /PurchaseInvoices/create/{id}";
     }

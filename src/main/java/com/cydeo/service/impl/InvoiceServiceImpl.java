@@ -164,7 +164,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         Long id = invoiceRepository.getMaxId(invoiceType);
         String InvoiceNo = "";
 
-        if (invoiceType.value.equals("Purchase")) {
+        if (invoiceType.value().equals("Purchase")) {
             InvoiceNo = "P-" + String.format("%03d", id + 1);
 
         } else {
