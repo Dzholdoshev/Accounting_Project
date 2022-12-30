@@ -33,8 +33,7 @@ public class PurchaseInvoiceController {
 
     @PostMapping("/update/{invoiceId}")
     public String updatePurchaseInvoice(@PathVariable("invoiceId") Long invoiceId, InvoiceDto invoiceDto) {
-        invoiceService.save(invoiceDto, InvoiceType.PURCHASE); // change to update!
-        //What do I do with the invoiceId passed?
+        invoiceService.update(invoiceId, invoiceDto);
         return "redirect: /purchaseInvoices/list";
     }
 

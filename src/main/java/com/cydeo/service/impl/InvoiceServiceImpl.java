@@ -95,6 +95,15 @@ public class InvoiceServiceImpl implements InvoiceService {
         return invoiceDto;
     }
 
+    @Override
+    public InvoiceDto update(Long id, InvoiceDto invoiceDto) {
+       Invoice invoice= invoiceRepository.findInvoiceById(id);
+        Invoice updatedInvoice = mapperUtil.convert(invoiceDto, new Invoice());
+        invoice.setClientVendor(updatedInvoice.getClientVendor());
+        invoiceRepository.save(invoice);
+        return invoiceDto;
+    }
+
 
     @Override
     public InvoiceDto printInvoice(Long id) {

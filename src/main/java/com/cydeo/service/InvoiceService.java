@@ -19,6 +19,8 @@ public interface InvoiceService {
 
 
     InvoiceDto save(InvoiceDto invoiceDto, InvoiceType invoiceType);
+    InvoiceDto update(Long id, InvoiceDto invoiceDto);
+
     InvoiceDto printInvoice(Long id);
 
     void delete(Long id);
