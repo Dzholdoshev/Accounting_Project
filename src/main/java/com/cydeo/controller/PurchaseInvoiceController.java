@@ -57,7 +57,7 @@ public class PurchaseInvoiceController {
     }
 
     @PostMapping("/create")
-    public String createNewPurchaseInvoice(@ModelAttribute("invoiceDto") InvoiceDto invoiceDto, Model model) {
+    public String createNewPurchaseInvoice(@ModelAttribute("invoiceDto") InvoiceDto invoiceDto, BindingResult result, Model model) {
         var invoice=invoiceService.save(invoiceDto, InvoiceType.PURCHASE);
         // add binding result
 
