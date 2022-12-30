@@ -1,5 +1,8 @@
 package com.cydeo.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum InvoiceStatus {
     AWAITING_APPROVAL ("Awaiting Approval"),
     APPROVED("Approved");
