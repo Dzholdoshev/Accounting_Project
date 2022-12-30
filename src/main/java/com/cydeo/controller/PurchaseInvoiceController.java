@@ -7,6 +7,7 @@ import com.cydeo.service.InvoiceProductService;
 import com.cydeo.service.InvoiceService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
@@ -64,11 +65,16 @@ public class PurchaseInvoiceController {
         return "redirect: /purchaseInvoices/update/" + invoice.getId();
     }
 
-    @PostMapping("/addInvoiceProduct/{id}")
-    public String addInvoiceProductToPurchaseInvoice(@PathVariable("id") Long id, @ModelAttribute("invoiceProduct") InvoiceProductDto invoiceProductDto, Model model) {
-        invoiceProductService.save(id, invoiceProductDto);
+    @PostMapping("/addInvoiceProduct/{invoiceId}")
+    public String addInvoiceProductToPurchaseInvoice(@PathVariable("invoiceId") Long invoiceId, @ModelAttribute("invoiceProduct") InvoiceProductDto invoiceProductDto, BindingResult result, Model model) {
+        if (result.hasErrors()){
+            model.addAttribute("invoice", invoiceService.findInvoiceById(invoiceId));
+            model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(invoiceId));
+            return "/invoice/purchase-invoice-update";
+        }
+        invoiceProductService.save(invoiceId, invoiceProductDto);
         //add binding result
-        return "redirect: /purchaseInvoices/update/" + id;
+        return "redirect: /purchaseInvoices/update/" + invoiceId;
     }
 
     @GetMapping("removeInvoiceProduct/{invoiceId}/{invoiceProductId}")
