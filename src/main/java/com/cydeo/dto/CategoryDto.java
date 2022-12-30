@@ -1,13 +1,11 @@
 package com.cydeo.dto;
 
 import com.sun.istack.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
-@ToString
-@Data
+
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryDto {
@@ -16,7 +14,7 @@ public class CategoryDto {
 
     private String description;
 
-    @NotNull
+
     private CompanyDto company;
 
     private boolean hasProduct;
