@@ -31,14 +31,15 @@ public class PurchaseInvoiceController {
     }
 
     @PostMapping("/update/{invoiceId}")
-    public String updateInvoice(@PathVariable("invoiceId") Long id, @ModelAttribute("invoiceDto") InvoiceDto invoiceDto, Model model) {
-        invoiceService.updateInvoice(invoiceDto);
+    public String updateInvoice(@PathVariable("invoiceId") Long invoiceId, @ModelAttribute("invoiceDto") InvoiceDto invoiceDto) {
+        invoiceService.save(invoiceDto, InvoiceType.PURCHASE);
+        //What do I do with the invoiceId passed?
         return "redirect: /PurchaseInvoices/list";
     }
 
     @GetMapping("/delete/{invoiceId}")
-    public String deleteInvoice(@PathVariable("invoiceId") Long id, Model model) {
-        invoiceService.delete(id);
+    public String deleteInvoice(@PathVariable("invoiceId") Long invoiceId, Model model) {
+        invoiceService.delete(invoiceId);
         return "redirect: /PurchaseInvoices/list";
     }
 
@@ -57,17 +58,7 @@ public class PurchaseInvoiceController {
     @PostMapping("/create")
     public String createInvoice(@ModelAttribute("invoiceDto") InvoiceDto invoiceDto, Model model) {
         invoiceService.save(invoiceDto, InvoiceType.PURCHASE);
-        return "redirect: /PurchaseInvoices/create/" + invoiceDto.getId();
-    }
-
-    @GetMapping("/create/{id}")
-    public String createInvoice(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("invoice", invoiceService.findInvoiceById(id));
-        model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(id));
-        model.addAttribute("newInvoiceProduct", new InvoiceProductDto());
-        //  model.addAttribute("clientVendor", )
-        //  model.addAttribute("products", );
-        return "/invoice/purchase-invoice-create";
+        return "redirect: /PurchaseInvoices/update/" + invoiceDto.getId();
     }
 
     @PostMapping("/addInvoiceProduct/{id}")
@@ -85,10 +76,16 @@ public class PurchaseInvoiceController {
 
     @GetMapping("/print/{id}")
     public String print(@PathVariable("id") long id, Model model) {
-        InvoiceDto invoice= invoiceService.findInvoiceById(id);
+        InvoiceDto invoice= invoiceService.printInvoice(id);
         model.addAttribute("company", invoice.getCompany());
         model.addAttribute("invoice", invoice);
         model.addAttribute("invoiceProducts", invoice.getInvoiceProducts() );
         return "invoice/invoice_print";
+    }
+
+    @GetMapping("/approve/{id}")
+    public String approve(@PathVariable("id") long id) {
+      invoiceService.approveInvoice(id); // This needs to be changed
+        return "redirect: /PurchaseInvoices/list";
     }
 }

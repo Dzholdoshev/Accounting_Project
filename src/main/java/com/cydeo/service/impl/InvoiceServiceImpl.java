@@ -95,6 +95,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         return invoiceDto;
     }
 
+
     @Override
     public InvoiceDto printInvoice(Long id) {
         return null;
@@ -143,13 +144,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         return false;
     }
 
-    @Override
-    public void updateInvoice(InvoiceDto invoiceDto) { // This needs to be removed
-        Invoice updatedInvoice = mapperUtil.convert(invoiceDto, new Invoice());
-        Invoice invoice = invoiceRepository.findInvoiceById(id);
-        invoice.setCompany(updatedInvoice.getCompany());
-        invoiceRepository.save(invoice);
-    }
+
 
     @Override
     public void approveInvoice(Long id) { // Find another way to do this?

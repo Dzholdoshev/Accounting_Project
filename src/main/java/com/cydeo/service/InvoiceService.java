@@ -34,6 +34,5 @@ public interface InvoiceService {
     boolean checkIfInvoiceExist(Long clientVendorId);
 
     void approveInvoice(Long id);
-    void updateInvoice(InvoiceDto invoiceDto);
 
 }
