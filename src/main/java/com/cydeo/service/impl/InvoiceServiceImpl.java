@@ -45,7 +45,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
         Company company=user.getCompany();
-        try {
+
             List<Invoice> PurchaseInvoicesList = invoiceRepository.findInvoicesByCompanyAndInvoiceType(company, InvoiceType.PURCHASE);
 
             return PurchaseInvoicesList.stream().map(invoice -> {
@@ -56,10 +56,6 @@ public class InvoiceServiceImpl implements InvoiceService {
 
                 return invoiceDto;
             }).sorted(Comparator.comparing(InvoiceDto::getInvoiceNo).reversed()).collect(Collectors.toList());
-        }catch (Exception e){
-            e.getMessage();
-        }
-        return null;
     }
 
     @Override
@@ -80,7 +76,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public InvoiceDto getNewInvoice(InvoiceType invoiceType) {
+    public InvoiceDto getNewInvoice(InvoiceType invoiceType) throws Exception {
+
         Invoice invoice = new Invoice();
         invoice.setInvoiceNo(InvoiceNo(InvoiceType.PURCHASE));
         invoice.setDate(LocalDate.now());
@@ -170,11 +167,9 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public boolean checkIfInvoiceExist(Long clientVendorId) {
-        return false;
+    List<Invoice> invoiceList=invoiceRepository.findAll();
+    return invoiceList.stream().anyMatch(invoice->invoice.getClientVendor().getId().equals(clientVendorId));
     }
-
-
-
 
 
     public String InvoiceNo(InvoiceType invoiceType) {
