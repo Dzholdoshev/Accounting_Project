@@ -14,6 +14,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByUsername(String username);
 
-    @Query("Select u from User u where u.isDeleted=?1 order by u.company.title, u.role.description ")
-    List<User> findAllOrderByCompanyAndRole(Boolean deleted);
 }
