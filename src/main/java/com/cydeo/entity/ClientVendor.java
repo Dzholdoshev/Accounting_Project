@@ -22,7 +22,7 @@ public class ClientVendor extends BaseEntity {
   private String website;
   @Enumerated(EnumType.STRING)
   private ClientVendorType clientVendorType;
-  @OneToOne
+  @OneToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "address_id")
   private Address address;
   @ManyToOne (fetch = FetchType.LAZY)

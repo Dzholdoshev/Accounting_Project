@@ -20,6 +20,6 @@ private final ClientVendorService clientVendorService;
             return null;
         }
 
-        return clientVendorService.findByClientVendorId(Long.parseLong(source));
+        return clientVendorService.findClientVendorById(Long.parseLong(source));
     }
 }

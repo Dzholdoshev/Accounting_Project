@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class InvoiceServiceImpl implements InvoiceService {
-
+/*
     private final InvoiceRepository invoiceRepository;
     private final MapperUtil mapperUtil;
     // private final ProductService productService;
@@ -198,6 +198,10 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
         return InvoiceNo;
     }
+
+
+
+ */
 }
 
 

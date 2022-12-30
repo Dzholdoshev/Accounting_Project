@@ -3,19 +3,15 @@ package com.cydeo.service.impl;
 import com.cydeo.dto.ClientVendorDto;
 import com.cydeo.dto.UserDto;
 import com.cydeo.entity.ClientVendor;
-import com.cydeo.entity.Company;
 import com.cydeo.enums.ClientVendorType;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.ClientVendorRepository;
 import com.cydeo.service.ClientVendorService;
 import com.cydeo.service.SecurityService;
 import com.cydeo.service.UserService;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,63 +26,35 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     private final SecurityService securityService;
 
     public ClientVendorServiceImpl(ClientVendorRepository clientVendorRepository, MapperUtil mapperUtil, UserService userService, SecurityService securityService) {
-            this.clientVendorRepository = clientVendorRepository;
-            this.mapperUtil = mapperUtil;
-            this.userService = userService;
-            this.securityService = securityService;
-        }
+        this.clientVendorRepository = clientVendorRepository;
+        this.mapperUtil = mapperUtil;
+        this.userService = userService;
+        this.securityService = securityService;
+    }
 
+    @Override
+    public ClientVendorDto findClientVendorById(Long id) {
+        Optional<ClientVendor> clientVendor = clientVendorRepository.findClientVendorById(id);
+        return mapperUtil.convert(clientVendor.get(), new ClientVendorDto());
+    }
 
-//    @Override
-//    public void update(ClientVendorDto dto) {
-//        Optional<ClientVendor> clientVendor = clientVendorRepository.findClientVendorById(dto.getId());
-//        ClientVendor convertedClientVendor = mapperUtil.convert(dto, new ClientVendor());
-//
-//        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-//        UserDto loggedInUser = userService.findByUsername(username);
-//
-//        if (clientVendor.isPresent()) {
-//          // convertedClientVendor.setLastUpdateUserId(loggedInUser.getId()); //should be changed to id of authenticated user
-//            convertedClientVendor.setLastUpdateDateTime(LocalDateTime.now());
-//            clientVendorRepository.save(convertedClientVendor);
-//        }
-//
-//    }
+    @Override
+    public List<ClientVendorDto> getAllClientVendors() throws Exception {
+        return clientVendorRepository.findAll()
+                .stream()
+                .map(clientVendor -> mapperUtil.convert(clientVendor, new ClientVendorDto()))
+                .collect(Collectors.toList());
+    }
 
-        @Override
-        public void save(ClientVendorDto dto) {
-        ClientVendor clientVendor = mapperUtil.convert(dto, new ClientVendor());
-            clientVendorRepository.save(clientVendor);
+    @Override
+    public List<ClientVendorDto> getAllClientVendorsOfCompany(ClientVendorType clientVendorType) {
+        return null;
+    }
 
-        }
-
-        @Override
-        public ClientVendorDto findClientVendorById(Long id) {
-            Optional<ClientVendor> clientVendor = clientVendorRepository.findClientVendorById(id);
-            return mapperUtil.convert(clientVendor.get(), new ClientVendorDto());
-        }
-
-        @Override
-        public List<ClientVendorDto> listAllClientVendors() {
-            public List<ClientVendorDto> getAllClientVendors() throws Exception {
-                return clientVendorRepository.findAll()
-                        .stream()
-                        .map(clientVendor -> mapperUtil.convert(clientVendor, new ClientVendorDto()))
-
-            }
-
-            @Override
-            public void complete(String name) {
-
-                public List<ClientVendorDto> getAllClientVendorsOfCompany(ClientVendorType clientVendorType) {
-                    return null;
-                }
-
-                @Override
-                public void update(ClientVendorDto dto) {
-                    public ClientVendorDto create(ClientVendorDto clientVendorDto) throws Exception {
-                        return null;
-                    }
+    @Override
+    public ClientVendorDto create(ClientVendorDto clientVendorDto) throws Exception {
+        return null;
+    }
 
     /*
         @Override
@@ -118,57 +86,51 @@ public class ClientVendorServiceImpl implements ClientVendorService {
 
 
  */
-                    @Override
-                    public ClientVendorDto update(Long id, ClientVendorDto clientVendorDto) throws ClassNotFoundException, CloneNotSupportedException {
-                        Optional<ClientVendor> clientVendor = clientVendorRepository.findById(id);
-                        ClientVendor convertedClientVendor = mapperUtil.convert(clientVendorDto , new ClientVendor());
+    @Override
+    public ClientVendorDto update(Long id, ClientVendorDto clientVendorDto) throws ClassNotFoundException, CloneNotSupportedException {
+        Optional<ClientVendor> clientVendor = clientVendorRepository.findById(id);
+        ClientVendor convertedClientVendor = mapperUtil.convert(clientVendorDto, new ClientVendor());
+        UserDto loggedInUser = securityService.getLoggedInUser();
+        if (clientVendor.isPresent()) {
+            // convertedClientVendor.setLastUpdateUserId(loggedInUser.getId()); //should be changed to id of authenticated user
+            //convertedClientVendor.setLastUpdateUserId(loggedInUser.getId()); //should be changed to id of authenticated user
+            convertedClientVendor.setLastUpdateDateTime(LocalDateTime.now());
+            clientVendorRepository.save(convertedClientVendor);
+        }
+        return findClientVendorById(clientVendorDto.getId());
+    }
 
-                        UserDto loggedInUser = securityService.getLoggedInUser();
+    @Override
+    public ClientVendorDto save(ClientVendorDto dto) {
+        ClientVendor clientVendor = mapperUtil.convert(dto, new ClientVendor());
+        clientVendorRepository.save(clientVendor);
+        return findClientVendorById(clientVendor.getId());
+    }
 
-                        if (clientVendor.isPresent()) {
-                            // convertedClientVendor.setLastUpdateUserId(loggedInUser.getId()); //should be changed to id of authenticated user
-                            //convertedClientVendor.setLastUpdateUserId(loggedInUser.getId()); //should be changed to id of authenticated user
-                            convertedClientVendor.setLastUpdateDateTime(LocalDateTime.now());
-                            clientVendorRepository.save(convertedClientVendor);
-                        }
+    @Override
+    public void delete(Long id) {
+        Optional<ClientVendor> foundClientVendor = clientVendorRepository.findById(id);
+        if (foundClientVendor.isPresent()) {
+            foundClientVendor.get().setIsDeleted(true);
+            clientVendorRepository.save(foundClientVendor.get());
+        }
 
-                    }
-
-                    @Override
-                    public void save(ClientVendorDto dto) {
-
-                        ClientVendor clientVendor = mapperUtil.convert(dto, new ClientVendor());
-                        clientVendorRepository.save(clientVendor);
-
-                        return findClientVendorById(id);
-                    }
-
-                    @Override
-                    public void delete(Long id) {
-
-                        Optional<ClientVendor> foundClientVendor = clientVendorRepository.findById(id);
-                        if (foundClientVendor.isPresent()) {
-                            foundClientVendor.get().setIsDeleted(true);
-                            clientVendorRepository.save(foundClientVendor.get());
-                        }
-
-                    }
-
-                    @Override
-                    public ClientVendorDto findByClientVendorId(Long id){
-                        Optional<ClientVendor> clientVendor = clientVendorRepository.findById(id);
-                        return mapperUtil.convert(clientVendor.get(), new ClientVendorDto());
-                        public boolean companyNameExists (ClientVendorDto clientVendorDto){
-                            return clientVendorRepository.existsById(clientVendorDto.getId());
-                        }
+    }
 
 
-                        public List<String> getClientVendorType () {
-                            return Stream.of(ClientVendorType.values())
-                                    .map(ClientVendorType::getValue)
-                                    .collect(Collectors.toList());
-                            //List.of(ClientVendorType.CLIENT.getValue(), ClientVendorType.VENDOR.getValue());
-                        }
+
+    @Override
+    public boolean companyNameExists(ClientVendorDto clientVendorDto) {
+        return clientVendorRepository.existsById(clientVendorDto.getId());
+    }
+
+    @Override
+    public List<String> getClientVendorType() {
+        return Stream.of(ClientVendorType.values())
+                .map(ClientVendorType::getValue)
+                .collect(Collectors.toList());
+        //List.of(ClientVendorType.CLIENT.getValue(), ClientVendorType.VENDOR.getValue());
+    }
 
 
-                    }
+}
