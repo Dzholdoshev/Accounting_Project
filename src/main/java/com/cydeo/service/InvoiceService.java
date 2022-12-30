@@ -1,6 +1,7 @@
 package com.cydeo.service;
 
 import com.cydeo.dto.InvoiceDto;
+import com.cydeo.enums.InvoiceStatus;
 import com.cydeo.enums.InvoiceType;
 
 import java.math.BigDecimal;
@@ -8,20 +9,25 @@ import java.util.List;
 
 public interface InvoiceService {
 
+    InvoiceDto findInvoiceById(long id);
 
-    List<InvoiceDto> listAllInvoices(InvoiceType invoiceType);
+    List<InvoiceDto> getAllInvoicesOfCompany(InvoiceType invoiceType) throws Exception;
 
-    void updateInvoice(InvoiceDto invoiceDto);
+    List<InvoiceDto> getAllInvoicesByInvoiceStatus(InvoiceStatus status);
 
-    void deleteInvoice(Long id);
+    InvoiceDto getNewInvoice(InvoiceType invoiceType) throws Exception;
 
     void approveInvoice(Long id);
+    InvoiceDto save(InvoiceDto invoiceDto, InvoiceType invoiceType);
+    InvoiceDto printInvoice(Long id);
 
-    InvoiceDto create(InvoiceDto invoiceDto);
-    InvoiceDto findInvoiceById(long id);
-    InvoiceDto createNewPurchaseInvoiceDto();
-    BigDecimal invoiceTotalPrice(InvoiceDto invoiceDto);
-    BigDecimal invoicePrice(InvoiceDto invoiceDto);
-    Integer invoiceTax(InvoiceDto invoiceDto);
-    InvoiceDto createNewSalesInvoiceDto();
+    void delete(Long id);
+
+    List<InvoiceDto> getLastThreeInvoices();
+
+    BigDecimal getTotalPriceOfInvoice(Long id);
+
+    BigDecimal getTotalTaxOfInvoice(Long id);
+    void updateInvoice(InvoiceDto invoiceDto);
+
 }

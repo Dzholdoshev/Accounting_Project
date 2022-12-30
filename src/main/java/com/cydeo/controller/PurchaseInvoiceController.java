@@ -38,25 +38,25 @@ public class PurchaseInvoiceController {
 
     @GetMapping("/delete/{invoiceId}")
     public String deleteInvoice(@PathVariable("invoiceId") Long id, Model model) {
-        invoiceService.deleteInvoice(id);
+        invoiceService.delete(id);
         return "redirect: /PurchaseInvoices/list";
     }
 
     @GetMapping("/list")
-    public String listInvoice(Model model) {
-        model.addAttribute("Invoice", invoiceService.listAllInvoices(InvoiceType.PURCHASE));
+    public String listInvoice(Model model) throws Exception {
+        model.addAttribute("Invoice", invoiceService.getAllInvoicesOfCompany(InvoiceType.PURCHASE));
         return "/invoice/purchase-invoice-list";
     }
 
     @GetMapping("/create")
-    public String createInvoice(Model model) {
-        model.addAttribute("newPurchaseInvoice", invoiceService.createNewPurchaseInvoiceDto());
+    public String createInvoice(Model model) throws Exception {
+        model.addAttribute("newPurchaseInvoice", invoiceService.getNewInvoice(InvoiceType.PURCHASE));
         return "/invoice/purchase-invoice-create";
     }
 
     @PostMapping("/create")
     public String createInvoice(@ModelAttribute("invoiceDto") InvoiceDto invoiceDto, Model model) {
-        invoiceService.create(invoiceDto);
+        invoiceService.save(invoiceDto, InvoiceType.PURCHASE);
         return "redirect: /PurchaseInvoices/create/" + invoiceDto.getId();
     }
 
