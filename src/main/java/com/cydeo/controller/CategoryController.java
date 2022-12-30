@@ -27,7 +27,7 @@ public class CategoryController {
         List<CategoryDto> categoryDtoList = categoryService.listAllCategories();
         model.addAttribute("categories",categoryDtoList);
 
-        return "category/category-list";
+        return "/category/category-list";
     }
 
     @GetMapping("/update/{id}")// th:href="@{/categories/update/{id}(id=${category.getId()})}"
@@ -58,7 +58,7 @@ public class CategoryController {
          model.addAttribute("",new CategoryDto());
          return "/category/category-create";
      }
-    //  @PostMapping("/create")
+    // @PostMapping("/create")
      // public String createCategoryNew(@ModelAttribute)
                     //where is the button link??????
 
