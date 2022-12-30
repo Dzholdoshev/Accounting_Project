@@ -24,7 +24,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
     private final MapperUtil mapperUtil;
-   // private final ProductService productService;
+    // private final ProductService productService;
     private final SecurityService securityService;
 
     public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapperUtil, SecurityService securityService) {
@@ -44,34 +44,35 @@ public class InvoiceServiceImpl implements InvoiceService {
     public List<InvoiceDto> getAllInvoicesOfCompany(InvoiceType invoiceType) throws Exception {
 
         User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
-        Company company=user.getCompany();
+        Company company = user.getCompany();
 
-            List<Invoice> PurchaseInvoicesList = invoiceRepository.findInvoicesByCompanyAndInvoiceType(company, InvoiceType.PURCHASE);
+        List<Invoice> PurchaseInvoicesList = invoiceRepository.findInvoicesByCompanyAndInvoiceType(company, InvoiceType.PURCHASE);
 
-            return PurchaseInvoicesList.stream().map(invoice -> {
-                InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
-               // invoiceDto.setPrice(invoicePrice(invoiceDto));
-                invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()).intValue());
-                invoiceDto.setTotal(getTotalPriceOfInvoice(invoiceDto.getId()));
+        return PurchaseInvoicesList.stream().map(invoice -> {
+            InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
+            // invoiceDto.setPrice(invoicePrice(invoiceDto));
+            invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()).intValue());
+            invoiceDto.setTotal(getTotalPriceOfInvoice(invoiceDto.getId()));
 
-                return invoiceDto;
-            }).sorted(Comparator.comparing(InvoiceDto::getInvoiceNo).reversed()).collect(Collectors.toList());
+            return invoiceDto;
+        }).sorted(Comparator.comparing(InvoiceDto::getInvoiceNo).reversed()).collect(Collectors.toList());
     }
 
     @Override
     public List<InvoiceDto> getAllInvoicesByInvoiceStatus(InvoiceStatus status) {
         User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
 
-        Company company=user.getCompany();
-      List<Invoice> invoiceList=  invoiceRepository.findInvoicesByCompanyAndInvoiceStatus(company, status);
+        Company company = user.getCompany();
+        List<Invoice> invoiceList = invoiceRepository.findInvoicesByCompanyAndInvoiceStatus(company, status);
 
         return invoiceList.stream().map(invoice -> {
             InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
-           // invoiceDto.setPrice(invoicePrice(invoiceDto));
+            // invoiceDto.setPrice(invoicePrice(invoiceDto));
             invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()).intValue());
             invoiceDto.setTotal(getTotalPriceOfInvoice(invoiceDto.getId()));
 
-            return invoiceDto;}).collect(Collectors.toList());
+            return invoiceDto;
+        }).collect(Collectors.toList());
 
     }
 
@@ -101,7 +102,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public InvoiceDto update(Long id, InvoiceDto invoiceDto) {
-       Invoice invoice= invoiceRepository.findInvoiceById(id);
+        Invoice invoice = invoiceRepository.findInvoiceById(id);
         Invoice updatedInvoice = mapperUtil.convert(invoiceDto, new Invoice());
         invoice.setClientVendor(updatedInvoice.getClientVendor());
         invoiceRepository.save(invoice);
@@ -120,8 +121,8 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public InvoiceDto printInvoice(Long id) {
-       InvoiceDto invoiceDto=mapperUtil.convert(invoiceRepository.findInvoiceById(id),new InvoiceDto());
-       // invoiceDto.setPrice();
+        InvoiceDto invoiceDto = mapperUtil.convert(invoiceRepository.findInvoiceById(id), new InvoiceDto());
+        // invoiceDto.setPrice();
         invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()).intValue());
         invoiceDto.setTotal(getTotalPriceOfInvoice(invoiceDto.getId()));
         return invoiceDto;
@@ -162,13 +163,15 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public BigDecimal getProfitLossOfInvoice(Long id) {
+
+        //Total price of the invoice subtracted by cost of products, only a loss if negative?
         return null;
     }
 
     @Override
     public boolean checkIfInvoiceExist(Long clientVendorId) {
-    List<Invoice> invoiceList=invoiceRepository.findAll();
-    return invoiceList.stream().anyMatch(invoice->invoice.getClientVendor().getId().equals(clientVendorId));
+        List<Invoice> invoiceList = invoiceRepository.findAll();
+        return invoiceList.stream().anyMatch(invoice -> invoice.getClientVendor().getId().equals(clientVendorId));
     }
 
 
