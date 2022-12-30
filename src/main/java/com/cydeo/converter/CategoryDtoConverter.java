@@ -21,6 +21,6 @@ public class CategoryDtoConverter implements Converter<String, CategoryDto> {
         if (source == null || source.equals("")){
             return  null;
         }
-        return categoryService.findById(Long.parseLong(source));
+        return categoryService.findCategoryById(Long.parseLong(source));
     }
 }

@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface CategoryService {
 
-    CategoryDto findById(Long id);
+    CategoryDto findCategoryById(Long id);
     List<CategoryDto> listAllCategories();
+
+    void deleteCategoryById(Long id);
 }

@@ -29,7 +29,13 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDto findById(Long id) {
+    public void deleteCategoryById(Long id) {
+
+
+    }
+
+    @Override
+    public CategoryDto findCategoryById(Long id) {
        Category category = categoryRepository.findById(id).get();
         return mapperUtil.convert(category, new CategoryDto());
     }
