@@ -4,6 +4,7 @@ import com.cydeo.dto.CompanyDto;
 
 import com.cydeo.dto.UserDto;
 import com.cydeo.entity.Company;
+import com.cydeo.enums.CompanyStatus;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.CompanyRepository;
 import com.cydeo.service.CompanyService;
@@ -18,7 +19,6 @@ public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
     private final MapperUtil mapperUtil;
-
     private final SecurityService securityService;
 
     public CompanyServiceImpl(CompanyRepository companyRepository, MapperUtil mapperUtil, SecurityService securityService) {
@@ -46,8 +46,9 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public CompanyDto getCompanyByLoggedInUser() {
 
-        UserDto user = securityService.getLoggedInUser();
-        return user.getCompany();
+        UserDto loggedInUser = securityService.getLoggedInUser();
+
+        return null;
 
     }
 
@@ -63,6 +64,9 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public List<CompanyDto> getFilteredCompaniesForCurrentUser() {
+
+        UserDto loggedInUser = securityService.getLoggedInUser();
+
         return null;
     }
 
@@ -79,10 +83,18 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public void activate(Long companyId) {
 
+        Company company = companyRepository.findById(companyId).orElseThrow(); //future exception message?
+        company.setCompanyStatus(CompanyStatus.ACTIVE);
+        companyRepository.save(company);
+
     }
 
     @Override
     public void deactivate(Long companyId) {
+
+        Company company = companyRepository.findById(companyId).orElseThrow(); //future exception message?
+        company.setCompanyStatus(CompanyStatus.PASSIVE);
+        companyRepository.save(company);
 
     }
 
