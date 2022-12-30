@@ -6,8 +6,9 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 public class AddressDto {
+
+    private Long id;
 
     private String addressLine1;
 
