@@ -4,9 +4,7 @@ import com.cydeo.dto.CategoryDto;
 import com.cydeo.service.CategoryService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -14,8 +12,15 @@ import java.util.List;
 @RequestMapping("/categories")
 public class CategoryController {
 
-    CategoryService categoryService;
+   private final CategoryService categoryService;
 
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
+    @GetMapping("/test")
+    public String test (){
+        return "Hello";
+    }
     @GetMapping("/list")
     public  String listAllCategories(Model model){
 
@@ -48,7 +53,14 @@ public class CategoryController {
     //End-user should be able to Delete each category(soft delete), then end up to the category_list
     // page with updated category list.
 
-
+     @GetMapping("/create/")
+    public String createCategory(Model model){
+         model.addAttribute("",new CategoryDto());
+         return "/category/category-create";
+     }
+    //  @PostMapping("/create")
+     // public String createCategoryNew(@ModelAttribute)
+                    //where is the button link??????
 
     //When End-User clicks on "Create-Category" button, category_create page should be displayed with
     // an Empty category form

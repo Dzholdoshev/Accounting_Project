@@ -24,13 +24,19 @@ public class CategoryServiceImpl implements CategoryService {
 
     public List<CategoryDto> listAllCategories(){
 
-     return    mapperUtil.convert(categoryRepository.findAll() , Arrays.asList(new CategoryDto()));
-
+        return categoryRepository.findAll()
+               .stream()
+                .map(category -> mapperUtil.convert(category, new CategoryDto()))
+               .collect(Collectors.toList());
     }
 
     @Override
     public void deleteCategoryById(Long id) {
+         Category category = categoryRepository.getCategoryById(id).get();
 
+         category.setIsDeleted(true);
+
+         categoryRepository.save(category);
 
     }
 

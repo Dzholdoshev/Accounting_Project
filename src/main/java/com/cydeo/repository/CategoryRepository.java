@@ -16,4 +16,5 @@ import java.util.function.Function;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
+    Optional<Category> getCategoryById (Long id);
 }
