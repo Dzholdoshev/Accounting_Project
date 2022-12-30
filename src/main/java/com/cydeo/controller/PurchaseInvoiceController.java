@@ -26,7 +26,7 @@ public class PurchaseInvoiceController {
         model.addAttribute("InvoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(id));
         model.addAttribute("newInvoiceProduct", new InvoiceProductDto());
         //client vendor model.addAttribute("clientVendor", )
-        //product model.addAttribute("
+        //product model.addAttribute("products", getlistofproducts);
         return "/invoice/purchase-invoice-update";
     }
 
