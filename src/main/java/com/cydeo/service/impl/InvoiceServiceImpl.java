@@ -10,6 +10,7 @@ import com.cydeo.enums.InvoiceType;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceRepository;
 import com.cydeo.service.InvoiceService;
+import com.cydeo.service.SecurityService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -24,14 +25,14 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final MapperUtil mapperUtil;
     private final ProductService productService;
-    private final SercurityService sercurityService;
+    private final SecurityService securityService;
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapperUtil, ProductService productService, SercurityService sercurityService) {
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapperUtil, SecurityService securityService) {
         this.invoiceRepository = invoiceRepository;
         this.mapperUtil = mapperUtil;
-        this.productService = productService;
-        this.sercurityService = sercurityService;
+        this.securityService = securityService;
     }
+
 
     @Override
     public InvoiceDto findInvoiceById(long id) {
@@ -44,28 +45,34 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
         Company company=user.getCompany();
-        List<Invoice> PurchaseInvoicesList = invoiceRepository.findInvoicesByCompanyAndInvoiceType(company, InvoiceType.PURCHASE);
+        try {
+            List<Invoice> PurchaseInvoicesList = invoiceRepository.findInvoicesByCompanyAndInvoiceType(company, InvoiceType.PURCHASE);
 
             return PurchaseInvoicesList.stream().map(invoice -> {
                 InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
                 invoiceDto.setPrice(invoicePrice(invoiceDto));
-                invoiceDto.setTax(invoiceTax(invoiceDto));
+                invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()));
                 invoiceDto.setTotal(getTotalPriceOfInvoice(invoiceDto.getId()));
 
                 return invoiceDto;
             }).sorted(Comparator.comparing(InvoiceDto::getInvoiceNo).reversed()).collect(Collectors.toList());
+        }catch (Exception e){
+            e.getMessage();
+        }
+        return null;
     }
 
     @Override
     public List<InvoiceDto> getAllInvoicesByInvoiceStatus(InvoiceStatus status) {
         User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
+
         Company company=user.getCompany();
       List<Invoice> invoiceList=  invoiceRepository.findInvoicesByCompanyAndInvoiceStatus(company, status);
 
-        return invoicesList.stream().map(invoice -> {
+        return invoiceList.stream().map(invoice -> {
             InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
-            invoiceDto.setPrice(invoicePrice(invoiceDto));
-            invoiceDto.setTax(invoiceTax(invoiceDto));
+           // invoiceDto.setPrice(invoicePrice(invoiceDto));
+            invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()).intValue());
             invoiceDto.setTotal(getTotalPriceOfInvoice(invoiceDto.getId()));
 
             return invoiceDto;}).collect(Collectors.toList());
@@ -116,7 +123,11 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public InvoiceDto printInvoice(Long id) {
-        return null;
+       InvoiceDto invoiceDto=mapperUtil.convert(invoiceRepository.findInvoiceById(id),new InvoiceDto());
+       // invoiceDto.setPrice();
+        invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()).intValue());
+        invoiceDto.setTotal(getTotalPriceOfInvoice(invoiceDto.getId()));
+
     }
 
     @Override
@@ -148,8 +159,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     public BigDecimal getTotalTaxOfInvoice(Long id) { // Sum of the tax of the Invoice Product
         InvoiceDto invoiceDto = mapperUtil.convert(invoiceRepository.findById(id), new InvoiceDto());
 
-        BigDecimal tax = invoiceDto.getInvoiceProducts().stream().map(InvoiceProductDto::getTax).reduce(0, Integer::sum);
-        return tax;
+        Integer tax = invoiceDto.getInvoiceProducts().stream().map(InvoiceProductDto::getTax).reduce(0, Integer::sum);
+        return BigDecimal.valueOf(tax);
     }
 
     @Override
