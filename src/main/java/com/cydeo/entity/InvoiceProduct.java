@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @NoArgsConstructor
-@Where(clause = "is_deleted=false")
+//@Where(clause = "is_deleted=false")
 @Table(name="invoice_products")
 public class InvoiceProduct extends BaseEntity {
     private BigDecimal price;
