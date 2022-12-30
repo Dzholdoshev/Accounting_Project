@@ -17,7 +17,7 @@ public interface InvoiceService {
 
     InvoiceDto getNewInvoice(InvoiceType invoiceType) throws Exception;
 
-    void approveInvoice(Long id);
+
     InvoiceDto save(InvoiceDto invoiceDto, InvoiceType invoiceType);
     InvoiceDto printInvoice(Long id);
 
@@ -28,6 +28,12 @@ public interface InvoiceService {
     BigDecimal getTotalPriceOfInvoice(Long id);
 
     BigDecimal getTotalTaxOfInvoice(Long id);
+
+
+    BigDecimal getProfitLossOfInvoice(Long id);
+    boolean checkIfInvoiceExist(Long clientVendorId);
+
+    void approveInvoice(Long id);
     void updateInvoice(InvoiceDto invoiceDto);
 
 }

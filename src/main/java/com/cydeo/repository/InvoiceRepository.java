@@ -10,11 +10,17 @@ import java.util.List;
 
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
-    List<Invoice> findAllByInvoiceTypeAndIsDeleted(InvoiceType invoiceType, Boolean deleted);
-    Invoice findByIdAndIsDeleted(Long id, Boolean deleted);
+//    List<Invoice> findAllByInvoiceTypeAndIsDeleted(InvoiceType invoiceType, Boolean deleted);
+//    Invoice findByIdAndIsDeleted(Long id, Boolean deleted);
 
     @Query("SELECT coalesce(max(ch.id), 1) FROM Invoice ch where ch.invoiceType =?1")
     Long getMaxId(InvoiceType invoiceType);
 
+
+    Invoice findInvoiceById(Long id);
+    List<Invoice> findInvoicesByCompanyAndInvoiceType(Company company, InvoiceType invoiceType);
+    List<Invoice> findInvoicesByCompanyAndInvoiceStatus(Company company, InvoiceStatus invoiceStatus);
+    List<Invoice> findInvoicesByCompanyAndInvoiceStatusOrderByDateDesc(Company company, InvoiceStatus invoiceStatus);
+    Integer countAllByCompanyAndClientVendor_Id(Company company, Long clientVendorId);
 
 }
