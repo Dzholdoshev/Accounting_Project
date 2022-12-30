@@ -16,11 +16,11 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     @Query("SELECT coalesce(max(ch.id), 1) FROM Invoice ch where ch.invoiceType =?1 AND ch.company.id =?2")
     Long getMaxId(InvoiceType invoiceType, Long companyId);
 
-
+/*
     Invoice findInvoiceById(Long id);
     List<Invoice> findInvoicesByCompanyAndInvoiceType(Company company, InvoiceType invoiceType);
     List<Invoice> findInvoicesByCompanyAndInvoiceStatus(Company company, InvoiceStatus invoiceStatus);
     List<Invoice> findInvoicesByCompanyAndInvoiceStatusOrderByDateDesc(Company company, InvoiceStatus invoiceStatus);
     Integer countAllByCompanyAndClientVendor_Id(Company company, Long clientVendorId);
-
+*/
 }
