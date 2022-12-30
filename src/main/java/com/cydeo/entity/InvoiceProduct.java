@@ -1,9 +1,31 @@
 package com.cydeo.entity;
 
 import com.cydeo.entity.common.BaseEntity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import java.math.BigDecimal;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+//@Where(clause = "is_deleted=false")
+@Table(name="invoice_products")
 public class InvoiceProduct extends BaseEntity {
+    private BigDecimal price;
+    private BigDecimal profitLoss;
+    private int quantity;
+    private int remainingQuantity;
+    private int tax;
+    @ManyToOne(fetch= FetchType.LAZY)
+    private Invoice invoice;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Product product;
 }
