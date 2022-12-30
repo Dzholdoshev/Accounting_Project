@@ -8,4 +8,5 @@ public interface RoleService {
 
     List<RoleDto> listAllRoles();
     RoleDto findRoleById(Long id);
+    List<RoleDto> getRolesFilterForLoggedUser();
 }

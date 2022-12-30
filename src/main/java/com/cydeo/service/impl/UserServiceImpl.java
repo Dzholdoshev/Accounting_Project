@@ -60,11 +60,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getFilteredUsers() throws Exception {
-        List<User> userList=userRepository.findAll();
+        List<User> userList=userRepository.findAll(); // filtered by company?
         return userList.stream().map(user -> mapperUtil
                 .convert(user,new UserDto())).collect(Collectors.toList());
     }
-
     @Override
     public UserDto save(UserDto userDto) {
         userDto.setPassWord(userDto.getPassWord());
@@ -75,10 +74,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto update(UserDto userDto) {
-        Optional<User> user = userRepository.findById(userDto.getId());
+        Optional<User> user = userRepository.findUserById(userDto.getId());
         User convertedUser = mapperUtil.convert(userDto, new User());
         convertedUser.setId(user.get().getId());
-        convertedUser.setPassWord(user.get().getPassWord());
+        convertedUser.setPassword(user.get().getPassword());
         userRepository.save(convertedUser);
         return findUserById(userDto.getId());
     }
@@ -105,17 +104,6 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
-    //    public List<UserDto> listAllUsersByLoggedInStatus() {
-//        if (securityService.getLoggedInUser().getRole().getDescription().equals("Admin")) {
-//            return listAllUsers().stream()
-//                    .filter(userDto -> userDto.getCompany().getId().equals(securityService.getLoggedInUser()
-//                            .getCompany().getId())).collect(Collectors.toList());
-//        } else if (securityService.getLoggedInUser().getRole().getDescription().equals("Root User")) {
-//            return listAllUsers().stream().filter(userDto -> userDto.getRole().getDescription().equals("Admin")).collect(Collectors.toList());
-//        } else {
-//            throw new NoSuchElementException("No users is available");
-//        }
-//    }
        private List<UserDto> findAllUsersByCompanyAndRole() {
 
           List<UserDto> list = userRepository.findAllUsersByCompanyAndRole(false).stream()

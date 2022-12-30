@@ -29,17 +29,25 @@ public class UserController {
         model. addAttribute("users", userService.getFilteredUsers());
         return "user/user-list";
     }
-    @GetMapping("/update/{username}")
-    public String editUser (@PathVariable("username") String username, Model model){
+    @GetMapping("/update/{id}")
+    public String editUser (@PathVariable("id") Long id, Model model){
 
-        model.addAttribute("user", userService.findByUsername(username));
-        model.addAttribute("roles", roleService.listAllRoles());
+        model.addAttribute("user", userService.findUserById(id));
+        model.addAttribute("userRoles", roleService.listAllRoles());
         return "user/user-update";
+    }
+
+    @PostMapping("/update/{id}")
+    public String update(@PathVariable("id") Long id,UserDto userDto){
+       userService.update(userDto);
+       return "redirect:/users/list";
     }
 
 
     @PostMapping("/create")
     public String createNewUser(@ModelAttribute("newUser")UserDto userDto,BindingResult result, Model model){
+
+        model.addAttribute("user",new UserDto());
         boolean emailExist = userService.emailExist(userDto); // write this method
         if(result.hasErrors()||emailExist){
             if (emailExist) {
@@ -52,21 +60,9 @@ public class UserController {
         return "redirect:/users/list";
     }
 
-//    @PostMapping("/create")
-//    public String saveUser(@ModelAttribute("user") UserDto user, BindingResult bindingResult, Model model) throws Exception {
-//
-//        if (bindingResult.hasErrors()){
-//            model.addAttribute("users", userService.getFilteredUsers());
-//            model.addAttribute("roles", roleService.listAllRoles());
-//            return "user/user-create";
-//        }
-//        userService.save(user);
-//        return "redirect:/user-create";
-//    }
 
-
-    @PostMapping("/update")
-    public String update(@ModelAttribute("user") UserDto userDto, BindingResult bindingResult, Model model) throws Exception {
+    @PostMapping("/update{id}")
+    public String update(@PathVariable("id")Long id, UserDto userDto, BindingResult bindingResult, Model model) throws Exception {
 
         if (bindingResult.hasErrors()){
             model.addAttribute("users", userService.getFilteredUsers());
@@ -79,10 +75,10 @@ public class UserController {
 
 
 
-    @GetMapping("/delete/{username}")
-    public String deleteUser(@PathVariable("username") String username){
+    @GetMapping("/delete/{id}")
+    public String deleteUser(@PathVariable("id")Long id){
 
-        userService.deleteUser(username);
+        userService.delete(id);
         return "redirect:/user-list";
     }
 
