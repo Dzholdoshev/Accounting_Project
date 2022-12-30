@@ -24,7 +24,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
     private final MapperUtil mapperUtil;
-    private final ProductService productService;
+   // private final ProductService productService;
     private final SecurityService securityService;
 
     public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapperUtil, SecurityService securityService) {
@@ -50,8 +50,8 @@ public class InvoiceServiceImpl implements InvoiceService {
 
             return PurchaseInvoicesList.stream().map(invoice -> {
                 InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
-                invoiceDto.setPrice(invoicePrice(invoiceDto));
-                invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()));
+               // invoiceDto.setPrice(invoicePrice(invoiceDto));
+                invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()).intValue());
                 invoiceDto.setTotal(getTotalPriceOfInvoice(invoiceDto.getId()));
 
                 return invoiceDto;
@@ -92,7 +92,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     public InvoiceDto save(InvoiceDto invoiceDto, InvoiceType invoiceType) {
 
         User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
-        if (InvoiceType.getValue.equals("Purchase")) {
+        if (invoiceType.getValue().equals("Purchase")) {
             invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
         }
         Invoice invoice = mapperUtil.convert(invoiceDto, new Invoice());
@@ -127,7 +127,7 @@ public class InvoiceServiceImpl implements InvoiceService {
        // invoiceDto.setPrice();
         invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()).intValue());
         invoiceDto.setTotal(getTotalPriceOfInvoice(invoiceDto.getId()));
-
+        return invoiceDto;
     }
 
     @Override
@@ -181,7 +181,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         Long id = invoiceRepository.getMaxId(invoiceType);
         String InvoiceNo = "";
 
-        if (invoiceType.value().equals("Purchase")) {
+        if (invoiceType.getValue().equals("Purchase")) {
             InvoiceNo = "P-" + String.format("%03d", id + 1);
 
         } else {
