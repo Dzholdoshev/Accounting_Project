@@ -104,6 +104,15 @@ public class InvoiceServiceImpl implements InvoiceService {
         return invoiceDto;
     }
 
+    @Override
+    public void approve(Long id) {
+        Invoice invoice = invoiceRepository.findInvoiceById(id);
+        invoice.setInvoiceStatus(InvoiceStatus.APPROVED);
+        //Change product quantities
+        // productService.update(invoice.getInvoiceProduct());  to update stock values?
+        invoiceRepository.save(invoice);
+    }
+
 
     @Override
     public InvoiceDto printInvoice(Long id) {
@@ -155,14 +164,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 
 
-    @Override
-    public void approveInvoice(Long id) { // Find another way to do this?
-        Invoice invoice = invoiceRepository.findInvoiceById(id);
-        invoice.setInvoiceStatus(InvoiceStatus.APPROVED);
-        //Change product quantities
-        // productService.update(invoice.getInvoiceProduct());  to update stock values?
-        invoiceRepository.save(invoice);
-    }
+
 
     public String InvoiceNo(InvoiceType invoiceType) {
         Long id = invoiceRepository.getMaxId(invoiceType);

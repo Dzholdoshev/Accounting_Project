@@ -58,9 +58,12 @@ public class PurchaseInvoiceController {
 
     @PostMapping("/create")
     public String createNewPurchaseInvoice(@ModelAttribute("invoiceDto") InvoiceDto invoiceDto, BindingResult result, Model model) {
-        var invoice=invoiceService.save(invoiceDto, InvoiceType.PURCHASE);
-        // add binding result
 
+        if(result.hasErrors()){
+            model.addAttribute("invoice", invoiceDto);
+            return "/invoice/purchase-invoice-create";
+        }
+        var invoice=invoiceService.save(invoiceDto, InvoiceType.PURCHASE);
         return "redirect: /purchaseInvoices/update/" + invoice.getId();
     }
 
@@ -82,9 +85,9 @@ public class PurchaseInvoiceController {
         return "redirect: /purchaseInvoices/update/+id";
     }
 
-    @GetMapping("/print/{id}")
-    public String print(@PathVariable("id") long id, Model model) {
-        InvoiceDto invoice= invoiceService.printInvoice(id);
+    @GetMapping("/print/{invoiceId}")
+    public String print(@PathVariable("invoiceaId") long invoiceId, Model model) {
+        InvoiceDto invoice= invoiceService.printInvoice(invoiceId);
         model.addAttribute("company", invoice.getCompany());
         model.addAttribute("invoice", invoice);
         model.addAttribute("invoiceProducts", invoice.getInvoiceProducts() );
@@ -93,7 +96,7 @@ public class PurchaseInvoiceController {
 
     @GetMapping("/approve/{invoiceId}")
     public String approve(@PathVariable("invoiceId") long invoiceId) {
-      invoiceService.approveInvoice(invoiceId); // This needs to be changed
+      invoiceService.approve(invoiceId); // This needs to be changed
         return "redirect: /purchaseInvoices/list";
     }
 }

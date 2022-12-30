@@ -21,6 +21,7 @@ public interface InvoiceService {
     InvoiceDto save(InvoiceDto invoiceDto, InvoiceType invoiceType);
     InvoiceDto update(Long id, InvoiceDto invoiceDto);
 
+    void approve(Long id);
     InvoiceDto printInvoice(Long id);
 
     void delete(Long id);
@@ -35,6 +36,6 @@ public interface InvoiceService {
     BigDecimal getProfitLossOfInvoice(Long id);
     boolean checkIfInvoiceExist(Long clientVendorId);
 
-    void approveInvoice(Long id);
+
 
 }
