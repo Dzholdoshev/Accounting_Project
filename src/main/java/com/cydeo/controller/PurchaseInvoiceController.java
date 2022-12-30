@@ -9,7 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import javax.validation.Valid;
 @Controller
 @RequestMapping("/purchaseInvoices")
 public class PurchaseInvoiceController {
@@ -52,12 +52,11 @@ public class PurchaseInvoiceController {
     @GetMapping("/create")
     public String navigateToPurchaseInvoiceCreate(Model model) throws Exception {
         model.addAttribute("newPurchaseInvoice", invoiceService.getNewInvoice(InvoiceType.PURCHASE));
-
         return "/invoice/purchase-invoice-create";
     }
 
     @PostMapping("/create")
-    public String createNewPurchaseInvoice(@ModelAttribute("invoiceDto") InvoiceDto invoiceDto, BindingResult result, Model model) {
+    public String createNewPurchaseInvoice(@Valid @ModelAttribute("invoiceDto") InvoiceDto invoiceDto, BindingResult result, Model model) {
 
         if(result.hasErrors()){
             model.addAttribute("invoice", invoiceDto);
@@ -68,7 +67,7 @@ public class PurchaseInvoiceController {
     }
 
     @PostMapping("/addInvoiceProduct/{invoiceId}")
-    public String addInvoiceProductToPurchaseInvoice(@PathVariable("invoiceId") Long invoiceId, @ModelAttribute("invoiceProduct") InvoiceProductDto invoiceProductDto, BindingResult result, Model model) {
+    public String addInvoiceProductToPurchaseInvoice(@Valid @PathVariable("invoiceId") Long invoiceId, @ModelAttribute("invoiceProduct") InvoiceProductDto invoiceProductDto, BindingResult result, Model model) {
         if (result.hasErrors()){
             model.addAttribute("invoice", invoiceService.findInvoiceById(invoiceId));
             model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(invoiceId));
@@ -80,17 +79,17 @@ public class PurchaseInvoiceController {
     }
 
     @GetMapping("removeInvoiceProduct/{invoiceId}/{invoiceProductId}")
-    public String removeInvoiceProductfromPurchaseInvoice(@PathVariable("invoiceId") Long invoiceId, @PathVariable("invoiceProductId") Long invoiceProductId) {
+    public String removeInvoiceProductFromPurchaseInvoice(@PathVariable("invoiceId") Long invoiceId, @PathVariable("invoiceProductId") Long invoiceProductId) {
         invoiceProductService.delete(invoiceProductId);
         return "redirect: /purchaseInvoices/update/+id";
     }
 
     @GetMapping("/print/{invoiceId}")
-    public String print(@PathVariable("invoiceaId") long invoiceId, Model model) {
+    public String print(@PathVariable("invoiceId") long invoiceId, Model model) {
         InvoiceDto invoice= invoiceService.printInvoice(invoiceId);
         model.addAttribute("company", invoice.getCompany());
         model.addAttribute("invoice", invoice);
-        model.addAttribute("invoiceProducts", invoice.getInvoiceProducts() );
+        model.addAttribute("invoiceProducts", invoice.getInvoiceProducts());
         return "invoice/invoice_print";
     }
 
