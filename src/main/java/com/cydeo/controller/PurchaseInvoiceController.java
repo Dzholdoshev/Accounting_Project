@@ -62,7 +62,7 @@ public class PurchaseInvoiceController {
     }
 
     @PostMapping("/addInvoiceProduct/{id}")
-    public String createInvoiceWithProduct(@PathVariable("id") Long id, @ModelAttribute("invoiceProduct") InvoiceProductDto invoiceProductDto, Model model) {
+    public String addInvoiceProduct(@PathVariable("id") Long id, @ModelAttribute("invoiceProduct") InvoiceProductDto invoiceProductDto, Model model) {
         invoiceProductService.save(id, invoiceProductDto);
         return "redirect: /PurchaseInvoices/create/" + id;
     }
