@@ -1,6 +1,7 @@
 package com.cydeo.repository;
 
 import com.cydeo.entity.Category;
+import com.cydeo.entity.Company;
 import com.cydeo.entity.User;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -16,5 +17,10 @@ import java.util.function.Function;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
-    Optional<Category> getCategoryById (Long id);
+    List<Category> findAllByCompany(Company company);
+
+    Category findByDescriptionAndCompany (String description, Company actualCompany);
 }
+
+
+
