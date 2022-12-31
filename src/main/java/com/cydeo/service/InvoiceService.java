@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface InvoiceService {
-
+/*
     InvoiceDto findInvoiceById(long id);
 
     List<InvoiceDto> getAllInvoicesOfCompany(InvoiceType invoiceType) throws Exception;
@@ -37,5 +37,7 @@ public interface InvoiceService {
     boolean checkIfInvoiceExist(Long clientVendorId);
 
 
+
+ */
 
 }
