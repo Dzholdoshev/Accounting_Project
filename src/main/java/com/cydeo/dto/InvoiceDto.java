@@ -18,7 +18,10 @@ public class InvoiceDto {
     private Long id;
     private String invoiceNo;
     private InvoiceStatus invoiceStatus;
+
+    @NotNull(message="Invoice Type is a required field")
     private InvoiceType invoiceType;
+
     private LocalDate date;
     private CompanyDto company;
     private ClientVendorDto clientVendor;
