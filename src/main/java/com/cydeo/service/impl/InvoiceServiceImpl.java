@@ -26,7 +26,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final ProductService productService;
     private final SercurityService sercurityService;
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapperUtil, ProductService productService, SercurityService sercurityService) {
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapperUtil){// ProductService productService, SercurityService sercurityService) {
         this.invoiceRepository = invoiceRepository;
         this.mapperUtil = mapperUtil;
         this.productService = productService;
@@ -166,19 +166,19 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 
 
-    public String InvoiceNo(InvoiceType invoiceType) {
-        Long id = invoiceRepository.getMaxId(invoiceType);
-        String InvoiceNo = "";
-
-        if (invoiceType.value().equals("Purchase")) {
-            InvoiceNo = "P-" + String.format("%03d", id + 1);
-
-        } else {
-            InvoiceNo = "S-" + String.format("%03d", id + 1);
-
-        }
-        return InvoiceNo;
-    }
+//    public String InvoiceNo(InvoiceType invoiceType) {
+//        Long id = invoiceRepository.getMaxId(invoiceType);
+//        String InvoiceNo = "";
+//
+//        if (invoiceType.value().equals("Purchase")) {
+//            InvoiceNo = "P-" + String.format("%03d", id + 1);
+//
+//        } else {
+//            InvoiceNo = "S-" + String.format("%03d", id + 1);
+//
+//        }
+//        return InvoiceNo;
+//    }
 }
 
 

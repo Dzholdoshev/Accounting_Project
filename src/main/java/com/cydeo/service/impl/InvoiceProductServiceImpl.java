@@ -26,11 +26,11 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     private final MapperUtil mapperUtil;
     private final ProductService productService;
 
-    public InvoiceProductServiceImpl(InvoiceProductRepository invoiceProductRepository, @Lazy InvoiceService invoiceService, MapperUtil mapperUtil, ProductService productService) {
+    public InvoiceProductServiceImpl(InvoiceProductRepository invoiceProductRepository, @Lazy InvoiceService invoiceService, MapperUtil mapperUtil ,ProductService productService) {
         this.invoiceProductRepository = invoiceProductRepository;
         this.invoiceService = invoiceService;
         this.mapperUtil = mapperUtil;
-        this.productService = productService;
+       // this.productService = productService;
     }
 
     @Override
@@ -65,6 +65,11 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         InvoiceProduct invoiceProduct= invoiceProductRepository.findInvoiceProductById(invoiceProductId);
         invoiceProduct.setIsDeleted(true);
         invoiceProductRepository.save(invoiceProduct);
+    }
+
+    @Override
+    public void completeApprovalProcedures(Long invoiceId, InvoiceType type) {
+
     }
 
     @Override
