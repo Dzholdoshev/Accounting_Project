@@ -13,8 +13,8 @@ import java.util.List;
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
-    @Query("SELECT coalesce(max(ch.id), 1) FROM Invoice ch where ch.invoiceType =?1")
-    Long getMaxId(InvoiceType invoiceType);
+    @Query("SELECT coalesce(max(ch.id), 1) FROM Invoice ch where ch.invoiceType =?1 AND ch.company.id =?2")
+    Long getMaxId(InvoiceType invoiceType, Long companyId);
 
 
     Invoice findInvoiceById(Long id);

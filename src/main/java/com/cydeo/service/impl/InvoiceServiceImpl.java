@@ -79,8 +79,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public InvoiceDto getNewInvoice(InvoiceType invoiceType) throws Exception {
 
+        Long companyId= securityService.getLoggedInUser().getCompany().getId();
+
         Invoice invoice = new Invoice();
-        invoice.setInvoiceNo(InvoiceNo(InvoiceType.PURCHASE));
+        invoice.setInvoiceNo(InvoiceNo(InvoiceType.PURCHASE, comapanyId));
         invoice.setDate(LocalDate.now());
         invoice.setInvoiceType(invoiceType);
         return mapperUtil.convert(invoice, new InvoiceDto());
@@ -111,6 +113,9 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public void approve(Long id) {
+
+
+
         Invoice invoice = invoiceRepository.findInvoiceById(id);
         invoice.setInvoiceStatus(InvoiceStatus.APPROVED);
         //Change product quantities
@@ -175,8 +180,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
 
-    public String InvoiceNo(InvoiceType invoiceType) {
-        Long id = invoiceRepository.getMaxId(invoiceType);
+    public String InvoiceNo(InvoiceType invoiceType, Long companyId) {
+        Long id = invoiceRepository.getMaxId(invoiceType, companyId );
         String InvoiceNo = "";
 
         if (invoiceType.getValue().equals("Purchase")) {
