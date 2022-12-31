@@ -71,7 +71,6 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         List<InvoiceProduct> invoiceProductList = invoiceProductRepository.findAllByInvoice_Id(invoiceId);
         if(type ==InvoiceType.SALES){
             for (InvoiceProduct eachInvoiceProduct : invoiceProductList) {
-
                // if(eachInvoiceProduct.getProduct().getQuantityInStock()>=eachInvoiceProduct.getQuantity())
                 //waiting for product entity
             }
