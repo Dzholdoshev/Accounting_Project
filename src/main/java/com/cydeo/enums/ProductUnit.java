@@ -15,7 +15,6 @@ public enum ProductUnit {
 
     private final String value;
 
-
     ProductUnit(String value) {
         this.value = value;
     }
