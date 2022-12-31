@@ -73,7 +73,7 @@ public class SalesInvoiceController {
     @PostMapping("/addInvoiceProduct/{invoiceId}")
     public String addInvoiceProductToSalesInvoice(@Valid @PathVariable("invoiceId") Long invoiceId, @ModelAttribute("invoiceProduct") InvoiceProductDto invoiceProductDto, BindingResult result, Model model) {
         if (result.hasErrors()) {
-            model.addAttribute("newInvoiceProduct", invoiceService.findInvoiceById(invoiceId));
+            model.addAttribute("invoice", invoiceService.findInvoiceById(invoiceId));
             model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(invoiceId));
             //product model.addAttribute("products", getlistofproducts);
             //client vendor model.addAttribute("clients", )
