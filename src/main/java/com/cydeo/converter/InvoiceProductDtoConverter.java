@@ -11,22 +11,18 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationPropertiesBinding
 public class InvoiceProductDtoConverter implements Converter<String, InvoiceProductDto> {
-    @Override
-    public InvoiceProductDto convert(String source) {
-        return null;
+    InvoiceProductService invoiceProductService;
+
+    public InvoiceProductDtoConverter(@Lazy InvoiceProductService invoiceProductService) {
+        this.invoiceProductService = invoiceProductService;
     }
-//    InvoiceProductService invoiceProductService;
-//
-//    public InvoiceProductDtoConverter(@Lazy InvoiceProductService invoiceProductService) {
-//        this.invoiceProductService = invoiceProductService;
-//    }
-//
-//    @SneakyThrows
-//    @Override
-//    public InvoiceProductDto convert(String id) {
-//        if (id == null || id.equals("")) {
-//            return null;
-//        }
-//        return invoiceProductService.findInvoiceProductById(Long.parseLong(id));
-//    }
+
+    @SneakyThrows
+    @Override
+    public InvoiceProductDto convert(String id) {
+        if (id == null || id.equals("")) {
+            return null;
+        }
+        return invoiceProductService.findInvoiceProductById(Long.parseLong(id));
+    }
 }
