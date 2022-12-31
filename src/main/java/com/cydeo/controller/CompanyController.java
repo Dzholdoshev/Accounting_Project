@@ -4,8 +4,8 @@ import com.cydeo.service.CompanyService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 
 @Controller
 @RequestMapping("/companies")
@@ -24,6 +24,23 @@ public class CompanyController {
 
         return "/company/company-list";
 
+    }
+
+    @GetMapping("/activate/{id}")
+    public String activate(@PathVariable("id") Long id) {
+
+        companyService.activate(id);
+
+        return "redirect:/companies/list";
+
+    }
+
+    @GetMapping("/deactivate/{id}")
+    public String deactivate(@PathVariable("id") Long id) {
+
+        companyService.deactivate(id);
+
+        return "redirect:/companies/list";
     }
 
 
