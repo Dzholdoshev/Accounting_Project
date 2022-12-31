@@ -11,12 +11,6 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationPropertiesBinding
 public class InvoiceDtoConverter implements Converter<String, InvoiceDto> {
-    @Override
-    public InvoiceDto convert(String source) {
-        return null;
-    }
-  /*
-
     private final InvoiceService invoiceService;
 
     public InvoiceDtoConverter(@Lazy InvoiceService invoiceService) {
@@ -30,6 +24,4 @@ public class InvoiceDtoConverter implements Converter<String, InvoiceDto> {
         return invoiceService.findInvoiceById(Long.parseLong(id));
 
     }
-
-   */
 }
