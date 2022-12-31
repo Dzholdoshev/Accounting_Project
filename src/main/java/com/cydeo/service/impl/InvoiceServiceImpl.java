@@ -82,7 +82,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         Long companyId= securityService.getLoggedInUser().getCompany().getId();
 
         Invoice invoice = new Invoice();
-        invoice.setInvoiceNo(InvoiceNo(InvoiceType.PURCHASE, comapanyId));
+        invoice.setInvoiceNo(InvoiceNo(InvoiceType.PURCHASE, companyId));
         invoice.setDate(LocalDate.now());
         invoice.setInvoiceType(invoiceType);
         return mapperUtil.convert(invoice, new InvoiceDto());
