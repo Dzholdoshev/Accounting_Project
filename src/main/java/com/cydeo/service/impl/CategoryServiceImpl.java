@@ -74,6 +74,7 @@ public class CategoryServiceImpl implements CategoryService {
         return productService.findAllProductsWithCategoryId(categoryId).size() > 0;
     }
 
+
     @Override
     public boolean isCategoryDescriptionExist(CategoryDto categoryDTO) {
         Company actualCompany = mapperUtil.convert(securityService.getLoggedInUser().getCompany(), new Company());
