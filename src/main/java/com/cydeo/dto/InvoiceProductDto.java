@@ -2,6 +2,7 @@ package com.cydeo.dto;
 
 import lombok.*;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 @Setter
 @Getter
@@ -9,6 +10,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class InvoiceProductDto {
     private Long id;
+    @NotNull(message= "Quantity is a required field.")
     private Integer quantity;
     private BigDecimal price;
     private Integer tax;
