@@ -19,15 +19,17 @@ public class SecurityServiceImpl implements SecurityService {
     private final UserRepository userRepository;
 
 
-    public SecurityServiceImpl(UserRepository userRepository, UserService userService, UserRepository userRepository1, MapperUtil mapperUtil) {
-        this.userRepository = userRepository1;
+    public SecurityServiceImpl(UserRepository userRepository, UserService userService) {
+        this.userRepository = userRepository;
         this.userService = userService;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow( ()-> new UsernameNotFoundException("Username not found"));
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("This user does not exist");
+        }
         return new UserPrincipal(user);
     }
 

@@ -22,27 +22,4 @@ public class CategoryServiceImpl implements CategoryService {
         this.mapperUtil = mapperUtil;
     }
 
-    public List<CategoryDto> listAllCategories(){
-
-        return categoryRepository.findAll()
-               .stream()
-                .map(category -> mapperUtil.convert(category, new CategoryDto()))
-               .collect(Collectors.toList());
-    }
-
-    @Override
-    public void deleteCategoryById(Long id) {
-         Category category = categoryRepository.getCategoryById(id).get();
-
-         category.setIsDeleted(true);
-
-         categoryRepository.save(category);
-
-    }
-
-    @Override
-    public CategoryDto findCategoryById(Long id) {
-       Category category = categoryRepository.findById(id).get();
-        return mapperUtil.convert(category, new CategoryDto());
-    }
 }
