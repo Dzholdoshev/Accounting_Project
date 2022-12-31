@@ -10,6 +10,7 @@ import com.cydeo.enums.InvoiceType;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceRepository;
 import com.cydeo.service.InvoiceService;
+import com.cydeo.service.SecurityService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -24,13 +25,13 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final MapperUtil mapperUtil;
     private final ProductService productService;
-    private final SercurityService sercurityService;
+    private final SecurityService securityService;
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapperUtil){// ProductService productService, SercurityService sercurityService) {
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapperUtil, ProductService productService, SecurityService securityService) {
         this.invoiceRepository = invoiceRepository;
         this.mapperUtil = mapperUtil;
         this.productService = productService;
-        this.sercurityService = sercurityService;
+        this.securityService = securityService;
     }
 
     @Override
@@ -166,19 +167,19 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 
 
-//    public String InvoiceNo(InvoiceType invoiceType) {
-//        Long id = invoiceRepository.getMaxId(invoiceType);
-//        String InvoiceNo = "";
-//
-//        if (invoiceType.value().equals("Purchase")) {
-//            InvoiceNo = "P-" + String.format("%03d", id + 1);
-//
-//        } else {
-//            InvoiceNo = "S-" + String.format("%03d", id + 1);
-//
-//        }
-//        return InvoiceNo;
-//    }
+    public String InvoiceNo(InvoiceType invoiceType) {
+        Long id = invoiceRepository.getMaxId(invoiceType);
+        String InvoiceNo = "";
+
+        if (invoiceType.value().equals("Purchase")) {
+            InvoiceNo = "P-" + String.format("%03d", id + 1);
+
+        } else {
+            InvoiceNo = "S-" + String.format("%03d", id + 1);
+
+        }
+        return InvoiceNo;
+    }
 }
 
 

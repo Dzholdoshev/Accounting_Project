@@ -11,13 +11,10 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationPropertiesBinding
 public class InvoiceDtoConverter implements Converter<String, InvoiceDto> {
-      private final InvoiceService invoiceService;
+    private final InvoiceService invoiceService;
 
-    //  public InvoiceDTOConverter(@Lazy InvoiceService invoiceService) {
-  //     this.invoiceService = invoiceService;
-   // }
 
-    public InvoiceDtoConverter(InvoiceService invoiceService) {
+    public InvoiceDtoConverter(@Lazy InvoiceService invoiceService) {
         this.invoiceService = invoiceService;
     }
 
