@@ -69,10 +69,10 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public void completeApprovalProcedures(Long invoiceId, InvoiceType type) {
-      InvoiceDto invoice=  invoiceService.findInvoiceById(invoiceId);
-      Company company= mapperUtil.convert(invoice.getCompany(), new CompanyDto());
-   List<InvoiceProduct> InvoiceProductForApproval= invoiceProductRepository.findAllByInvoice_InvoiceTypeAndInvoice_Company(type, company);
-   // What approval needs to be done?
+        InvoiceDto invoice=  invoiceService.findInvoiceById(invoiceId);
+        Company company= mapperUtil.convert(invoice.getCompany(), new CompanyDto());
+        List<InvoiceProduct> InvoiceProductForApproval= invoiceProductRepository.findAllByInvoice_InvoiceTypeAndInvoice_Company(type, company);
+        // What approval needs to be done?
     }
 
     @Override
@@ -85,7 +85,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public List<InvoiceProduct> findInvoiceProductsByInvoiceTypeAndProductRemainingQuantity(InvoiceType type, Product product, Integer remainingQuantity) {
-      return invoiceProductRepository.findInvoiceProductsByInvoiceInvoiceTypeAndProductAndRemainingQuantityNotOrderByIdAsc(type, product,remainingQuantity);
+        return invoiceProductRepository.findInvoiceProductsByInvoiceInvoiceTypeAndProductAndRemainingQuantityNotOrderByIdAsc(type, product,remainingQuantity);
     }
 
     @Override
