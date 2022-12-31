@@ -9,9 +9,11 @@ import com.cydeo.enums.InvoiceStatus;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceRepository;
+import com.cydeo.service.InvoiceProductService;
 import com.cydeo.service.InvoiceService;
 import com.cydeo.service.SecurityService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -26,11 +28,13 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final MapperUtil mapperUtil;
     // private final ProductService productService;
     private final SecurityService securityService;
+    private final InvoiceProductService invoiceProductService;
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapperUtil, SecurityService securityService) {
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapperUtil, SecurityService securityService, InvoiceProductService invoiceProductService) {
         this.invoiceRepository = invoiceRepository;
         this.mapperUtil = mapperUtil;
         this.securityService = securityService;
+        this.invoiceProductService = invoiceProductService;
     }
 
 
@@ -79,7 +83,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public InvoiceDto getNewInvoice(InvoiceType invoiceType) throws Exception {
 
-        Long companyId= securityService.getLoggedInUser().getCompany().getId();
+        Long companyId = securityService.getLoggedInUser().getCompany().getId();
 
         Invoice invoice = new Invoice();
         invoice.setInvoiceNo(InvoiceNo(InvoiceType.PURCHASE, companyId));
@@ -112,15 +116,17 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public void approve(Long id) {
+    @Transactional
+    public void approve(Long invoiceId) {
 
-
-
-        Invoice invoice = invoiceRepository.findInvoiceById(id);
+        Invoice invoice = invoiceRepository.findInvoiceById(invoiceId);
         invoice.setInvoiceStatus(InvoiceStatus.APPROVED);
         //Change product quantities
         // productService.update(invoice.getInvoiceProduct());  to update stock values?
+
+        invoiceProductService.completeApprovalProcedures(invoiceId, invoice.getInvoiceType());
         invoiceRepository.save(invoice);
+
     }
 
 
@@ -181,15 +187,13 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 
     public String InvoiceNo(InvoiceType invoiceType, Long companyId) {
-        Long id = invoiceRepository.getMaxId(invoiceType, companyId );
+        Long id = invoiceRepository.getMaxId(invoiceType, companyId);
         String InvoiceNo = "";
 
         if (invoiceType.getValue().equals("Purchase")) {
             InvoiceNo = "P-" + String.format("%03d", id + 1);
-
         } else {
             InvoiceNo = "S-" + String.format("%03d", id + 1);
-
         }
         return InvoiceNo;
     }

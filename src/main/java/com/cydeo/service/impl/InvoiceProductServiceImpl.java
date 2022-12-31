@@ -67,10 +67,14 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public void completeApprovalProcedures(Long invoiceId, InvoiceType type) {
-        InvoiceDto invoice = invoiceService.findInvoiceById(invoiceId);
-        Company company = mapperUtil.convert(invoice.getCompany(), new Company());
-        List<InvoiceProduct> InvoiceProductForApproval = invoiceProductRepository.findAllByInvoice_InvoiceTypeAndInvoice_Company(type, company);
-        // What approval needs to be done?
+        List<InvoiceProduct> invoiceProductList = invoiceProductRepository.findAllByInvoice_Id(invoiceId);
+        if(type ==InvoiceType.SALES){
+            for (InvoiceProduct eachInvoiceProduct : invoiceProductList) {
+
+               // if(eachInvoiceProduct.getProduct().getQuantityInStock()>=eachInvoiceProduct.getQuantity())
+                //waiting for product entity
+            }
+        }
     }
 
     @Override
