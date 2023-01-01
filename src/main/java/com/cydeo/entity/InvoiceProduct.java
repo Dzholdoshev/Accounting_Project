@@ -23,8 +23,6 @@ import java.math.BigDecimal;
 public class InvoiceProduct extends BaseEntity {
     private BigDecimal price;
     private BigDecimal profitLoss;
-    @NotNull(message = "Quantity is a required field.")
-    @Range(min = 1, max = 100, message = "Maximum order count is 100")
     private int quantity;
     private int remainingQuantity;
     private int tax;

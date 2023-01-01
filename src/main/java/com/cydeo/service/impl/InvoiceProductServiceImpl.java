@@ -79,10 +79,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public boolean checkProductQuantity(InvoiceProductDto salesInvoiceProduct) {
-
-        //Haven't started salesInvoices
-
-        return false;
+        return salesInvoiceProduct.getProduct().getQuantityInStock() >= salesInvoiceProduct.getQuantity();
     }
 
     @Override

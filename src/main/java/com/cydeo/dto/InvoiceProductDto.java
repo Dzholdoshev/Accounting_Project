@@ -23,6 +23,7 @@ public class InvoiceProductDto {
     @NotNull(message="Tax is a required field")
     @Range(min=5, max=20, message="Tax should be between 5% and 20%")
     private Integer tax;
+
     private BigDecimal total;
     private BigDecimal profitLoss;
     private int remainingQuantity;
