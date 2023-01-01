@@ -18,6 +18,6 @@ public interface ClientVendorService {
     void delete(Long id);
     ClientVendorDto save(ClientVendorDto dto);
     boolean companyNameExists(ClientVendorDto clientVendorDto);
-    List<String> getClientVendorType();
+    List<ClientVendorType> getClientVendorType();
 
 }

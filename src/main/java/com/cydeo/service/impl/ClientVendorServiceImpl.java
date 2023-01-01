@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 
 @Service
 public class ClientVendorServiceImpl implements ClientVendorService {
@@ -124,13 +124,16 @@ public class ClientVendorServiceImpl implements ClientVendorService {
         return clientVendorRepository.existsById(clientVendorDto.getId());
     }
 
+    //    @Override
+//    public List<String> getClientVendorType() {
+//        return Stream.of(ClientVendorType.values())
+//                .map(ClientVendorType::getValue)
+//                .collect(Collectors.toList());
+//        //List.of(ClientVendorType.CLIENT.getValue(), ClientVendorType.VENDOR.getValue());
+//    }
     @Override
-    public List<String> getClientVendorType() {
-        return Stream.of(ClientVendorType.values())
-                .map(ClientVendorType::getValue)
-                .collect(Collectors.toList());
-        //List.of(ClientVendorType.CLIENT.getValue(), ClientVendorType.VENDOR.getValue());
+    public List<ClientVendorType> getClientVendorType() {
+        return List.of(ClientVendorType.CLIENT,ClientVendorType.VENDOR);
+
     }
-
-
 }

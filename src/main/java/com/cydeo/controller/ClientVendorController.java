@@ -1,14 +1,13 @@
 package com.cydeo.controller;
 
-
 import com.cydeo.dto.ClientVendorDto;
-import com.cydeo.entity.ClientVendor;
 import com.cydeo.service.ClientVendorService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
@@ -32,12 +31,12 @@ public class ClientVendorController {
     public String editClientVendor(@PathVariable("id") Long id, Model model) {
 
         model.addAttribute("clientVendor", clientVendorService.findClientVendorById(id));
-
+        model.addAttribute("clientVendorTypes", clientVendorService.getClientVendorType());
         return "clientVendor/clientVendor-update";
     }
 
     @PostMapping("/update/{id}")
-    public String updateClientVendor(@ModelAttribute ("clientVendor")ClientVendorDto clientVendorDto, Model model) {
+    public String updateClientVendor(@Valid @ModelAttribute ("clientVendor")ClientVendorDto clientVendorDto, Model model) {
         clientVendorService.save(clientVendorDto);
         return "redirect:/clientVendors/list";
     }
@@ -55,9 +54,10 @@ public class ClientVendorController {
         return "/clientVendor/clientVendor-create";
     }
     @PostMapping("/create")
-    public String insertClientVendor(@ModelAttribute("clientVendor") ClientVendorDto clientVendor,BindingResult bindingResult,Model model) {
+    public String insertClientVendor(@Valid @ModelAttribute("newClientVendor") ClientVendorDto clientVendor,BindingResult bindingResult,Model model) {
+
         if(bindingResult.hasErrors()){
-            model.addAttribute("clientVendor", new ClientVendorDto());
+            model.addAttribute("clientVendorTypes", clientVendorService.getClientVendorType());
             return "/clientVendor/clientVendor-create";
 
         }
