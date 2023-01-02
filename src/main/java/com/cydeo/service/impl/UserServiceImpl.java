@@ -109,14 +109,13 @@ import java.util.stream.Collectors;
 
 
     @Override
-    public UserDto save(UserDto user) {
+    public UserDto save(UserDto userDto) {
 
-        //User user = mapperUtil.convert(userDto,new User());
-        user.setPassword(user.getPassword());
-        user.setConfirmPassword(user.getPassword());
-        User user1 = mapperUtil.convert(user, new User());
-        userRepository.save(user1);
-        return user;
+        User user = mapperUtil.convert(userDto,new User());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setEnabled(true);
+        userRepository.save(user);
+        return mapperUtil.convert(user,userDto);
     }
 
     @Override
