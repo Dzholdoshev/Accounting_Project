@@ -102,7 +102,7 @@ public class PurchaseInvoiceController {
     }
 
     @GetMapping("/approve/{invoiceId}")
-    public String approve(@PathVariable("invoiceId") long invoiceId) {
+    public String approve(@PathVariable("invoiceId") long invoiceId) throws Exception {
         invoiceService.approve(invoiceId);
         return "redirect: /purchaseInvoices/list";
     }
