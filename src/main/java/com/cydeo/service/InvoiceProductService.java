@@ -5,6 +5,7 @@ import com.cydeo.dto.InvoiceProductDto;
 import com.cydeo.entity.InvoiceProduct;
 import com.cydeo.entity.Product;
 import com.cydeo.enums.InvoiceType;
+import com.cydeo.exception.NotEnoughProductException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -18,7 +19,7 @@ public interface InvoiceProductService {
     void save(Long invoiceId, InvoiceProductDto invoiceProductDto);
 
     void delete(Long invoiceProductId);
-    void completeApprovalProcedures(Long invoiceId, InvoiceType type);
+    void completeApprovalProcedures(Long invoiceId, InvoiceType type) throws NotEnoughProductException;
     boolean checkProductQuantity(InvoiceProductDto salesInvoiceProduct);
     List<InvoiceProduct> findInvoiceProductsByInvoiceTypeAndProductRemainingQuantity(InvoiceType type, Product product, Integer remainingQuantity);
 
