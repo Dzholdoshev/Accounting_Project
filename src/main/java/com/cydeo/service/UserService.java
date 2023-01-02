@@ -5,6 +5,8 @@ import com.cydeo.dto.UserDto;
 import java.util.List;
 
 public interface UserService {
+    List<UserDto> getAllFilterForLoggedInUser(UserDto loggedInUser);
+
     UserDto findUserById(Long id);
     UserDto findByUsername(String username);
     List<UserDto> getFilteredUsers() throws Exception;
