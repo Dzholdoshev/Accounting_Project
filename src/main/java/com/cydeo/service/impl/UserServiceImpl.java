@@ -1,5 +1,7 @@
 package com.cydeo.service.impl;
 
+import com.cydeo.dto.CompanyDto;
+import com.cydeo.dto.RoleDto;
 import com.cydeo.dto.UserDto;
 import com.cydeo.entity.Company;
 import com.cydeo.entity.User;
@@ -9,27 +11,28 @@ import com.cydeo.service.CompanyService;
 import com.cydeo.service.RoleService;
 import com.cydeo.service.SecurityService;
 import com.cydeo.service.UserService;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Service
-public class UserServiceImpl implements UserService {
+ @Service
+ public class UserServiceImpl implements UserService {
 
-    private final SecurityService securityService;
-    private final UserRepository userRepository;
-    private final MapperUtil mapperUtil;
-    private final CompanyService companyService;
+     private final UserRepository userRepository;
+     private final SecurityService securityService;
+     private final MapperUtil mapperUtil;
+     private final PasswordEncoder passwordEncoder;
 
-
-    public UserServiceImpl(SecurityService securityService, UserRepository userRepository,
-                           MapperUtil mapperUtil, CompanyService companyService) {
-        this.securityService = securityService;
-        this.userRepository = userRepository;
-        this.mapperUtil = mapperUtil;
-        this.companyService = companyService;
-    }
+     public UserServiceImpl(UserRepository userRepository, RoleService roleService,
+                            @Lazy SecurityService securityService, MapperUtil mapperUtil, PasswordEncoder passwordEncoder) {
+         this.userRepository = userRepository;
+         this.securityService = securityService;
+         this.mapperUtil = mapperUtil;
+         this.passwordEncoder = passwordEncoder;
+     }
 
     @Override
     public UserDto findByUsername(String username) {
@@ -37,29 +40,34 @@ public class UserServiceImpl implements UserService {
         return mapperUtil.convert(user, new UserDto());
     }
 
-    @Override
-    public List<UserDto> getAllFilterForLoggedInUser(UserDto loggedInUser) {
-        switch (loggedInUser.getRole().getDescription()) {
 
-            case "Root User":
-                return getAllFilterForLoggedInUser(loggedInUser).stream()
-                        .filter(user -> user.getRole().getDescription().equals("Admin"))
-                        .collect(Collectors.toList());
 
-            case "Admin":
-                return getAllFilterForLoggedInUser(loggedInUser).stream()
-                        .filter(user -> user.getCompany().equals(loggedInUser.getCompany()))
-                        .collect(Collectors.toList());
-            default:
-                return findAllUsersByCompanyAndRole();
-
-        }
-    }
+//    @Override
+//    public List<UserDto> getAllFilterForLoggedInUser(UserDto loggedInUser) {
+//        switch (loggedInUser.getRole().getDescription()) {
+//
+//            case "Root User":
+//                return getAllFilterForLoggedInUser(loggedInUser).stream()
+//                        .filter(user -> user.getRole().getDescription().equals("Admin"))
+//                        .collect(Collectors.toList());
+//
+//            case "Admin":
+//                return getAllFilterForLoggedInUser(loggedInUser).stream()
+//                        .filter(user -> user.getCompany().equals(loggedInUser.getCompany()))
+//                        .collect(Collectors.toList());
+//            default:
+//                return findAllUsersByCompanyAndRole();
+//
+//        }
+  //  }
 
     @Override
     public UserDto findUserById(Long id) {
         User user = userRepository.findUserById(id);
-        return mapperUtil.convert(user, new UserDto());
+        UserDto dto =  mapperUtil.convert(user, new UserDto());
+        dto.setIsOnlyAdmin(checkIfOnlyAdminForCompany(dto));
+        return dto;
+
     }
 
     @Override
@@ -76,15 +84,20 @@ public class UserServiceImpl implements UserService {
                 .map(entity -> {
                     UserDto dto = mapperUtil.convert(entity, new UserDto());
                     dto.setIsOnlyAdmin(checkIfOnlyAdminForCompany(dto));
+                    dto.setRole(mapperUtil.convert(entity.getRole(),new RoleDto()));
                     return dto;
                 })
                 .collect(Collectors.toList());
     }
 
-    private boolean checkIfOnlyAdminForCompany(UserDto userDto) {
-      Company company= mapperUtil.convert(userDto.getCompany(),new Company());
-        List<User> admins = userRepository.findAllByCompany_Title(company.getTitle().equals("Admin"));
-        return userDto.getRole().getDescription().equals("Admin") && admins.size() == 1;
+    private Boolean checkIfOnlyAdminForCompany(UserDto userDto) {
+       if (userDto.getRole().getDescription().equals("Admin")){
+           List<User> admins = userRepository.findAllByRole_Description(("Admin"));
+           if (admins.size() == 1){
+               return true;
+       }
+       }
+        return false;
     }
 
     private Object getCurrentUserCompanyTitle() {
@@ -93,10 +106,7 @@ public class UserServiceImpl implements UserService {
 
     private boolean isCurrentUserRootUser() {
        User user= mapperUtil.convert(securityService.getLoggedInUser(),new User());
-     if (user.getRole().getDescription().equals("Root User")){
-         return true;
-     }
-     return false;
+        return user.getRole().getDescription().equals("Root User");
     }
 
 
@@ -142,19 +152,28 @@ public class UserServiceImpl implements UserService {
 
     }
 
-       private List<UserDto> findAllUsersByCompanyAndRole() {
+//     @Override
+//     public List<UserDto> listAllUsers() {
+//
+//        List<User> userList = userRepository.findAll();
+//             return userList.stream().map(user -> mapperUtil.convert(user, new UserDto()))
+//                     .collect(Collectors.toList());
+//         }
 
-          List<UserDto> userList = userRepository.findAllUsersByCompanyAndRole(false).stream()
-            .map(currentUser -> {
-                Boolean isOnlyAdmin =
-                        currentUser.getRole().getDescription().equals("Admin");
-                UserDto userDto = mapperUtil.convert(currentUser, new UserDto());
-                userDto.setIsOnlyAdmin(isOnlyAdmin);
-                return userDto;
-            })
-            .collect(Collectors.toList());
-    return userList;
-    }
+
+//     private List<UserDto> findAllUsersByCompanyAndRole() {
+//
+//          List<UserDto> userList = userRepository.findAllUsersByCompanyAndRole(false).stream()
+//            .map(currentUser -> {
+//                Boolean isOnlyAdmin =
+//                        currentUser.getRole().getDescription().equals("Admin");
+//                UserDto userDto = mapperUtil.convert(currentUser, new UserDto());
+//                userDto.setIsOnlyAdmin(isOnlyAdmin);
+//                return userDto;
+//            })
+//            .collect(Collectors.toList());
+//    return userList;
+//    }
 
 }
 
