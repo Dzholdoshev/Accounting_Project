@@ -76,6 +76,7 @@ public class ProductServiceImpl implements ProductService {
         return productsList.stream().map(product -> mapperUtil.convert(product, new ProductDto())).collect(Collectors.toList());
     }
 
+
     @Override
     public boolean isProductNameExist(ProductDto productDto) {
         return productRepository.existsByName(productDto.getName());
