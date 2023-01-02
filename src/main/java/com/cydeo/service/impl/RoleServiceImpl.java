@@ -9,6 +9,7 @@ import com.cydeo.service.RoleService;
 import com.cydeo.service.SecurityService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,21 +42,23 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<RoleDto> getRolesFilterForLoggedUser() {
-        UserDto loggedInUser = securityService.getLoggedInUser();
-        switch (loggedInUser.getRole().getDescription()) {
-
-            case "Root User":
-                return getAllRoles().stream()
-                        .filter(role -> role.getDescription().equals("Admin"))
-                        .collect(Collectors.toList());
-            case "Admin":
-                return getAllRoles().stream()
-                        .filter(role -> !role.getDescription().equals("Admin")
-                                &&!role.getDescription().equals("Root User"))
-                        .collect(Collectors.toList());
-            default:
-                return getAllRoles();
-        }
-
+        return null;
     }
+
+
+        @Override
+        public List<RoleDto> getFilteredRolesForCurrentUser() {
+
+            UserDto user = securityService.getLoggedInUser();
+            if (user.getRole().getDescription().equals("Root User")) {
+                List<RoleDto> list = new ArrayList<>();
+                list.add(mapperUtil.convert(roleRepository.findByDescription("Admin"), new RoleDto()));
+                return list;
+            } else {
+                return roleRepository.findAll().stream().filter(role -> !role.getDescription().equals("Root User"))
+                        .map(role -> mapperUtil.convert(role, new RoleDto()))
+                        .collect(Collectors.toList());
+            }
+
+        }
 }
