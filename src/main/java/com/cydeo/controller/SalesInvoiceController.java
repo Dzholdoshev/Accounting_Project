@@ -72,12 +72,21 @@ public class SalesInvoiceController {
 
     @PostMapping("/addInvoiceProduct/{invoiceId}")
     public String addInvoiceProductToSalesInvoice(@Valid @PathVariable("invoiceId") Long invoiceId, @ModelAttribute("invoiceProduct") InvoiceProductDto invoiceProductDto, BindingResult result, Model model) {
-        if (result.hasErrors()) {
+    boolean enoughStock= invoiceProductService.checkProductQuantity(invoiceProductDto);
+        if (result.hasErrors()||!enoughStock) {
+
+            if(!enoughStock){
+                result.reject("Not enough "+invoiceProductDto.getProduct().getName()+" quantity to sell...");
+            }
             model.addAttribute("invoice", invoiceService.findInvoiceById(invoiceId));
             model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(invoiceId));
             //product model.addAttribute("products", getlistofproducts);
             //client vendor model.addAttribute("clients", )
             return "/invoice/purchase-invoice-update";
+        }
+
+        if(!invoiceProductService.checkProductQuantity(invoiceProductDto)){
+
         }
         invoiceProductService.save(invoiceId, invoiceProductDto);
         return "redirect: /salesInvoices/update/" + invoiceId;
