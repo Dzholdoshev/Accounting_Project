@@ -1,9 +1,11 @@
 package com.cydeo.service.impl;
 
 import com.cydeo.dto.UserDto;
+import com.cydeo.entity.Company;
 import com.cydeo.entity.User;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.UserRepository;
+import com.cydeo.service.CompanyService;
 import com.cydeo.service.RoleService;
 import com.cydeo.service.SecurityService;
 import com.cydeo.service.UserService;
@@ -18,21 +20,20 @@ public class UserServiceImpl implements UserService {
     private final SecurityService securityService;
     private final UserRepository userRepository;
     private final MapperUtil mapperUtil;
-    private final RoleService roleService;
+    private final CompanyService companyService;
 
-    private final C
 
     public UserServiceImpl(SecurityService securityService, UserRepository userRepository,
-                           MapperUtil mapperUtil, RoleService roleService) {
+                           MapperUtil mapperUtil, CompanyService companyService) {
         this.securityService = securityService;
         this.userRepository = userRepository;
         this.mapperUtil = mapperUtil;
-        this.roleService = roleService;
+        this.companyService = companyService;
     }
 
     @Override
     public UserDto findByUsername(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new NoSuchElementException("User not found"));
+        User user = userRepository.findByUsername(username);
         return mapperUtil.convert(user, new UserDto());
     }
 
@@ -62,7 +63,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getFilteredUsers() throws Exception {
+    public List<UserDto> getFilteredUsers(){
 
         List<User> userList;
         if (isCurrentUserRootUser()) {
@@ -80,35 +81,42 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
-    private Object checkIfOnlyAdminForCompany(UserDto userDto) {
-
+    private boolean checkIfOnlyAdminForCompany(UserDto userDto) {
+      Company company= mapperUtil.convert(userDto.getCompany(),new Company());
+        List<User> admins = userRepository.findAllByCompany_Title(company.getTitle().equals("Admin"));
+        return userDto.getRole().getDescription().equals("Admin") && admins.size() == 1;
     }
 
     private Object getCurrentUserCompanyTitle() {
-
+     return  securityService.getLoggedInUser().getCompany().getTitle();
     }
 
     private boolean isCurrentUserRootUser() {
-
-
-
+       User user= mapperUtil.convert(securityService.getLoggedInUser(),new User());
+     if (user.getRole().getDescription().equals("Root User")){
+         return true;
+     }
+     return false;
     }
 
+
     @Override
-    public UserDto save(UserDto userDto) {
-        userDto.setPassWord(userDto.getPassWord());
-        userDto.setConfirmPassword(userDto.getPassWord());
-        User user = mapperUtil.convert(userDto, new User());
-        userRepository.save(user);
-        return userDto;
+    public UserDto save(UserDto user) {
+
+        //User user = mapperUtil.convert(userDto,new User());
+        user.setPassword(user.getPassword());
+        user.setConfirmPassword(user.getPassword());
+        User user1 = mapperUtil.convert(user, new User());
+        userRepository.save(user1);
+        return user;
     }
 
     @Override
     public UserDto update(UserDto userDto) {
-        Optional<User> user = userRepository.findUserById(userDto.getId());
+        User user = userRepository.findUserById(userDto.getId());
         User convertedUser = mapperUtil.convert(userDto, new User());
-        convertedUser.setId(user.get().getId());
-        convertedUser.setPassword(user.get().getPassword());
+        convertedUser.setId(user.getId());
+        convertedUser.setPassword(user.getPassword());
         userRepository.save(convertedUser);
         return findUserById(userDto.getId());
     }
@@ -128,16 +136,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Boolean emailExist(UserDto userDto) {
-         User user = userRepository.findByUsername(userDto.getUserName());
-        if (user != null) {
-            return true;
-        }
-        return false;
+        Optional <User> user = Optional.ofNullable(userRepository.findByUsername(userDto.getUsername()));
+        return user.filter(value -> !value.getId().equals(userDto.getId())).isPresent();
+
+
     }
 
        private List<UserDto> findAllUsersByCompanyAndRole() {
 
-          List<UserDto> list = userRepository.findAllUsersByCompanyAndRole(false).stream()
+          List<UserDto> userList = userRepository.findAllUsersByCompanyAndRole(false).stream()
             .map(currentUser -> {
                 Boolean isOnlyAdmin =
                         currentUser.getRole().getDescription().equals("Admin");
@@ -146,7 +153,7 @@ public class UserServiceImpl implements UserService {
                 return userDto;
             })
             .collect(Collectors.toList());
-    return list;
+    return userList;
     }
 
 }
