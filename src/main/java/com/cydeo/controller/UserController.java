@@ -1,6 +1,7 @@
 package com.cydeo.controller;
 
 import com.cydeo.dto.UserDto;
+import com.cydeo.entity.Company;
 import com.cydeo.service.CompanyService;
 import com.cydeo.service.RoleService;
 import com.cydeo.service.UserService;
@@ -20,13 +21,13 @@ public class UserController {
     private final CompanyService companyService;
 
 
+
     public UserController(UserService userService, RoleService roleService, CompanyService companyService) {
         this.userService = userService;
         this.roleService = roleService;
         this.companyService = companyService;
 
     }
-
 
     @GetMapping("/list")
     public String listUsers(Model model) throws Exception {
@@ -60,6 +61,7 @@ public class UserController {
     @GetMapping("/create")
     public String navigateToUserCreate(Model model) {
         model.addAttribute("newUser", new UserDto());
+
         return "/user/user-create";
     }
 
@@ -107,10 +109,10 @@ public class UserController {
         model.addAttribute("title", "Cydeo Accounting-User");
     }
 
-
-
-
-
-
-
 }
+
+
+
+
+
+
