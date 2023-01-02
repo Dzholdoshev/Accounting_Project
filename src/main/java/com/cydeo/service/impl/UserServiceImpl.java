@@ -84,29 +84,27 @@ import java.util.stream.Collectors;
                 .map(entity -> {
                     UserDto dto = mapperUtil.convert(entity, new UserDto());
                     dto.setIsOnlyAdmin(checkIfOnlyAdminForCompany(dto));
-                    dto.setRole(mapperUtil.convert(entity.getRole(),new RoleDto()));
                     return dto;
                 })
                 .collect(Collectors.toList());
     }
 
-    private Boolean checkIfOnlyAdminForCompany(UserDto userDto) {
-       if (userDto.getRole().getDescription().equals("Admin")){
-           List<User> admins = userRepository.findAllByRole_Description(("Admin"));
-           if (admins.size() == 1){
-               return true;
+    private Boolean checkIfOnlyAdminForCompany(UserDto dto) {
+       if (dto.getRole().getDescription().equalsIgnoreCase("Admin")){
+           List<User> users = userRepository.findAllByCompany_TitleAndRole_Description(dto.getCompany().getTitle(),"Admin");
+           return users.size()==1;
        }
-       }
-        return false;
+       return false;
     }
 
-    private Object getCurrentUserCompanyTitle() {
-     return  securityService.getLoggedInUser().getCompany().getTitle();
+    private String getCurrentUserCompanyTitle() {
+         String currentUserName = securityService.getLoggedInUser().getUsername();
+     return  userRepository.findByUsername(currentUserName).getCompany().getTitle();
     }
 
-    private boolean isCurrentUserRootUser() {
-       User user= mapperUtil.convert(securityService.getLoggedInUser(),new User());
-        return user.getRole().getDescription().equals("Root User");
+    private Boolean isCurrentUserRootUser() {
+
+        return securityService.getLoggedInUser().getRole().getDescription().equalsIgnoreCase("root user");
     }
 
 
