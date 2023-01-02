@@ -5,6 +5,7 @@ import com.cydeo.dto.InvoiceProductDto;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.service.InvoiceProductService;
 import com.cydeo.service.InvoiceService;
+import com.cydeo.service.ProductService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,9 +19,12 @@ public class PurchaseInvoiceController {
     private final InvoiceService invoiceService;
     private final InvoiceProductService invoiceProductService;
 
-    public PurchaseInvoiceController(InvoiceService invoiceService, InvoiceProductService invoiceProductService) {
+    private final ProductService productService;
+
+    public PurchaseInvoiceController(InvoiceService invoiceService, InvoiceProductService invoiceProductService, ProductService productService) {
         this.invoiceService = invoiceService;
         this.invoiceProductService = invoiceProductService;
+        this.productService = productService;
     }
 
     @GetMapping("/update/{invoiceId}")
@@ -29,7 +33,7 @@ public class PurchaseInvoiceController {
         model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(invoiceId));
         model.addAttribute("newInvoiceProduct", new InvoiceProductDto());
         //client vendor model.addAttribute("vendors", )
-        //product model.addAttribute("products", getlistofproducts);
+        model.addAttribute("products",productService.getAllProducts());
         return "/invoice/purchase-invoice-update";
     }
 
@@ -75,7 +79,7 @@ public class PurchaseInvoiceController {
             model.addAttribute("invoice", invoiceService.findInvoiceById(invoiceId));
             model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(invoiceId));
           //  model.addAttribute("vendors") list of vendors
-            // model.addAttribute("products",) list of  products
+            model.addAttribute("products",productService.getAllProducts());
             return "/invoice/purchase-invoice-update";
         }
         invoiceProductService.save(invoiceId, invoiceProductDto);

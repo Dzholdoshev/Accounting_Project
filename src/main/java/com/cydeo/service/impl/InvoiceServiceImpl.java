@@ -7,6 +7,7 @@ import com.cydeo.entity.Invoice;
 import com.cydeo.entity.User;
 import com.cydeo.enums.InvoiceStatus;
 import com.cydeo.enums.InvoiceType;
+import com.cydeo.exception.NotEnoughProductException;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceRepository;
 import com.cydeo.service.InvoiceProductService;
@@ -118,7 +119,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     @Transactional
-    public void approve(Long invoiceId) {
+    public void approve(Long invoiceId) throws NotEnoughProductException {
 
         Invoice invoice = invoiceRepository.findInvoiceById(invoiceId);
         invoice.setInvoiceStatus(InvoiceStatus.APPROVED);
@@ -198,6 +199,10 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
         return InvoiceNo;
     }
+
+
+
+
 }
 
 
