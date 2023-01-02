@@ -26,7 +26,7 @@ public class InvoiceDto {
     private CompanyDto company;
     private ClientVendorDto clientVendor;
     private BigDecimal price;                   //(only in Dto)
-    private Integer tax;                       //(only in Dto)
+    private BigDecimal tax;                       //(only in Dto)
     private BigDecimal total;                 //(only in Dto)
     private List<InvoiceProductDto> invoiceProducts;
 }
