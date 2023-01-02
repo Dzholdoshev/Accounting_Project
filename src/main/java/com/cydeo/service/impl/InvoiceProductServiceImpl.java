@@ -14,6 +14,7 @@ import com.cydeo.service.InvoiceService;
 import com.cydeo.service.ProductService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -68,6 +69,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         invoiceProductRepository.save(invoiceProduct);
     }
 
+    @Transactional
     @Override
     public void completeApprovalProcedures(Long invoiceId, InvoiceType type) throws NotEnoughProductException{
         List<InvoiceProduct> invoiceProductList = invoiceProductRepository.findAllByInvoice_Id(invoiceId);
@@ -75,18 +77,34 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
             for (InvoiceProduct salesInvoiceProduct : invoiceProductList) {
                 //If there is enough stock
                 if (salesInvoiceProduct.getProduct().getQuantityInStock() >= salesInvoiceProduct.getQuantity()) {
-
+                    //decrease the product quantity based on the quantity we are selling
                     updateQuantityOfProduct(salesInvoiceProduct, type);
+                    //assign quantity to remainingQty (currently null), will be updated when doing profit/loss calculation
+                    salesInvoiceProduct.setRemainingQuantity(salesInvoiceProduct.getQuantity());
+                    //updating
+                    invoiceProductRepository.save(salesInvoiceProduct);
+                    //calculate profit/loss and update remaining quantity values
+                    setProfitLossOfInvoiceProductsForSalesInvoice(salesInvoiceProduct);
 
                 }else{
                     throw new NotEnoughProductException("This sale cannot be completed due to insufficient quantity of product");
-
                 }
+            }
+        }else{
+            for (InvoiceProduct purchaseInvoiceProduct : invoiceProductList) {
+                //increase the product quantity based on the amount purchased
+                updateQuantityOfProduct(purchaseInvoiceProduct,type);
+                purchaseInvoiceProduct.setRemainingQuantity(purchaseInvoiceProduct.getQuantity());
+                //updating
+                invoiceProductRepository.save(purchaseInvoiceProduct);
             }
         }
     }
 
 
+    private void setProfitLossOfInvoiceProductsForSalesInvoice(InvoiceProduct toBeSoldProduct){
+
+    }
     private void updateQuantityOfProduct(InvoiceProduct invoiceProduct, InvoiceType type) {
         ProductDto productDto = mapperUtil.convert(invoiceProduct.getProduct(), new ProductDto());
         if (type.equals(InvoiceType.SALES)) {// increasing quantity in stock
