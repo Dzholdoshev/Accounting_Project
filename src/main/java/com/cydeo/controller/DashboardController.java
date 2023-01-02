@@ -24,9 +24,9 @@ public class DashboardController {
     public String navigateToDashboard(Model model) throws Exception{
 
         model.addAttribute("companyTitle",companyService.getCompanyByLoggedInUser().getTitle());
-        model.addAttribute("summaryNumbers",dashboardService.getSummaryNumbers());
+        //model.addAttribute("summaryNumbers",dashboardService.getSummaryNumbers());
         model.addAttribute("invoices",invoiceService.getLastThreeInvoices());
-        model.addAttribute("exchangeRates",dashboardService.getExchangeRates());
+        //model.addAttribute("exchangeRates",dashboardService.getExchangeRates());
         model.addAttribute("title","Cydeo Accounting Dashboard");
 
         return"dashboard";
