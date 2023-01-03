@@ -3,6 +3,7 @@ package com.cydeo.dto;
 import lombok.*;
 import org.hibernate.validator.constraints.Range;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 @Setter
@@ -28,6 +29,7 @@ public class InvoiceProductDto {
     private BigDecimal profitLoss;
     private int remainingQuantity;
     private InvoiceDto invoice;
+
 
     @NotNull(message="product is a required field")
     private ProductDto product;
