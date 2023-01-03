@@ -31,8 +31,8 @@ public class Invoice extends BaseEntity {
     private InvoiceType invoiceType;
 
     private LocalDate date;
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch=FetchType.LAZY, cascade =  CascadeType.MERGE)
     private ClientVendor clientVendor;
-    @ManyToOne(fetch=FetchType.LAZY) // Do we need to add Cascade?
+    @ManyToOne(fetch=FetchType.LAZY, cascade = CascadeType.MERGE) // Do we need to add Cascade?
     private Company company;
 }
