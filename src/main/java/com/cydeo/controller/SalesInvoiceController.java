@@ -86,7 +86,7 @@ public class SalesInvoiceController {
             boolean enoughStock = invoiceProductService.checkProductQuantity(newInvoiceProduct);
 
             if (!enoughStock) {
-                result.rejectValue("product", "err.product","Not enough " + newInvoiceProduct.getProduct().getName() + " quantity to sell...");
+                result.rejectValue("error", " ","Not enough " + newInvoiceProduct.getProduct().getName() + " quantity to sell...");
                 model.addAttribute("invoice", invoiceService.findInvoiceById(invoiceId));
                 model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(invoiceId));
                 model.addAttribute("products", productService.getAllProducts());

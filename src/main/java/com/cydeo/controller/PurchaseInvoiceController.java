@@ -88,7 +88,6 @@ public class PurchaseInvoiceController {
         }
         invoiceProductService.save(invoiceId, newInvoiceProduct);
         return "redirect:/purchaseInvoices/update/"+invoiceId;
-
     }
 
     @GetMapping("removeInvoiceProduct/{invoiceId}/{invoiceProductId}")
