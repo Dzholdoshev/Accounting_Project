@@ -107,9 +107,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     public InvoiceDto save(InvoiceDto invoiceDto, InvoiceType invoiceType) {
 
         User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
-        if (invoiceType.getValue().equals("Purchase")) {
-            invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
-        }
+        invoiceDto.setInvoiceType(invoiceType);
+        invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
         Invoice invoice = mapperUtil.convert(invoiceDto, new Invoice());
         invoice.setCompany(user.getCompany());
         invoice.setClientVendor(mapperUtil.convert(invoiceDto.getClientVendor(), new ClientVendor()));
@@ -171,7 +170,12 @@ public class InvoiceServiceImpl implements InvoiceService {
     public BigDecimal getTotalPriceOfInvoice(Long invoiceId) { // Invoice tax+ Invoice price
         List<InvoiceProductDto> listOfInvoiceProducts = invoiceProductService.getInvoiceProductsOfInvoice(invoiceId);
         if (listOfInvoiceProducts != null) {
-            BigDecimal price = listOfInvoiceProducts.stream().map(InvoiceProductDto::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal price = listOfInvoiceProducts.stream().map(invoiceProduct -> {
+                        BigDecimal priceOfProduct = invoiceProduct.getPrice();
+                        Integer quantityOfProduct = invoiceProduct.getQuantity();
+                        return priceOfProduct.multiply(BigDecimal.valueOf(quantityOfProduct));
+                    }
+            ).reduce(BigDecimal.ZERO, BigDecimal::add);
 
             BigDecimal tax = getTotalTaxOfInvoice(invoiceId);
             BigDecimal total = tax.add(price);
@@ -188,6 +192,8 @@ public class InvoiceServiceImpl implements InvoiceService {
 
             return listOfInvoiceProducts.stream().map(invoiceProductDto -> {
                 BigDecimal price = invoiceProductDto.getPrice();
+                Integer quantityOfProduct = invoiceProductDto.getQuantity();
+                price = price.multiply(BigDecimal.valueOf(quantityOfProduct));
                 BigDecimal tax = BigDecimal.valueOf(invoiceProductDto.getTax()).divide(BigDecimal.valueOf(100));
                 return price.multiply(tax);
             }).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_UP);
