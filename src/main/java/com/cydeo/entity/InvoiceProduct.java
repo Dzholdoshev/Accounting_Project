@@ -7,10 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Where;
 import org.hibernate.validator.constraints.Range;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
@@ -18,7 +15,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @NoArgsConstructor
-//@Where(clause = "is_deleted=false")
+@Where(clause = "is_deleted=false")
 @Table(name="invoice_products")
 public class InvoiceProduct extends BaseEntity {
     private BigDecimal price;
@@ -26,7 +23,7 @@ public class InvoiceProduct extends BaseEntity {
     private int quantity;
     private int remainingQuantity;
     private int tax;
-    @ManyToOne(fetch= FetchType.LAZY)
+    @ManyToOne(fetch= FetchType.LAZY, cascade= CascadeType.MERGE)
     private Invoice invoice;
     @ManyToOne(fetch = FetchType.LAZY)
     private Product product;

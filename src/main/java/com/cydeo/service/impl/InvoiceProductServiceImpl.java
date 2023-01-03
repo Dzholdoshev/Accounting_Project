@@ -16,6 +16,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -45,10 +47,17 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Override
     public List<InvoiceProductDto> getInvoiceProductsOfInvoice(Long invoiceId) {
-        return invoiceProductRepository.findAllByInvoice_Id(invoiceId).stream().
-                map(invoiceProduct -> mapperUtil.convert(invoiceProduct, new InvoiceProductDto()))
-                .collect(Collectors.toList());
-    }
+        List<InvoiceProduct> list = invoiceProductRepository.findAllByInvoice_Id(invoiceId);
+       return list.stream().map(invoiceProduct -> mapperUtil.convert(invoiceProduct, new InvoiceProductDto()))
+                .map(invoiceProductDto -> {
+                    BigDecimal price = invoiceProductDto.getPrice();
+                    BigDecimal tax = BigDecimal.valueOf(invoiceProductDto.getTax()).divide(BigDecimal.valueOf(100));
+                    BigDecimal totalPriceWithOutTax = price.multiply(BigDecimal.valueOf(invoiceProductDto.getQuantity()));
+                    BigDecimal totalWithTax = totalPriceWithOutTax.multiply(tax).add(totalPriceWithOutTax).setScale(2, RoundingMode.HALF_UP);
+                    invoiceProductDto.setTotal(totalWithTax);
+                    return invoiceProductDto;
+                }).collect(Collectors.toList());
+}
 
     @Override
     public void save(Long invoiceId, InvoiceProductDto invoiceProductDto) {
@@ -71,7 +80,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
     @Transactional
     @Override
-    public void completeApprovalProcedures(Long invoiceId, InvoiceType type) throws NotEnoughProductException{
+    public void completeApprovalProcedures(Long invoiceId, InvoiceType type) throws NotEnoughProductException {
         List<InvoiceProduct> invoiceProductList = invoiceProductRepository.findAllByInvoice_Id(invoiceId);
         if (type == InvoiceType.SALES) {
             for (InvoiceProduct salesInvoiceProduct : invoiceProductList) {
@@ -86,14 +95,14 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
                     //calculate profit/loss and update remaining quantity values
                     setProfitLossOfInvoiceProductsForSalesInvoice(salesInvoiceProduct);
 
-                }else{
+                } else {
                     throw new NotEnoughProductException("This sale cannot be completed due to insufficient quantity of product");
                 }
             }
-        }else{
+        } else {
             for (InvoiceProduct purchaseInvoiceProduct : invoiceProductList) {
                 //increase the product quantity based on the amount purchased
-                updateQuantityOfProduct(purchaseInvoiceProduct,type);
+                updateQuantityOfProduct(purchaseInvoiceProduct, type);
                 purchaseInvoiceProduct.setRemainingQuantity(purchaseInvoiceProduct.getQuantity());
                 //updating
                 invoiceProductRepository.save(purchaseInvoiceProduct);
@@ -102,9 +111,10 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
 
-    private void setProfitLossOfInvoiceProductsForSalesInvoice(InvoiceProduct toBeSoldProduct){
+    private void setProfitLossOfInvoiceProductsForSalesInvoice(InvoiceProduct toBeSoldProduct) {
 
     }
+
     private void updateQuantityOfProduct(InvoiceProduct invoiceProduct, InvoiceType type) {
         ProductDto productDto = mapperUtil.convert(invoiceProduct.getProduct(), new ProductDto());
         if (type.equals(InvoiceType.SALES)) {// increasing quantity in stock
