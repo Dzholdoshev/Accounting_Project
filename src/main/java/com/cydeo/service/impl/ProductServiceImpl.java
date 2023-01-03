@@ -1,0 +1,84 @@
+package com.cydeo.service.impl;
+
+import com.cydeo.dto.ProductDto;
+import com.cydeo.entity.Company;
+import com.cydeo.entity.Product;
+import com.cydeo.mapper.MapperUtil;
+import com.cydeo.repository.ProductRepository;
+import com.cydeo.service.InvoiceProductService;
+import com.cydeo.service.ProductService;
+import com.cydeo.service.SecurityService;
+import org.springframework.stereotype.Service;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class ProductServiceImpl implements ProductService {
+
+    private final ProductRepository productRepository;
+    private final SecurityService securityService;
+    private final MapperUtil mapperUtil;
+    private final InvoiceProductService invoiceProductService;
+
+    public ProductServiceImpl(ProductRepository productRepository, SecurityService securityService, MapperUtil mapperUtil, InvoiceProductService invoiceProductService) {
+        this.productRepository = productRepository;
+        this.securityService = securityService;
+        this.mapperUtil = mapperUtil;
+        this.invoiceProductService = invoiceProductService;
+    }
+
+    @Override
+    public ProductDto findProductById(Long productId) {
+     Product product = productRepository.findById(productId).get();
+
+        return mapperUtil.convert(product, new ProductDto());
+    }
+
+    @Override
+    public List<ProductDto> getAllProducts() {
+        Company company = mapperUtil.convert(securityService.getLoggedInUser().getCompany(), new Company());
+
+        return productRepository.findAllByCategoryCompany(company).stream()
+                .sorted(Comparator.comparing((Product product) -> product.getCategory().getDescription())
+                        .thenComparing(Product::getName))
+                .map(each-> mapperUtil.convert(each, new ProductDto()))
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public ProductDto save(ProductDto productDto) {
+
+        Product product = mapperUtil.convert(productDto, new Product());
+        product.setQuantityInStock(0);
+        return mapperUtil.convert(productRepository.save(product), new ProductDto());
+
+    }
+
+    @Override
+    public ProductDto update(Long productId, ProductDto productDto) {
+       Product product = productRepository.findById(productId).get();
+        return null;
+    }
+
+    @Override
+    public void delete(Long productId) {
+        Product product = productRepository.findById(productId).get();
+        product.setIsDeleted(true);
+        productRepository.save(product);
+    }
+
+    @Override
+    public List<ProductDto> findAllProductsWithCategoryId(Long categoryId) {
+        List<Product> productsList = productRepository.findByCategoryId(categoryId);
+        return productsList.stream().map(product -> mapperUtil.convert(product, new ProductDto())).collect(Collectors.toList());
+    }
+
+
+    @Override
+    public boolean isProductNameExist(ProductDto productDto) {
+        return productRepository.existsByName(productDto.getName());
+    }
+}

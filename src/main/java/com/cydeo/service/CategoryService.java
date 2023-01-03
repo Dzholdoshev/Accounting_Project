@@ -14,6 +14,7 @@ public interface CategoryService {
 
     CategoryDto update(Long categoryId, CategoryDto categoryDto);
 
+
     void delete(Long categoryId);
     boolean hasProduct(Long categoryId);
     boolean isCategoryDescriptionExist(CategoryDto categoryDto);
