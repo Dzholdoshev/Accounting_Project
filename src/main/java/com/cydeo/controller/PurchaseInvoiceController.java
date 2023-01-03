@@ -2,7 +2,9 @@ package com.cydeo.controller;
 
 import com.cydeo.dto.InvoiceDto;
 import com.cydeo.dto.InvoiceProductDto;
+import com.cydeo.entity.ClientVendor;
 import com.cydeo.enums.InvoiceType;
+import com.cydeo.service.ClientVendorService;
 import com.cydeo.service.InvoiceProductService;
 import com.cydeo.service.InvoiceService;
 import com.cydeo.service.ProductService;
@@ -20,19 +22,21 @@ public class PurchaseInvoiceController {
     private final InvoiceProductService invoiceProductService;
 
     private final ProductService productService;
+    private final ClientVendorService clientVendorService;
 
-    public PurchaseInvoiceController(InvoiceService invoiceService, InvoiceProductService invoiceProductService, ProductService productService) {
+    public PurchaseInvoiceController(InvoiceService invoiceService, InvoiceProductService invoiceProductService, ProductService productService, ClientVendorService clientVendorService) {
         this.invoiceService = invoiceService;
         this.invoiceProductService = invoiceProductService;
         this.productService = productService;
+        this.clientVendorService = clientVendorService;
     }
 
     @GetMapping("/update/{invoiceId}")
-    public String navigateToPurchaseInvoiceUpdate(@PathVariable("invoiceId") Long invoiceId, Model model) {
+    public String navigateToPurchaseInvoiceUpdate(@PathVariable("invoiceId") Long invoiceId, Model model) throws Exception {
         model.addAttribute("invoice", invoiceService.findInvoiceById(invoiceId));
         model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(invoiceId));
         model.addAttribute("newInvoiceProduct", new InvoiceProductDto());
-        //client vendor model.addAttribute("vendors", )
+        model.addAttribute("vendors", clientVendorService.getAllClientVendors());
         model.addAttribute("products",productService.getAllProducts());
         return "/invoice/purchase-invoice-update";
     }
@@ -40,13 +44,14 @@ public class PurchaseInvoiceController {
     @PostMapping("/update/{invoiceId}")
     public String updatePurchaseInvoice(@PathVariable("invoiceId") Long invoiceId, InvoiceDto invoiceDto) {
         invoiceService.update(invoiceId, invoiceDto);
-        return "redirect: /purchaseInvoices/list";
+        String redirectUrl= "/purchaseInvoices/update/"+invoiceId.toString();
+        return "redirect:" +redirectUrl;
     }
 
-    @GetMapping("/delete/{invoiceId}")
-    public String deletePurchaseInvoice(@PathVariable("invoiceId") Long invoiceId) {
-        invoiceService.delete(invoiceId);
-        return "redirect: /purchaseInvoices/list";
+    @GetMapping("/delete/{id}")
+    public String deletePurchaseInvoice(@PathVariable("id") Long id) {
+        invoiceService.delete(id);
+        return "redirect:/purchaseInvoices/list";
     }
 
     @GetMapping("/list")
@@ -58,38 +63,43 @@ public class PurchaseInvoiceController {
     @GetMapping("/create")
     public String navigateToPurchaseInvoiceCreate(Model model) throws Exception {
         model.addAttribute("newPurchaseInvoice", invoiceService.getNewInvoice(InvoiceType.PURCHASE));
-        //   model.addAttribute("vendors") get list of client vendors
+          model.addAttribute("vendors", clientVendorService.getAllClientVendors());
         return "/invoice/purchase-invoice-create";
     }
 
     @PostMapping("/create")
-    public String createNewPurchaseInvoice(@Valid @ModelAttribute("invoiceDto") InvoiceDto invoiceDto, BindingResult result, Model model) {
+    public String createNewPurchaseInvoice(@Valid @ModelAttribute("newPurchaseInvoice") InvoiceDto newPurchaseInvoice, BindingResult result, Model model) throws Exception {
 
         if (result.hasErrors()) {
-            //  model.addAttribute("vendors") list of vendors
+            model.addAttribute("vendors", clientVendorService.getAllClientVendors());
             return "/invoice/purchase-invoice-create";
         }
-        var invoice = invoiceService.save(invoiceDto, InvoiceType.PURCHASE);
-        return "redirect: /purchaseInvoices/update/" + invoice.getId();
+        var invoice = invoiceService.save(newPurchaseInvoice, InvoiceType.PURCHASE);
+
+        String redirectUrl= "/purchaseInvoices/update/"+invoice.getId().toString();
+        return "redirect:" +redirectUrl;
     }
 
     @PostMapping("/addInvoiceProduct/{invoiceId}")
-    public String addInvoiceProductToPurchaseInvoice(@Valid @PathVariable("invoiceId") Long invoiceId, @ModelAttribute("invoiceProduct") InvoiceProductDto invoiceProductDto, BindingResult result, Model model) {
+    public String addInvoiceProductToPurchaseInvoice( @PathVariable("invoiceId") Long invoiceId, @Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDto newInvoiceProduct, BindingResult result, Model model) throws Exception {
         if (result.hasErrors()) {
             model.addAttribute("invoice", invoiceService.findInvoiceById(invoiceId));
             model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(invoiceId));
-          //  model.addAttribute("vendors") list of vendors
+            model.addAttribute("vendors", clientVendorService.getAllClientVendors());
             model.addAttribute("products",productService.getAllProducts());
             return "/invoice/purchase-invoice-update";
         }
-        invoiceProductService.save(invoiceId, invoiceProductDto);
-        return "redirect: /purchaseInvoices/update/" + invoiceId;
+        invoiceProductService.save(invoiceId, newInvoiceProduct);
+        String redirectUrl= "/purchaseInvoices/update/"+invoiceId.toString();
+        return "redirect:" +redirectUrl;
+
     }
 
     @GetMapping("removeInvoiceProduct/{invoiceId}/{invoiceProductId}")
     public String removeInvoiceProductFromPurchaseInvoice(@PathVariable("invoiceId") Long invoiceId, @PathVariable("invoiceProductId") Long invoiceProductId) {
         invoiceProductService.delete(invoiceProductId);
-        return "redirect: /purchaseInvoices/update/" + invoiceId;
+        String redirectUrl= "/purchaseInvoices/update/"+invoiceId.toString();
+        return "redirect:" +redirectUrl;
     }
 
     @GetMapping("/print/{invoiceId}")
@@ -104,6 +114,6 @@ public class PurchaseInvoiceController {
     @GetMapping("/approve/{invoiceId}")
     public String approve(@PathVariable("invoiceId") long invoiceId) throws Exception {
         invoiceService.approve(invoiceId);
-        return "redirect: /purchaseInvoices/list";
+        return "redirect:/purchaseInvoices/list";
     }
 }
