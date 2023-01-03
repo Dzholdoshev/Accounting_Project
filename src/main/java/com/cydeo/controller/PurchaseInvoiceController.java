@@ -44,8 +44,7 @@ public class PurchaseInvoiceController {
     @PostMapping("/update/{invoiceId}")
     public String updatePurchaseInvoice(@PathVariable("invoiceId") Long invoiceId, InvoiceDto invoiceDto) {
         invoiceService.update(invoiceId, invoiceDto);
-        String redirectUrl= "/purchaseInvoices/update/"+invoiceId.toString();
-        return "redirect:" +redirectUrl;
+        return "redirect:/purchaseInvoices/update/"+invoiceId;
     }
 
     @GetMapping("/delete/{id}")
@@ -75,9 +74,7 @@ public class PurchaseInvoiceController {
             return "/invoice/purchase-invoice-create";
         }
         var invoice = invoiceService.save(newPurchaseInvoice, InvoiceType.PURCHASE);
-
-        String redirectUrl= "/purchaseInvoices/update/"+invoice.getId().toString();
-        return "redirect:" +redirectUrl;
+        return "redirect:/purchaseInvoices/update/"+invoice.getId();
     }
 
     @PostMapping("/addInvoiceProduct/{invoiceId}")
@@ -90,16 +87,14 @@ public class PurchaseInvoiceController {
             return "/invoice/purchase-invoice-update";
         }
         invoiceProductService.save(invoiceId, newInvoiceProduct);
-        String redirectUrl= "/purchaseInvoices/update/"+invoiceId.toString();
-        return "redirect:" +redirectUrl;
+        return "redirect:/purchaseInvoices/update/"+invoiceId;
 
     }
 
     @GetMapping("removeInvoiceProduct/{invoiceId}/{invoiceProductId}")
     public String removeInvoiceProductFromPurchaseInvoice(@PathVariable("invoiceId") Long invoiceId, @PathVariable("invoiceProductId") Long invoiceProductId) {
         invoiceProductService.delete(invoiceProductId);
-        String redirectUrl= "/purchaseInvoices/update/"+invoiceId.toString();
-        return "redirect:" +redirectUrl;
+        return "redirect:/purchaseInvoices/update/"+invoiceId;
     }
 
     @GetMapping("/print/{invoiceId}")

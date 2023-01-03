@@ -2,6 +2,7 @@ package com.cydeo.controller;
 
 import com.cydeo.dto.InvoiceDto;
 import com.cydeo.dto.InvoiceProductDto;
+import com.cydeo.dto.ProductDto;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.service.ClientVendorService;
 import com.cydeo.service.InvoiceProductService;
@@ -43,8 +44,7 @@ public class SalesInvoiceController {
     @PostMapping("/update/{invoiceId}")
     public String updateSalesInvoice(@PathVariable("invoiceId") Long invoiceId, InvoiceDto invoiceDto) {
         invoiceService.update(invoiceId, invoiceDto);
-        String redirectUrl = "/salesInvoices/update/" + invoiceId.toString();
-        return "redirect:" + redirectUrl;
+        return "redirect:/salesInvoices/update/" + invoiceId;
     }
 
     @GetMapping("/delete/{invoiceId}")
@@ -75,38 +75,40 @@ public class SalesInvoiceController {
             return "/invoice/sales-invoice-create";
         }
         var invoice = invoiceService.save(newSalesInvoice, InvoiceType.SALES);
-        String redirectUrl = "/salesInvoices/update/" + newSalesInvoice.getId().toString();
-        return "redirect:" + redirectUrl;
+        return "redirect:/salesInvoices/update/" + newSalesInvoice.getId();
     }
 
     @PostMapping("/addInvoiceProduct/{invoiceId}")
     public String addInvoiceProductToSalesInvoice(@PathVariable("invoiceId") Long invoiceId, @Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDto newInvoiceProduct, BindingResult result, Model model) throws Exception {
-        boolean enoughStock = invoiceProductService.checkProductQuantity(newInvoiceProduct);
-        if (result.hasErrors() || !enoughStock) {
+
+        if (newInvoiceProduct.getProduct() != null) {
+
+            boolean enoughStock = invoiceProductService.checkProductQuantity(newInvoiceProduct);
 
             if (!enoughStock) {
-                result.reject("Not enough " + newInvoiceProduct.getProduct().getName() + " quantity to sell...");
+                result.rejectValue("product", "err.product","Not enough " + newInvoiceProduct.getProduct().getName() + " quantity to sell...");
+                model.addAttribute("invoice", invoiceService.findInvoiceById(invoiceId));
+                model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(invoiceId));
+                model.addAttribute("products", productService.getAllProducts());
+                model.addAttribute("clients", clientVendorService.getAllClientVendors());
+                return "/invoice/purchase-invoice-update";
             }
+        }
+        if (result.hasErrors()){
             model.addAttribute("invoice", invoiceService.findInvoiceById(invoiceId));
             model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(invoiceId));
             model.addAttribute("products", productService.getAllProducts());
             model.addAttribute("clients", clientVendorService.getAllClientVendors());
             return "/invoice/purchase-invoice-update";
         }
-
-        if (!invoiceProductService.checkProductQuantity(newInvoiceProduct)) {
-
-        }
         invoiceProductService.save(invoiceId, newInvoiceProduct);
-        String redirectUrl = "/salesInvoices/update/" + invoiceId.toString();
-        return "redirect:" + redirectUrl;
+        return "redirect:/salesInvoices/update/" + invoiceId;
     }
 
     @GetMapping("removeInvoiceProduct/{invoiceId}/{invoiceProductId}")
     public String removeInvoiceProductFromSalesInvoice(@PathVariable("invoiceId") Long invoiceId, @PathVariable("invoiceProductId") Long invoiceProductId) {
         invoiceProductService.delete(invoiceProductId);
-        String redirectUrl = "/salesInvoices/update/" + invoiceId.toString();
-        return "redirect:" + redirectUrl;
+        return "redirect:/salesInvoices/update/" + invoiceId;
     }
 
     @GetMapping("/print/{invoiceId}")
