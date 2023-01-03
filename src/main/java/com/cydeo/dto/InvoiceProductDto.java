@@ -30,7 +30,6 @@ public class InvoiceProductDto {
     private int remainingQuantity;
     private InvoiceDto invoice;
 
-
     @NotNull(message="product is a required field")
     private ProductDto product;
 }
