@@ -2,13 +2,13 @@ package com.cydeo.service.impl;
 
 import com.cydeo.dto.CompanyDto;
 
-import com.cydeo.dto.UserDto;
 import com.cydeo.entity.Company;
 import com.cydeo.enums.CompanyStatus;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.CompanyRepository;
 import com.cydeo.service.CompanyService;
 import com.cydeo.service.SecurityService;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public class CompanyServiceImpl implements CompanyService {
 
         Company company = companyRepository.findById(id).get();
 
-        return mapperUtil.convert(company,new CompanyDto());
+        return mapperUtil.convert(company, new CompanyDto());
     }
 
     @Override
@@ -46,17 +46,16 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public CompanyDto getCompanyByLoggedInUser() {
 
-        UserDto loggedInUser = securityService.getLoggedInUser();
-
-        return null;
+        return securityService.getLoggedInUser().getCompany();
 
     }
 
     @Override
     public List<CompanyDto> getAllCompanies() {
 
-        return companyRepository.findAll()
+        return companyRepository.findAll(Sort.by("title"))
                 .stream()
+                .filter(company -> company.getId() != 1) //Removes CYDEO from list
                 .map(company -> mapperUtil.convert(company,new CompanyDto()))
                 .collect(Collectors.toList());
 
@@ -65,20 +64,31 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public List<CompanyDto> getFilteredCompaniesForCurrentUser() {
 
-        UserDto loggedInUser = securityService.getLoggedInUser();
+        if(securityService.getLoggedInUser().getRole().getId()==1L){
+            return getAllCompanies();
+        }
+        if(securityService.getLoggedInUser().getRole().getId()==2L){
+            return getAllCompanies().stream()
+                    .filter(companyDto -> companyDto.getId()==2L)
+                    .collect(Collectors.toList());
+        }
+        return getAllCompanies();
+        //Need to test
 
-        return null;
     }
 
-    @Override
-    public CompanyDto create(CompanyDto companyDto) {
-        return null;
-    }
+//    @Override
+//    public CompanyDto create(CompanyDto companyDto) {
+//
+//       return null;
+//
+//    }
 
-    @Override
-    public CompanyDto update(Long companyId, CompanyDto companyDto) throws CloneNotSupportedException {
-        return null;
-    }
+//    @Override
+//    public CompanyDto update(Long companyId, CompanyDto companyDto) throws CloneNotSupportedException {
+//        return null;
+//    }
+
 
     @Override
     public void activate(Long companyId) {
@@ -100,7 +110,25 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public boolean isTitleExist(String title) {
-        return false;
+        return companyRepository.existsByTitle(title);
+    }
+
+    @Override
+    public void save(CompanyDto companyDto) {
+        if(companyDto.getCompanyStatus()==null) companyDto.setCompanyStatus(CompanyStatus.PASSIVE);
+        companyRepository.save(mapperUtil.convert(companyDto, new Company()));
+    }
+
+    @Override
+    public CompanyDto updateCompany(CompanyDto companyDto) {
+
+        Company company = companyRepository.findById(companyDto.getId()).get();
+        Company convertedCompany = mapperUtil.convert(companyDto, new Company());
+        convertedCompany.setId(company.getId());
+        convertedCompany.setCompanyStatus(company.getCompanyStatus());
+        companyRepository.save(convertedCompany);
+
+        return findCompanyById(companyDto.getId());
     }
 
 }

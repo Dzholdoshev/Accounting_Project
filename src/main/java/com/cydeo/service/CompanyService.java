@@ -4,12 +4,14 @@ import com.cydeo.dto.CompanyDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-@Service
+
 public interface CompanyService {
 
     CompanyDto findCompanyById(Long id);
+    //for update?
 
     CompanyDto findCompanyByTitle(String Title);
+    //for update?
 
     CompanyDto getCompanyByLoggedInUser();
 
@@ -17,9 +19,9 @@ public interface CompanyService {
 
     List<CompanyDto> getFilteredCompaniesForCurrentUser();
 
-    CompanyDto create(CompanyDto companyDto);
+//    CompanyDto create(CompanyDto companyDto);
 
-    CompanyDto update(Long companyId, CompanyDto companyDto) throws CloneNotSupportedException;
+//    CompanyDto update(Long companyId, CompanyDto companyDto) throws CloneNotSupportedException;
 
     void activate(Long companyId);
 
@@ -27,5 +29,7 @@ public interface CompanyService {
 
     boolean isTitleExist(String title);
 
+    void save(CompanyDto company);
 
+    CompanyDto updateCompany(CompanyDto companyDto);
 }
