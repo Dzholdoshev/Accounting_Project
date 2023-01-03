@@ -43,8 +43,8 @@ public class SalesInvoiceController {
     @PostMapping("/update/{invoiceId}")
     public String updateSalesInvoice(@PathVariable("invoiceId") Long invoiceId, InvoiceDto invoiceDto) {
         invoiceService.update(invoiceId, invoiceDto);
-        String redirectUrl= "/salesInvoices/update/"+invoiceId.toString();
-        return "redirect:" +redirectUrl;
+        String redirectUrl = "/salesInvoices/update/" + invoiceId.toString();
+        return "redirect:" + redirectUrl;
     }
 
     @GetMapping("/delete/{invoiceId}")
@@ -71,16 +71,16 @@ public class SalesInvoiceController {
 
         if (result.hasErrors()) {
             model.addAttribute("newSalesInvoice", newSalesInvoice);
-            model.addAttribute("clients",clientVendorService.getAllClientVendors());
+            model.addAttribute("clients", clientVendorService.getAllClientVendors());
             return "/invoice/sales-invoice-create";
         }
         var invoice = invoiceService.save(newSalesInvoice, InvoiceType.SALES);
-        String redirectUrl= "/salesInvoices/update/"+newSalesInvoice.getId().toString();
-        return "redirect:" +redirectUrl;
+        String redirectUrl = "/salesInvoices/update/" + newSalesInvoice.getId().toString();
+        return "redirect:" + redirectUrl;
     }
 
     @PostMapping("/addInvoiceProduct/{invoiceId}")
-    public String addInvoiceProductToSalesInvoice(@PathVariable("invoiceId") Long invoiceId,@Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDto newInvoiceProduct, BindingResult result, Model model) throws Exception {
+    public String addInvoiceProductToSalesInvoice(@PathVariable("invoiceId") Long invoiceId, @Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDto newInvoiceProduct, BindingResult result, Model model) throws Exception {
         boolean enoughStock = invoiceProductService.checkProductQuantity(newInvoiceProduct);
         if (result.hasErrors() || !enoughStock) {
 
@@ -89,8 +89,8 @@ public class SalesInvoiceController {
             }
             model.addAttribute("invoice", invoiceService.findInvoiceById(invoiceId));
             model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(invoiceId));
-             model.addAttribute("products", productService.getAllProducts());
-          model.addAttribute("clients", clientVendorService.getAllClientVendors());
+            model.addAttribute("products", productService.getAllProducts());
+            model.addAttribute("clients", clientVendorService.getAllClientVendors());
             return "/invoice/purchase-invoice-update";
         }
 
@@ -98,15 +98,15 @@ public class SalesInvoiceController {
 
         }
         invoiceProductService.save(invoiceId, newInvoiceProduct);
-        String redirectUrl= "/salesInvoices/update/"+invoiceId.toString();
-        return "redirect:" +redirectUrl;
+        String redirectUrl = "/salesInvoices/update/" + invoiceId.toString();
+        return "redirect:" + redirectUrl;
     }
 
     @GetMapping("removeInvoiceProduct/{invoiceId}/{invoiceProductId}")
     public String removeInvoiceProductFromSalesInvoice(@PathVariable("invoiceId") Long invoiceId, @PathVariable("invoiceProductId") Long invoiceProductId) {
         invoiceProductService.delete(invoiceProductId);
-        String redirectUrl= "/salesInvoices/update/"+invoiceId.toString();
-        return "redirect:" +redirectUrl;
+        String redirectUrl = "/salesInvoices/update/" + invoiceId.toString();
+        return "redirect:" + redirectUrl;
     }
 
     @GetMapping("/print/{invoiceId}")
