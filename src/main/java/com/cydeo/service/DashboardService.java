@@ -9,9 +9,12 @@ import java.util.Map;
 
 public interface DashboardService {
 
+    /*
     Map<String, BigDecimal> getSummaryNumbers()throws Exception;
 
     CurrencyDto getExchangeRates();
+
+     */
 
 
 }
