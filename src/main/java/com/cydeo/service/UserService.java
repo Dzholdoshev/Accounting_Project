@@ -5,7 +5,8 @@ import com.cydeo.dto.UserDto;
 import java.util.List;
 
 public interface UserService {
-    List<UserDto> getAllFilterForLoggedInUser(UserDto loggedInUser);
+
+   // List<UserDto> getAllFilterForLoggedInUser(UserDto loggedInUser);
 
     UserDto findUserById(Long id);
     UserDto findByUsername(String username);
@@ -14,6 +15,8 @@ public interface UserService {
     UserDto update(UserDto userDto);
     void delete(Long id);
     Boolean emailExist(UserDto userDto);
+
+   // List<UserDto> listAllUsers();
 
 
 }
