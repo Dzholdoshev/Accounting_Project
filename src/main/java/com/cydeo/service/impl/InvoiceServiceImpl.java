@@ -57,7 +57,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         return PurchaseInvoicesList.stream().map(invoice -> {
             InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
             // invoiceDto.setPrice(invoicePrice(invoiceDto));
-            invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()).intValue());
+            invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()));
             invoiceDto.setTotal(getTotalPriceOfInvoice(invoiceDto.getId()));
 
             return invoiceDto;
@@ -74,7 +74,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         return invoiceList.stream().map(invoice -> {
             InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
             // invoiceDto.setPrice(invoicePrice(invoiceDto));
-            invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()).intValue());
+            invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()));
             invoiceDto.setTotal(getTotalPriceOfInvoice(invoiceDto.getId()));
 
             return invoiceDto;
@@ -136,7 +136,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     public InvoiceDto printInvoice(Long id) {
         InvoiceDto invoiceDto = mapperUtil.convert(invoiceRepository.findInvoiceById(id), new InvoiceDto());
         // invoiceDto.setPrice();
-        invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()).intValue());
+        invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()));
         invoiceDto.setTotal(getTotalPriceOfInvoice(invoiceDto.getId()));
         return invoiceDto;
     }
@@ -151,9 +151,22 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public List<InvoiceDto> getLastThreeInvoices() {
-        //Ilhan
-        return null;
+    public List<InvoiceDto> getLastThreeInvoices() { //my changes ilhan
+
+        Company company = mapperUtil.convert(securityService.getLoggedInUser().getCompany(), new Company());
+        return invoiceRepository.findInvoicesByCompanyAndInvoiceStatusOrderByDateDesc(company,InvoiceStatus.APPROVED)
+                .stream()
+                .limit(3)
+                .map(each->mapperUtil.convert(each,new InvoiceDto()))
+                .peek(this::calculateInvoiceDetails)
+                .collect(Collectors.toList());
+    }
+
+    private void calculateInvoiceDetails(InvoiceDto invoiceDto){   // my changes ilhan
+
+        invoiceDto.setPrice(getTotalPriceOfInvoice(invoiceDto.getId()));
+        invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()));
+        invoiceDto.setTotal(getTotalPriceOfInvoice(invoiceDto.getId()).add(getTotalTaxOfInvoice(invoiceDto.getId())));
     }
 
     @Override
