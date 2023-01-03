@@ -21,7 +21,7 @@ public interface InvoiceService {
     InvoiceDto save(InvoiceDto invoiceDto, InvoiceType invoiceType);
     InvoiceDto update(Long id, InvoiceDto invoiceDto);
 
-    void approve(Long id);
+    void approve(Long id) throws Exception;
     InvoiceDto printInvoice(Long id);
 
     void delete(Long id);
