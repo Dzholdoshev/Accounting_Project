@@ -2,7 +2,6 @@ package com.cydeo.controller;
 
 import com.cydeo.dto.InvoiceDto;
 import com.cydeo.dto.InvoiceProductDto;
-import com.cydeo.entity.ClientVendor;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.service.ClientVendorService;
 import com.cydeo.service.InvoiceProductService;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
 
 @Controller
@@ -20,7 +18,6 @@ import javax.validation.Valid;
 public class PurchaseInvoiceController {
     private final InvoiceService invoiceService;
     private final InvoiceProductService invoiceProductService;
-
     private final ProductService productService;
     private final ClientVendorService clientVendorService;
 
@@ -78,7 +75,7 @@ public class PurchaseInvoiceController {
     }
 
     @PostMapping("/addInvoiceProduct/{invoiceId}")
-    public String addInvoiceProductToPurchaseInvoice( @PathVariable("invoiceId") Long invoiceId, @Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDto newInvoiceProduct, BindingResult result, Model model) throws Exception {
+    public String addInvoiceProductToPurchaseInvoice(@PathVariable("invoiceId") Long invoiceId,  @Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDto newInvoiceProduct, BindingResult result, Model model) throws Exception {
         if (result.hasErrors()) {
             model.addAttribute("invoice", invoiceService.findInvoiceById(invoiceId));
             model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(invoiceId));

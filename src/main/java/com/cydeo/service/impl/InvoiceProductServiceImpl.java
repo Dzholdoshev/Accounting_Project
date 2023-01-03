@@ -16,6 +16,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.Valid;
+import javax.validation.constraints.AssertTrue;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -48,7 +50,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     @Override
     public List<InvoiceProductDto> getInvoiceProductsOfInvoice(Long invoiceId) {
         List<InvoiceProduct> list = invoiceProductRepository.findAllByInvoice_Id(invoiceId);
-       return list.stream().map(invoiceProduct -> mapperUtil.convert(invoiceProduct, new InvoiceProductDto()))
+        return list.stream().map(invoiceProduct -> mapperUtil.convert(invoiceProduct, new InvoiceProductDto()))
                 .map(invoiceProductDto -> {
                     BigDecimal price = invoiceProductDto.getPrice();
                     BigDecimal tax = BigDecimal.valueOf(invoiceProductDto.getTax()).divide(BigDecimal.valueOf(100));
@@ -57,7 +59,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
                     invoiceProductDto.setTotal(totalWithTax);
                     return invoiceProductDto;
                 }).collect(Collectors.toList());
-}
+    }
 
     @Override
     public void save(Long invoiceId, InvoiceProductDto invoiceProductDto) {
@@ -126,6 +128,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         productService.update(productDto.getId(), productDto);
 
     }
+
 
     @Override
     public boolean checkProductQuantity(InvoiceProductDto salesInvoiceProduct) {
