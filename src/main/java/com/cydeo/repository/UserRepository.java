@@ -17,17 +17,18 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findUserById(Long id);
 
-//    @Query("Select u from User u where u.isDeleted=?1 order by u.company.title, u.role.description ")
-//    List<User> findAllUsersByCompanyAndRole(Boolean deleted);
+    @Query("Select u from User u where u.isDeleted=?1 order by u.company.title, u.role.description ")
+    List<User> findAllUsersByCompanyAndRole(Boolean deleted);
 
 
-    User findUserByIdAndIsDeleted(Long id, boolean b);
+    User findByUsernameAndIsDeleted(Long id, boolean b);
 
-    List<User> findAllByRole_Description(String roleDescription);
+   // User findByEmail(String email);
 
 
-    List<User> findAllByCompany_Title(String companyName);
+    List<User> findAllByRole_Description(String admin);
 
-    List<User> findAllByCompany_TitleAndRole_Description(String companyTitle, String role);
+
+    List<User> findAllByCompany_Title(Object currentUserCompanyTitle);
 
 }
