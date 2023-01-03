@@ -56,20 +56,28 @@ public class ProductController {
         return "redirect:/products/list";
     }
 
-    @GetMapping("/update/{id}")
-    public String updateProduct(Model model, @PathVariable("{id}") Long id) throws Exception {
+    @GetMapping("/update/{productId}")
+    public String navigateToProductUpdate(@PathVariable("{productId}") Long productId, Model model) throws Exception{
 
-        model.addAttribute("product", productService.findProductById(id));
-        model.addAttribute("categories", categoryService.getAllCategories());
-        model.addAttribute("productUnits", Arrays.asList(ProductUnit.values()));
+        model.addAttribute("product", productService.findProductById(productId));
 
-        return "redirect:/products/list";
+        return "/product/product-update";
     }
 
-    @PostMapping("/update/{id}")
-    public String update(@ModelAttribute("product") ProductDto productDto, @PathVariable("{id}") Long id){
+    @PostMapping("/update/{productId}")
+    public String updateProduct(@ModelAttribute("product") ProductDto productDto, BindingResult bindingResult, @PathVariable("{productId}") Long productId, Model model) throws Exception{
 
-        productService.update(id, productDto);
+        productDto.setId(productId);
+
+        if (productService.isProductNameExist(productDto)){
+            bindingResult.rejectValue("name", " ", "product name already exist");
+        }
+
+        if (bindingResult.hasErrors()){
+            return "product/product-update";
+        }
+
+        productService.update(productId, productDto);
 
         return "redirect:/products/list";
     }
