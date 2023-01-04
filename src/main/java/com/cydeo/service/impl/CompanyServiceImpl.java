@@ -65,15 +65,16 @@ public class CompanyServiceImpl implements CompanyService {
     public List<CompanyDto> getFilteredCompaniesForCurrentUser() {
 
         if(securityService.getLoggedInUser().getRole().getId()==1L){
-            return getAllCompanies();
+            return getAllCompanies(); //takes care of ROOT
         }
         if(securityService.getLoggedInUser().getRole().getId()==2L){
+            Long companyId = securityService.getLoggedInUser().getCompany().getId();
             return getAllCompanies().stream()
-                    .filter(companyDto -> companyDto.getId()==2L)
+                    .filter(companyDto -> companyDto.getId().equals(companyId))
                     .collect(Collectors.toList());
         }
         return getAllCompanies();
-        //Need to test
+        //Need to test - Lorraine wants to improve on this - whatever... >:-)
 
     }
 
