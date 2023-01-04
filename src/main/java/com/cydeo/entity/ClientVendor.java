@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,10 +23,10 @@ public class ClientVendor extends BaseEntity {
   private String website;
   @Enumerated(EnumType.STRING)
   private ClientVendorType clientVendorType;
-  @OneToOne(cascade = CascadeType.PERSIST)
+  @OneToOne(cascade = {CascadeType.ALL,CascadeType.MERGE})
   @JoinColumn(name = "address_id")
   private Address address;
-  @ManyToOne (fetch = FetchType.LAZY)
+  @ManyToOne//(fetch = FetchType.LAZY)
   @JoinColumn(name = "company_id")
   private Company company;
 
