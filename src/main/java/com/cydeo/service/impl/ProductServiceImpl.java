@@ -77,11 +77,14 @@ public class ProductServiceImpl implements ProductService {
     public void delete(Long productId) {
         Product product = productRepository.findById(productId).get();
 
-        if (invoiceProductService.findAllInvoiceProductsByProductId(productId).size() == 0){
+        if (invoiceProductService.findAllInvoiceProductsByProductId(productId).size() == 0 || product.getQuantityInStock() == 0){
             product.setIsDeleted(true);
-            productRepository.save(product);
+
+        }else {
+            System.out.println("YOU CAN NOT DELETE THIS PRODUCT");
         }
 
+        productRepository.save(product);
 
     }
 
