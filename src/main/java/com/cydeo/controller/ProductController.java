@@ -60,7 +60,6 @@ public class ProductController {
     public String navigateToProductUpdate(@PathVariable(value = "productId") Long productId, Model model) throws Exception{
 
         model.addAttribute("product", productService.findProductById(productId));
-//        model.addAttribute("product", productService.findProductById(productId));
 
         return "/product/product-update";
     }
