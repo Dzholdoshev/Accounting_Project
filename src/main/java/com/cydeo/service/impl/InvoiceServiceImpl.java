@@ -161,9 +161,22 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public List<InvoiceDto> getLastThreeInvoices() {
-        //Ilhan
-        return null;
+    public List<InvoiceDto> getLastThreeInvoices() { //my changes ilhan
+
+        Company company = mapperUtil.convert(securityService.getLoggedInUser().getCompany(), new Company());
+        return invoiceRepository.findInvoicesByCompanyAndInvoiceStatusOrderByDateDesc(company,InvoiceStatus.APPROVED)
+                .stream()
+                .limit(3)
+                .map(each->mapperUtil.convert(each,new InvoiceDto()))
+                .peek(this::calculateInvoiceDetails)
+                .collect(Collectors.toList());
+    }
+
+    private void calculateInvoiceDetails(InvoiceDto invoiceDto){   // my changes ilhan
+
+        invoiceDto.setPrice(getTotalPriceOfInvoice(invoiceDto.getId()));
+        invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()));
+        invoiceDto.setTotal(getTotalPriceOfInvoice(invoiceDto.getId()).add(getTotalTaxOfInvoice(invoiceDto.getId())));
     }
 
     @Override
