@@ -33,7 +33,7 @@ public class CategoryController {
     }
 
     @PostMapping("/create")
-    public String createNewCategory(@Valid @ModelAttribute("newCategory") CategoryDto categoryDto, BindingResult bindingResult) throws Exception {
+    public String createNewCategory(@Valid @ModelAttribute("newCategory") CategoryDto categoryDto, BindingResult bindingResult,Model model) throws Exception {
 
         boolean categoryDescriptionExist = categoryService.isCategoryDescriptionExist(categoryDto);
 
