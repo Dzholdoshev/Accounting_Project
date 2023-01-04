@@ -76,8 +76,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void delete(Long productId) {
         Product product = productRepository.findById(productId).get();
-        product.setIsDeleted(true);
-        productRepository.save(product);
+
+        if (invoiceProductService.findAllInvoiceProductsByProductId(productId).size() == 0){
+            product.setIsDeleted(true);
+            productRepository.save(product);
+        }
+
+
     }
 
     @Override

@@ -83,6 +83,13 @@ public class ProductController {
         return "redirect:/products/list";
     }
 
+    @GetMapping("/delete/{productId}")
+    public String deleteProduct(@PathVariable(value = "productId") Long productId, Model model){
+
+        productService.delete(productId);
+        return "redirect:/products/list";
+    }
+
     @ModelAttribute
     public void commonAttributes(Model model) throws Exception {
         model.addAttribute("products", productService.getAllProducts());
