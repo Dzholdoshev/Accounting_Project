@@ -11,7 +11,7 @@ public class UserDto {
 
     Long id;
 
-    @NotBlank(message = "First Name is a required field.")
+    @NotBlank(message = "First Name is a required field. ")
     @Size(max = 50, min = 2, message = "First Name should be 2-50 characters long.")
     String firstname;
 
@@ -28,17 +28,18 @@ public class UserDto {
     String phone;
 
     @NotBlank (message = "Password is a required field.")
-    @Pattern(regexp = "(?=.\\d)(?=.[a-z])(?=.*[A-Z]).{4,}")
+    @Pattern(regexp = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{4,}")
     String password;
 
     @NotBlank (message = "Passwords should match.")
-    @Pattern(regexp = "(?=.\\d)(?=.[a-z])(?=.*[A-Z]).{4,}")
+    // @Pattern(regexp = "(?=.\\d)(?=.[a-z])(?=.*[A-Z]).{4}")
     String confirmPassword;
-
-    @NotBlank (message = "Please select a role")
+    @Valid
+    @NotNull (message = "Please select a role")
     RoleDto role;
 
-    @NotBlank (message = "Please select a customer")
+    @Valid
+    @NotNull (message = "Please select a company")
     CompanyDto company;
 
     Boolean isOnlyAdmin;
