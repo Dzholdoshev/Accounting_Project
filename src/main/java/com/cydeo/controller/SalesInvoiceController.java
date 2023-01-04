@@ -2,7 +2,6 @@ package com.cydeo.controller;
 
 import com.cydeo.dto.InvoiceDto;
 import com.cydeo.dto.InvoiceProductDto;
-import com.cydeo.dto.ProductDto;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.service.ClientVendorService;
 import com.cydeo.service.InvoiceProductService;
@@ -12,7 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.validation.Valid;
 
 @Controller
@@ -79,27 +78,23 @@ public class SalesInvoiceController {
     }
 
     @PostMapping("/addInvoiceProduct/{invoiceId}")
-    public String addInvoiceProductToSalesInvoice(@PathVariable("invoiceId") Long invoiceId, @Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDto newInvoiceProduct, BindingResult result, Model model) throws Exception {
+    public String addInvoiceProductToSalesInvoice(@PathVariable("invoiceId") Long invoiceId, RedirectAttributes redirectAttributes, @Valid @ModelAttribute("newInvoiceProduct") InvoiceProductDto newInvoiceProduct, BindingResult result, Model model) throws Exception {
 
         if (newInvoiceProduct.getProduct() != null) {
 
             boolean enoughStock = invoiceProductService.checkProductQuantity(newInvoiceProduct);
 
             if (!enoughStock) {
-                result.rejectValue("product", "err.product","Not enough " + newInvoiceProduct.getProduct().getName() + " quantity to sell...");
-                model.addAttribute("invoice", invoiceService.findInvoiceById(invoiceId));
-                model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(invoiceId));
-                model.addAttribute("products", productService.getAllProducts());
-                model.addAttribute("clients", clientVendorService.getAllClientVendors());
-                return "/invoice/purchase-invoice-update";
+                redirectAttributes.addFlashAttribute("error", "Not enough"+ newInvoiceProduct.getProduct().getName()+" quantity to sell...");
+                return "redirect:/salesInvoices/update/" + invoiceId;
             }
         }
-        if (result.hasErrors()){
+        if (result.hasErrors()) {
             model.addAttribute("invoice", invoiceService.findInvoiceById(invoiceId));
             model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(invoiceId));
             model.addAttribute("products", productService.getAllProducts());
             model.addAttribute("clients", clientVendorService.getAllClientVendors());
-            return "/invoice/purchase-invoice-update";
+            return "/invoice/sales-invoice-update";
         }
         invoiceProductService.save(invoiceId, newInvoiceProduct);
         return "redirect:/salesInvoices/update/" + invoiceId;
