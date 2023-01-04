@@ -2,8 +2,6 @@ package com.cydeo.dto;
 
 import lombok.*;
 import org.hibernate.validator.constraints.Range;
-
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 @Setter
