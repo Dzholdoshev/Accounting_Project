@@ -57,15 +57,16 @@ public class ProductController {
     }
 
     @GetMapping("/update/{productId}")
-    public String navigateToProductUpdate(@PathVariable("{productId}") Long productId, Model model) throws Exception{
+    public String navigateToProductUpdate(@PathVariable(value = "productId") Long productId, Model model) throws Exception{
 
         model.addAttribute("product", productService.findProductById(productId));
+//        model.addAttribute("product", productService.findProductById(productId));
 
         return "/product/product-update";
     }
 
     @PostMapping("/update/{productId}")
-    public String updateProduct(@ModelAttribute("product") ProductDto productDto, BindingResult bindingResult, @PathVariable("{productId}") Long productId, Model model) throws Exception{
+    public String updateProduct(@ModelAttribute("product") ProductDto productDto, BindingResult bindingResult, @PathVariable(value = "productId") Long productId, Model model) throws Exception{
 
         productDto.setId(productId);
 
@@ -81,5 +82,14 @@ public class ProductController {
 
         return "redirect:/products/list";
     }
+
+    @ModelAttribute
+    public void commonAttributes(Model model) throws Exception {
+        model.addAttribute("products", productService.getAllProducts());
+        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("productUnits", Arrays.asList(ProductUnit.values()));
+        model.addAttribute("title", "Cydeo Accounting-Product");
+    }
+
 
 }
