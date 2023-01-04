@@ -1,11 +1,16 @@
 package com.cydeo.controller;
 
 import com.cydeo.dto.ProductDto;
+import com.cydeo.enums.ProductUnit;
 import com.cydeo.service.CategoryService;
 import com.cydeo.service.ProductService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.Arrays;
 
 @Controller
 @RequestMapping("/products")
@@ -19,14 +24,71 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @RequestMapping("/create")
-    public String creatProduct(Model model, Long categoryId){
+
+    @GetMapping("/list")
+    public String listAllProducts(Model model){
+        model.addAttribute("products", productService.getAllProducts());
+
+        return "product/product-list";
+    }
+
+    @GetMapping("/create")
+    public String navigateToProductCreate(Model model) throws Exception {
         model.addAttribute("newProduct", new ProductDto());
-        model.addAttribute("categories", categoryService.findCategoryById(categoryId));
 
+        return "product/product-create";
 
-        return "/task/create";
+    }
 
+    @PostMapping("/create")
+    public String createNewProduct(@Valid @ModelAttribute("newProduct") ProductDto productDto, BindingResult bindingResult, Model model){
+
+        if (productService.isProductNameExist(productDto)){
+            bindingResult.rejectValue("name", " ", "product name already exist");
+        }
+
+        if (bindingResult.hasErrors()){
+            return "product/product-create";
+        }
+
+        productService.save(productDto);
+
+        return "redirect:/products/list";
+    }
+
+    @GetMapping("/update/{productId}")
+    public String navigateToProductUpdate(@PathVariable(value = "productId") Long productId, Model model) throws Exception{
+
+        model.addAttribute("product", productService.findProductById(productId));
+//        model.addAttribute("product", productService.findProductById(productId));
+
+        return "/product/product-update";
+    }
+
+    @PostMapping("/update/{productId}")
+    public String updateProduct(@ModelAttribute("product") ProductDto productDto, BindingResult bindingResult, @PathVariable(value = "productId") Long productId, Model model) throws Exception{
+
+        productDto.setId(productId);
+
+        if (productService.isProductNameExist(productDto)){
+            bindingResult.rejectValue("name", " ", "product name already exist");
+        }
+
+        if (bindingResult.hasErrors()){
+            return "product/product-update";
+        }
+
+        productService.update(productId, productDto);
+
+        return "redirect:/products/list";
+    }
+
+    @ModelAttribute
+    public void commonAttributes(Model model) throws Exception {
+        model.addAttribute("products", productService.getAllProducts());
+        model.addAttribute("categories", categoryService.getAllCategories());
+        model.addAttribute("productUnits", Arrays.asList(ProductUnit.values()));
+        model.addAttribute("title", "Cydeo Accounting-Product");
     }
 
 

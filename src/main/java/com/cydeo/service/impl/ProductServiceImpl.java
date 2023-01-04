@@ -8,10 +8,12 @@ import com.cydeo.repository.ProductRepository;
 import com.cydeo.service.InvoiceProductService;
 import com.cydeo.service.ProductService;
 import com.cydeo.service.SecurityService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,7 +24,7 @@ public class ProductServiceImpl implements ProductService {
     private final MapperUtil mapperUtil;
     private final InvoiceProductService invoiceProductService;
 
-    public ProductServiceImpl(ProductRepository productRepository, SecurityService securityService, MapperUtil mapperUtil, InvoiceProductService invoiceProductService) {
+    public ProductServiceImpl(ProductRepository productRepository, SecurityService securityService, MapperUtil mapperUtil, @Lazy InvoiceProductService invoiceProductService) {
         this.productRepository = productRepository;
         this.securityService = securityService;
         this.mapperUtil = mapperUtil;
@@ -59,8 +61,16 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDto update(Long productId, ProductDto productDto) {
-       Product product = productRepository.findById(productId).get();
-        return null;
+
+       productDto.setId(productId);
+       Product product = productRepository.findById(productId)
+               .orElseThrow(()-> new NoSuchElementException("Product "+ productDto.getName() + " not found"));
+       final int quantityInStock = productDto.getQuantityInStock() == null? product.getQuantityInStock():productDto.getQuantityInStock();
+       productDto.setQuantityInStock(quantityInStock);
+
+       product = productRepository.save(mapperUtil.convert(productDto, new Product()));
+
+        return mapperUtil.convert(product, productDto);
     }
 
     @Override
