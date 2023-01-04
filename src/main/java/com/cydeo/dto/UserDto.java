@@ -32,7 +32,7 @@ public class UserDto {
     String password;
 
     @NotBlank (message = "Passwords should match.")
-    // @Pattern(regexp = "(?=.\\d)(?=.[a-z])(?=.*[A-Z]).{4}")
+    // @Pattern(regexp = "(?=.\\d)(?=.*[a-z])(?=.*[A-Z]).{4}")
     String confirmPassword;
     @Valid
     @NotNull (message = "Please select a role")
