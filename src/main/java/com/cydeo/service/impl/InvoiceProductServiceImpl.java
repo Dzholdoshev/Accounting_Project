@@ -65,6 +65,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     public void save(Long invoiceId, InvoiceProductDto invoiceProductDto) {
         InvoiceDto invoiceDto = mapperUtil.convert(invoiceService.findInvoiceById(invoiceId), new InvoiceDto());
         invoiceProductDto.setInvoice(invoiceDto);
+        if(invoiceProductDto.getProfitLoss()==null){ invoiceProductDto.setProfitLoss(BigDecimal.ZERO);}
         invoiceProductRepository.save(mapperUtil.convert(invoiceProductDto, new InvoiceProduct()));
     }
 
@@ -91,7 +92,6 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
                     invoiceProductRepository.save(salesInvoiceProduct);
                     //calculate profit/loss and update remaining quantity values
                     setProfitLossOfInvoiceProductsForSalesInvoice(salesInvoiceProduct);
-
                 } else {
                     throw new NotEnoughProductException("This sale cannot be completed due to insufficient quantity of product");
                 }

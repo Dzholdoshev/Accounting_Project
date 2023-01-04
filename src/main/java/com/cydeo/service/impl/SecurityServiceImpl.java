@@ -7,6 +7,7 @@ import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.UserRepository;
 import com.cydeo.service.SecurityService;
 import com.cydeo.service.UserService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,7 +20,7 @@ public class SecurityServiceImpl implements SecurityService {
     private final UserRepository userRepository;
 
 
-    public SecurityServiceImpl(UserRepository userRepository, UserService userService) {
+    public SecurityServiceImpl(UserRepository userRepository, @Lazy UserService userService) {
         this.userRepository = userRepository;
         this.userService = userService;
     }
