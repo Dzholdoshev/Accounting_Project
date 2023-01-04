@@ -60,7 +60,6 @@ public class ProductController {
     public String navigateToProductUpdate(@PathVariable(value = "productId") Long productId, Model model) throws Exception{
 
         model.addAttribute("product", productService.findProductById(productId));
-//        model.addAttribute("product", productService.findProductById(productId));
 
         return "/product/product-update";
     }
@@ -80,6 +79,13 @@ public class ProductController {
 
         productService.update(productId, productDto);
 
+        return "redirect:/products/list";
+    }
+
+    @GetMapping("/delete/{productId}")
+    public String deleteProduct(@PathVariable(value = "productId") Long productId, Model model){
+
+        productService.delete(productId);
         return "redirect:/products/list";
     }
 
