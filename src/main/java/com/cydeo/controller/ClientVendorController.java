@@ -84,8 +84,11 @@ public class ClientVendorController {
     }
     @PostMapping("/create")
     public String insertClientVendor(@Valid @ModelAttribute("newClientVendor") ClientVendorDto clientVendor,BindingResult bindingResult,Model model) throws Exception {
-        if(bindingResult.hasErrors()){
 
+        if(clientVendorRepository.existsByClientVendorName(clientVendor.getClientVendorName())){
+            bindingResult.addError(new FieldError("newClientVendor","clientVendorName","A client/vendor with this name already exists. Please try with different name."));
+        }
+        if(bindingResult.hasErrors()){
             model.addAttribute("clientVendorTypes", clientVendorService.getClientVendorType());
             return "/clientVendor/clientVendor-create";
         }
