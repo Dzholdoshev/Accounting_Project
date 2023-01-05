@@ -2,6 +2,7 @@ package com.cydeo.controller;
 
 import com.cydeo.dto.InvoiceDto;
 import com.cydeo.dto.InvoiceProductDto;
+import com.cydeo.enums.ClientVendorType;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.service.ClientVendorService;
 import com.cydeo.service.InvoiceProductService;
@@ -35,7 +36,7 @@ public class SalesInvoiceController {
         model.addAttribute("invoice", invoiceService.findInvoiceById(invoiceId));
         model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(invoiceId));
         model.addAttribute("newInvoiceProduct", new InvoiceProductDto());
-        model.addAttribute("clients", clientVendorService.getAllClientVendors());
+        model.addAttribute("clients", clientVendorService.getAllClientVendorsOfCompany(ClientVendorType.CLIENT));
         model.addAttribute("products", productService.getAllProducts());
         return "/invoice/sales-invoice-update";
     }
@@ -61,7 +62,7 @@ public class SalesInvoiceController {
     @GetMapping("/create")
     public String navigateToSalesInvoiceCreate(Model model) throws Exception {
         model.addAttribute("newSalesInvoice", invoiceService.getNewInvoice(InvoiceType.SALES));
-        model.addAttribute("clients", clientVendorService.getAllClientVendors());
+        model.addAttribute("clients", clientVendorService.getAllClientVendorsOfCompany(ClientVendorType.CLIENT));
         return "/invoice/sales-invoice-create";
     }
 
@@ -70,7 +71,7 @@ public class SalesInvoiceController {
 
         if (result.hasErrors()) {
             model.addAttribute("newSalesInvoice", newSalesInvoice);
-            model.addAttribute("clients", clientVendorService.getAllClientVendors());
+            model.addAttribute("clients", clientVendorService.getAllClientVendorsOfCompany(ClientVendorType.CLIENT));
             return "/invoice/sales-invoice-create";
         }
         var invoice = invoiceService.save(newSalesInvoice, InvoiceType.SALES);
@@ -85,7 +86,7 @@ public class SalesInvoiceController {
             boolean enoughStock = invoiceProductService.checkProductQuantity(newInvoiceProduct);
 
             if (!enoughStock) {
-                redirectAttributes.addFlashAttribute("error", "Not enough"+ newInvoiceProduct.getProduct().getName()+" quantity to sell...");
+                redirectAttributes.addFlashAttribute("error", "Not enough : "+ newInvoiceProduct.getProduct().getName()+" quantity to sell. Only "+newInvoiceProduct.getProduct().getQuantityInStock()+" in stock!");
                 return "redirect:/salesInvoices/update/" + invoiceId;
             }
         }
@@ -93,7 +94,7 @@ public class SalesInvoiceController {
             model.addAttribute("invoice", invoiceService.findInvoiceById(invoiceId));
             model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(invoiceId));
             model.addAttribute("products", productService.getAllProducts());
-            model.addAttribute("clients", clientVendorService.getAllClientVendors());
+            model.addAttribute("clients", clientVendorService.getAllClientVendorsOfCompany(ClientVendorType.CLIENT));
             return "/invoice/sales-invoice-update";
         }
         invoiceProductService.save(invoiceId, newInvoiceProduct);
