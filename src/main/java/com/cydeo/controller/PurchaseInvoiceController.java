@@ -2,6 +2,7 @@ package com.cydeo.controller;
 
 import com.cydeo.dto.InvoiceDto;
 import com.cydeo.dto.InvoiceProductDto;
+import com.cydeo.enums.ClientVendorType;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.service.ClientVendorService;
 import com.cydeo.service.InvoiceProductService;
@@ -33,7 +34,7 @@ public class PurchaseInvoiceController {
         model.addAttribute("invoice", invoiceService.findInvoiceById(invoiceId));
         model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(invoiceId));
         model.addAttribute("newInvoiceProduct", new InvoiceProductDto());
-        model.addAttribute("vendors", clientVendorService.getAllClientVendors());
+        model.addAttribute("vendors", clientVendorService.getAllClientVendorsOfCompany(ClientVendorType.VENDOR));
         model.addAttribute("products",productService.getAllProducts());
         return "/invoice/purchase-invoice-update";
     }
@@ -59,7 +60,7 @@ public class PurchaseInvoiceController {
     @GetMapping("/create")
     public String navigateToPurchaseInvoiceCreate(Model model) throws Exception {
         model.addAttribute("newPurchaseInvoice", invoiceService.getNewInvoice(InvoiceType.PURCHASE));
-          model.addAttribute("vendors", clientVendorService.getAllClientVendors());
+          model.addAttribute("vendors", clientVendorService.getAllClientVendorsOfCompany(ClientVendorType.VENDOR));
         return "/invoice/purchase-invoice-create";
     }
 
@@ -67,7 +68,7 @@ public class PurchaseInvoiceController {
     public String createNewPurchaseInvoice(@Valid @ModelAttribute("newPurchaseInvoice") InvoiceDto newPurchaseInvoice, BindingResult result, Model model) throws Exception {
 
         if (result.hasErrors()) {
-            model.addAttribute("vendors", clientVendorService.getAllClientVendors());
+            model.addAttribute("vendors", clientVendorService.getAllClientVendorsOfCompany(ClientVendorType.VENDOR));
             return "/invoice/purchase-invoice-create";
         }
         var invoice = invoiceService.save(newPurchaseInvoice, InvoiceType.PURCHASE);
@@ -79,7 +80,7 @@ public class PurchaseInvoiceController {
         if (result.hasErrors()) {
             model.addAttribute("invoice", invoiceService.findInvoiceById(invoiceId));
             model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(invoiceId));
-            model.addAttribute("vendors", clientVendorService.getAllClientVendors());
+            model.addAttribute("vendors", clientVendorService.getAllClientVendorsOfCompany(ClientVendorType.VENDOR));
             model.addAttribute("products",productService.getAllProducts());
             return "/invoice/purchase-invoice-update";
         }
