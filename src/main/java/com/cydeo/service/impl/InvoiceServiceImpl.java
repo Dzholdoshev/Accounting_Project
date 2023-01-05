@@ -53,7 +53,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
         Company company = user.getCompany();
-        List<Invoice> PurchaseInvoicesList = invoiceRepository.findInvoicesByCompanyAndInvoiceType(company, invoiceType);
+        List<Invoice> PurchaseInvoicesList = invoiceRepository.findInvoicesByCompanyAndInvoiceTypeAndIsDeleted(company, invoiceType, false);
 
         return PurchaseInvoicesList.stream().map(invoice -> {
             InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
@@ -71,7 +71,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
 
         Company company = user.getCompany();
-        List<Invoice> invoiceList = invoiceRepository.findInvoicesByCompanyAndInvoiceStatus(company, status);
+        List<Invoice> invoiceList = invoiceRepository.findInvoicesByCompanyAndInvoiceStatusAndIsDeleted(company, status, false);
 
         return invoiceList.stream().map(invoice -> {
             InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
@@ -102,6 +102,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
         Invoice invoice = mapperUtil.convert(invoiceDto, new Invoice());
         invoice.setCompany(user.getCompany());
+        invoice.setIsDeleted(false);
         invoiceRepository.save(invoice);
         invoiceDto.setId(invoice.getId());
         return invoiceDto;
@@ -148,7 +149,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     public List<InvoiceDto> getLastThreeInvoices() { //my changes ilhan
 
         Company company = mapperUtil.convert(securityService.getLoggedInUser().getCompany(), new Company());
-        return invoiceRepository.findInvoicesByCompanyAndInvoiceStatusOrderByDateDesc(company,InvoiceStatus.APPROVED)
+        return invoiceRepository.findInvoicesByCompanyAndInvoiceStatusAndIsDeletedOrderByDateDesc(company,InvoiceStatus.APPROVED, false)
                 .stream()
                 .limit(3)
                 .map(each->mapperUtil.convert(each,new InvoiceDto()))
@@ -213,7 +214,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
 
     public String InvoiceNo(InvoiceType invoiceType, Long companyId) {
-        Long id = invoiceRepository.getMaxId(invoiceType, companyId);
+        Long id = invoiceRepository.countAllByInvoiceTypeAndCompanyId(invoiceType, companyId);
         String InvoiceNo = "";
 
         if (invoiceType.getValue().equals("Purchase")) {
