@@ -94,6 +94,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public InvoiceDto save(InvoiceDto invoiceDto, InvoiceType invoiceType) {
+
         User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
         invoiceDto.setInvoiceType(invoiceType);
         invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
