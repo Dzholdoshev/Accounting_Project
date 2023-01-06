@@ -50,9 +50,10 @@ public class ClientVendorController {
     }
 
     @PostMapping("/update/{id}")
-    public String updateClientVendor(@Valid @ModelAttribute ("clientVendor")ClientVendorDto clientVendorDto,BindingResult bindingResult, Model model) throws Exception {
+    public String updateClientVendor(@PathVariable("id") Long id,@Valid @ModelAttribute ("clientVendor")ClientVendorDto clientVendorDto,BindingResult bindingResult, Model model) throws Exception {
 
-        if(clientVendorRepository.existsByClientVendorName(clientVendorDto.getClientVendorName())){
+
+        if(clientVendorRepository.existsByClientVendorName(clientVendorDto.getClientVendorName())&&!clientVendorDto.getClientVendorName().equals(clientVendorService.findClientVendorById(id).getClientVendorName())){
             bindingResult.addError(new FieldError("clientVendor","clientVendorName","A client/vendor with this name already exists. Please try with different name."));
         }
         if (bindingResult.hasErrors()) {
@@ -60,7 +61,7 @@ public class ClientVendorController {
             return "clientVendor/clientVendor-update";
         }
 
-        clientVendorService.save(clientVendorDto);
+        clientVendorService.update(id,clientVendorDto);
         return "redirect:/clientVendors/list";
     }
 
