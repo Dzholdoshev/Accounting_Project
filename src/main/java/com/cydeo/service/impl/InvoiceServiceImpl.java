@@ -201,9 +201,10 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public BigDecimal getProfitLossOfInvoice(Long id) {
-
-        //Total price of the invoice subtracted by cost of products, only a loss if negative?
-        return null;
+       InvoiceDto invoiceDto= findInvoiceById(id);
+     return invoiceProductService.getInvoiceProductsOfInvoice(invoiceDto.getId()).stream()
+               .map(InvoiceProductDto::getProfitLoss)
+               .reduce(BigDecimal.ZERO,BigDecimal::add);
     }
 
     @Override
