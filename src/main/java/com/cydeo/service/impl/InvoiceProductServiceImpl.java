@@ -41,8 +41,8 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     }
 
     @Override
-    public InvoiceProductDto findInvoiceProductById(long id) {
-        InvoiceProduct invoiceProduct = invoiceProductRepository.findById(id).orElseThrow();
+    public InvoiceProductDto findInvoiceProductById(long invoiceProductId) {
+        InvoiceProduct invoiceProduct = invoiceProductRepository.findById(invoiceProductId).orElseThrow();
         return mapperUtil.convert(invoiceProduct, new InvoiceProductDto());
     }
 
@@ -65,7 +65,9 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     public void save(Long invoiceId, InvoiceProductDto invoiceProductDto) {
         InvoiceDto invoiceDto = mapperUtil.convert(invoiceService.findInvoiceById(invoiceId), new InvoiceDto());
         invoiceProductDto.setInvoice(invoiceDto);
-        if(invoiceProductDto.getProfitLoss()==null){ invoiceProductDto.setProfitLoss(BigDecimal.ZERO);}
+        if (invoiceProductDto.getProfitLoss() == null) {
+            invoiceProductDto.setProfitLoss(BigDecimal.ZERO);
+        }
         invoiceProductRepository.save(mapperUtil.convert(invoiceProductDto, new InvoiceProduct()));
     }
 
@@ -127,7 +129,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
                 invoiceProductRepository.save(purchasedProduct);
                 invoiceProductRepository.save(toBeSoldProduct);
                 break;
-            }else{
+            } else {
 
                 BigDecimal costForQty = purchasedProduct.getPrice().multiply(
                         BigDecimal.valueOf(toBeSoldProduct.getRemainingQuantity() * (purchasedProduct.getTax() + 100) / 100d));
@@ -137,7 +139,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
                 BigDecimal profitLoss = toBeSoldProduct.getProfitLoss().add(salesTotalForQty.subtract(costForQty));
                 purchasedProduct.setRemainingQuantity(0);
-                toBeSoldProduct.setRemainingQuantity(toBeSoldProduct.getRemainingQuantity()-purchasedProduct.getRemainingQuantity());
+                toBeSoldProduct.setRemainingQuantity(toBeSoldProduct.getRemainingQuantity() - purchasedProduct.getRemainingQuantity());
                 toBeSoldProduct.setProfitLoss(profitLoss);
 
                 invoiceProductRepository.save(purchasedProduct);
@@ -164,7 +166,17 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
 
     @Override
-    public boolean checkProductQuantity(InvoiceProductDto salesInvoiceProduct) {
+    public boolean checkProductQuantity(InvoiceProductDto salesInvoiceProduct, Long invoiceId) {
+
+        Integer contOfProductAlreadyInInvoice =
+                getInvoiceProductsOfInvoice(invoiceId).stream()
+                        .filter(invoiceProductDto -> invoiceProductDto.getProduct().getId() == salesInvoiceProduct.getProduct().getId())
+                        .map(InvoiceProductDto::getQuantity).reduce(0, Integer::sum);
+
+        if (salesInvoiceProduct.getQuantity() + contOfProductAlreadyInInvoice > salesInvoiceProduct.getProduct().getQuantityInStock()) {
+            return false;
+        }
+
         return salesInvoiceProduct.getProduct().getQuantityInStock() >= salesInvoiceProduct.getQuantity();
     }
 
