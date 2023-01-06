@@ -96,12 +96,11 @@ public class ClientVendorServiceImpl implements ClientVendorService {
 
     @Override
     public ClientVendorDto update(Long id, ClientVendorDto clientVendorDto) throws ClassNotFoundException, CloneNotSupportedException {
-        Optional<ClientVendor> clientVendor = clientVendorRepository.findById(id);
-        ClientVendor convertedClientVendor = mapperUtil.convert(clientVendorDto, new ClientVendor());
-        UserDto loggedInUser = securityService.getLoggedInUser();
-        if (clientVendor.isPresent()) {
-            clientVendorRepository.save(convertedClientVendor);
-        }
+        CompanyDto companyDto = securityService.getLoggedInUser().getCompany();
+        Company company = mapperUtil.convert(companyDto, new Company());
+        ClientVendor clientVendor = mapperUtil.convert(clientVendorDto, new ClientVendor());
+        clientVendor.setCompany(company);
+        clientVendorRepository.save(clientVendor);
         return findClientVendorById(clientVendorDto.getId());
     }
 
