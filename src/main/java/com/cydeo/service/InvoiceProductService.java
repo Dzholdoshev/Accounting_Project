@@ -20,7 +20,7 @@ public interface InvoiceProductService {
 
     void delete(Long invoiceProductId);
     void completeApprovalProcedures(Long invoiceId, InvoiceType type) throws NotEnoughProductException;
-    boolean checkProductQuantity(InvoiceProductDto salesInvoiceProduct);
+    boolean checkProductQuantity(InvoiceProductDto salesInvoiceProduct, Long invoiceId);
     List<InvoiceProduct> findInvoiceProductsByInvoiceTypeAndProductRemainingQuantity(InvoiceType type, Product product, Integer remainingQuantity);
 
     List<InvoiceProductDto> findAllInvoiceProductsByProductId(Long id);
