@@ -159,9 +159,9 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private void calculateInvoiceDetails(InvoiceDto invoiceDto) {   // my changes ilhan
 
-        invoiceDto.setPrice(getTotalPriceOfInvoice(invoiceDto.getId()));
         invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()));
-        invoiceDto.setTotal(getTotalPriceOfInvoice(invoiceDto.getId()).add(getTotalTaxOfInvoice(invoiceDto.getId())));
+        invoiceDto.setPrice(getTotalPriceOfInvoice(invoiceDto.getId()).subtract(invoiceDto.getTax()));
+        invoiceDto.setTotal(getTotalPriceOfInvoice(invoiceDto.getId()));
     }
 
     @Override
