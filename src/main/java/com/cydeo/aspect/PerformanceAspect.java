@@ -5,12 +5,18 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
 @Slf4j
 public class PerformanceAspect {
+
+
+    private String getUsername() {
+        return SecurityContextHolder.getContext().getAuthentication().getName();
+    }
 
     @Pointcut("@annotation(com.cydeo.annotation.ExecutionTime)")
     public void executionTimePC() {}
