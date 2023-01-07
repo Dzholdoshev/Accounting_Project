@@ -20,7 +20,6 @@ public class InvoiceDtoConverter implements Converter<String, InvoiceDto> {
     @SneakyThrows
     @Override
     public InvoiceDto convert(String id) {
-
         return invoiceService.findInvoiceById(Long.parseLong(id));
 
     }

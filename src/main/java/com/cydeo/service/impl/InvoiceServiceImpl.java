@@ -3,10 +3,7 @@ package com.cydeo.service.impl;
 import com.cydeo.dto.ClientVendorDto;
 import com.cydeo.dto.InvoiceDto;
 import com.cydeo.dto.InvoiceProductDto;
-import com.cydeo.entity.ClientVendor;
-import com.cydeo.entity.Company;
-import com.cydeo.entity.Invoice;
-import com.cydeo.entity.User;
+import com.cydeo.entity.*;
 import com.cydeo.enums.InvoiceStatus;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.exception.NotEnoughProductException;
@@ -122,6 +119,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     public void approve(Long invoiceId) throws NotEnoughProductException {
         Invoice invoice = invoiceRepository.findInvoiceById(invoiceId);
         invoice.setInvoiceStatus(InvoiceStatus.APPROVED);
+        invoice.setDate(LocalDate.now());
         invoiceProductService.completeApprovalProcedures(invoiceId, invoice.getInvoiceType());
         invoiceRepository.save(invoice);
     }
@@ -141,6 +139,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         Invoice invoice = invoiceRepository.findInvoiceById(id);
         if (invoice.getInvoiceStatus().getValue().equals("Awaiting Approval")) {
             invoice.setIsDeleted(true);
+            invoiceProductService.getInvoiceProductsOfInvoice(id).stream().
+                    peek(invoiceProductDto -> invoiceProductService.delete(invoiceProductDto.getId())).collect(Collectors.toList());
             invoiceRepository.save(invoice);
         }
     }
@@ -149,15 +149,15 @@ public class InvoiceServiceImpl implements InvoiceService {
     public List<InvoiceDto> getLastThreeInvoices() { //my changes ilhan
 
         Company company = mapperUtil.convert(securityService.getLoggedInUser().getCompany(), new Company());
-        return invoiceRepository.findInvoicesByCompanyAndInvoiceStatusAndIsDeletedOrderByDateDesc(company,InvoiceStatus.APPROVED, false)
+        return invoiceRepository.findInvoicesByCompanyAndInvoiceStatusAndIsDeletedOrderByDateDesc(company, InvoiceStatus.APPROVED, false)
                 .stream()
                 .limit(3)
-                .map(each->mapperUtil.convert(each,new InvoiceDto()))
+                .map(each -> mapperUtil.convert(each, new InvoiceDto()))
                 .peek(this::calculateInvoiceDetails)
                 .collect(Collectors.toList());
     }
 
-    private void calculateInvoiceDetails(InvoiceDto invoiceDto){   // my changes ilhan
+    private void calculateInvoiceDetails(InvoiceDto invoiceDto) {   // my changes ilhan
 
         invoiceDto.setPrice(getTotalPriceOfInvoice(invoiceDto.getId()));
         invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()));

@@ -83,7 +83,7 @@ public class SalesInvoiceController {
 
         if (newInvoiceProduct.getProduct() != null) {
 
-            boolean enoughStock = invoiceProductService.checkProductQuantity(newInvoiceProduct);
+            boolean enoughStock = invoiceProductService.checkProductQuantity(newInvoiceProduct, invoiceId);
 
             if (!enoughStock) {
                 redirectAttributes.addFlashAttribute("error", "Not enough : "+ newInvoiceProduct.getProduct().getName()+" quantity to sell. Only "+newInvoiceProduct.getProduct().getQuantityInStock()+" in stock!");
