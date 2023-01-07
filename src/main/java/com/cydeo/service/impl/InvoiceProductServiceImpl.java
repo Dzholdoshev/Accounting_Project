@@ -129,13 +129,13 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
                 invoiceProductRepository.save(purchasedProduct);
                 invoiceProductRepository.save(toBeSoldProduct);
                 break;
-            } else {
 
+            } else {
                 BigDecimal costForQty = purchasedProduct.getPrice().multiply(
-                        BigDecimal.valueOf(toBeSoldProduct.getRemainingQuantity() * (purchasedProduct.getTax() + 100) / 100d));
+                        BigDecimal.valueOf(purchasedProduct.getRemainingQuantity() * (purchasedProduct.getTax() + 100) / 100d));
 
                 BigDecimal salesTotalForQty = toBeSoldProduct.getPrice().multiply(
-                        BigDecimal.valueOf(toBeSoldProduct.getRemainingQuantity() * (toBeSoldProduct.getTax() + 100) / 100d));
+                        BigDecimal.valueOf(purchasedProduct.getRemainingQuantity() * (toBeSoldProduct.getTax() + 100) / 100d));
 
                 BigDecimal profitLoss = toBeSoldProduct.getProfitLoss().add(salesTotalForQty.subtract(costForQty));
                 purchasedProduct.setRemainingQuantity(0);
@@ -148,7 +148,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         }
     }
 
-    private List<InvoiceProduct> findNotSoldProduct(Product product) {
+    private List<InvoiceProduct>  findNotSoldProduct(Product product) {
         return invoiceProductRepository
                 .findInvoiceProductsByInvoiceInvoiceTypeAndProductAndRemainingQuantityNotOrderByIdAsc(InvoiceType.PURCHASE, product, 0);
     }
