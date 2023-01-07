@@ -94,6 +94,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public InvoiceDto save(InvoiceDto invoiceDto, InvoiceType invoiceType) {
+
         User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
         invoiceDto.setInvoiceType(invoiceType);
         invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
@@ -159,9 +160,9 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private void calculateInvoiceDetails(InvoiceDto invoiceDto) {   // my changes ilhan
 
-        invoiceDto.setPrice(getTotalPriceOfInvoice(invoiceDto.getId()));
         invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()));
-        invoiceDto.setTotal(getTotalPriceOfInvoice(invoiceDto.getId()).add(getTotalTaxOfInvoice(invoiceDto.getId())));
+        invoiceDto.setPrice(getTotalPriceOfInvoice(invoiceDto.getId()).subtract(invoiceDto.getTax()));
+        invoiceDto.setTotal(getTotalPriceOfInvoice(invoiceDto.getId()));
     }
 
     @Override
@@ -201,9 +202,10 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public BigDecimal getProfitLossOfInvoice(Long id) {
-
-        //Total price of the invoice subtracted by cost of products, only a loss if negative?
-        return null;
+       InvoiceDto invoiceDto= findInvoiceById(id);
+     return invoiceProductService.getInvoiceProductsOfInvoice(invoiceDto.getId()).stream()
+               .map(InvoiceProductDto::getProfitLoss)
+               .reduce(BigDecimal.ZERO,BigDecimal::add);
     }
 
     @Override
