@@ -32,7 +32,6 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     private final MapperUtil mapperUtil;
     private final ProductService productService;
 
-
     public InvoiceProductServiceImpl(InvoiceProductRepository invoiceProductRepository, @Lazy InvoiceService invoiceService, MapperUtil mapperUtil, ProductService productService) {
         this.invoiceProductRepository = invoiceProductRepository;
         this.invoiceService = invoiceService;
@@ -45,7 +44,6 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         InvoiceProduct invoiceProduct = invoiceProductRepository.findById(invoiceProductId).orElseThrow();
         return mapperUtil.convert(invoiceProduct, new InvoiceProductDto());
     }
-
 
     @Override
     public List<InvoiceProductDto> getInvoiceProductsOfInvoice(Long invoiceId) {
@@ -148,7 +146,8 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         }
     }
 
-    private List<InvoiceProduct>  findNotSoldProduct(Product product) {
+    @Override
+    public List<InvoiceProduct> findNotSoldProduct(Product product) {
         return invoiceProductRepository
                 .findInvoiceProductsByInvoiceInvoiceTypeAndProductAndRemainingQuantityNotOrderByIdAsc(InvoiceType.PURCHASE, product, 0);
     }
@@ -180,14 +179,10 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         return salesInvoiceProduct.getProduct().getQuantityInStock() >= salesInvoiceProduct.getQuantity();
     }
 
-    @Override
-    public List<InvoiceProduct> findInvoiceProductsByInvoiceTypeAndProductRemainingQuantity(InvoiceType type, Product product, Integer remainingQuantity) {
-        return invoiceProductRepository.findInvoiceProductsByInvoiceInvoiceTypeAndProductAndRemainingQuantityNotOrderByIdAsc(type, product, remainingQuantity);
-    }
 
     @Override
-    public List<InvoiceProductDto> findAllInvoiceProductsByProductId(Long id) {
-        return invoiceProductRepository.findAllInvoiceProductByProductId(id).stream()
+    public List<InvoiceProductDto> findAllInvoiceProductsByProductId(Long productId) {
+        return invoiceProductRepository.findAllInvoiceProductByProductId(productId).stream()
                 .map(invoiceProduct -> mapperUtil.convert(invoiceProduct, new InvoiceProductDto()))
                 .collect(Collectors.toList());
     }

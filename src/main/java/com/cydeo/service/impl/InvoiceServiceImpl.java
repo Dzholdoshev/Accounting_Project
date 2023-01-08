@@ -1,6 +1,5 @@
 package com.cydeo.service.impl;
 
-import com.cydeo.dto.ClientVendorDto;
 import com.cydeo.dto.InvoiceDto;
 import com.cydeo.dto.InvoiceProductDto;
 import com.cydeo.entity.*;
@@ -9,11 +8,9 @@ import com.cydeo.enums.InvoiceType;
 import com.cydeo.exception.NotEnoughProductException;
 import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceRepository;
+import com.cydeo.service.CompanyService;
 import com.cydeo.service.InvoiceProductService;
 import com.cydeo.service.InvoiceService;
-import com.cydeo.service.SecurityService;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,15 +26,16 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
     private final MapperUtil mapperUtil;
-    private final SecurityService securityService;
     private final InvoiceProductService invoiceProductService;
+    private final CompanyService companyService;
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapperUtil, SecurityService securityService, @Lazy InvoiceProductService invoiceProductService) {
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, MapperUtil mapperUtil, InvoiceProductService invoiceProductService, CompanyService companyService) {
         this.invoiceRepository = invoiceRepository;
         this.mapperUtil = mapperUtil;
-        this.securityService = securityService;
         this.invoiceProductService = invoiceProductService;
+        this.companyService = companyService;
     }
+
 
     @Override
     public InvoiceDto findInvoiceById(long id) {
@@ -47,9 +45,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public List<InvoiceDto> getAllInvoicesOfCompany(InvoiceType invoiceType) throws Exception {
-
-        User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
-        Company company = user.getCompany();
+        Company company = mapperUtil.convert(companyService.getCompanyByLoggedInUser(), new Company());
         List<Invoice> PurchaseInvoicesList = invoiceRepository.findInvoicesByCompanyAndInvoiceTypeAndIsDeleted(company, invoiceType, false);
 
         return PurchaseInvoicesList.stream().map(invoice -> {
@@ -65,9 +61,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public List<InvoiceDto> getAllInvoicesByInvoiceStatus(InvoiceStatus status) {
-        User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
-
-        Company company = user.getCompany();
+        Company company = mapperUtil.convert(companyService.getCompanyByLoggedInUser(), new Company());
         List<Invoice> invoiceList = invoiceRepository.findInvoicesByCompanyAndInvoiceStatusAndIsDeleted(company, status, false);
 
         return invoiceList.stream().map(invoice -> {
@@ -85,7 +79,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public InvoiceDto getNewInvoice(InvoiceType invoiceType) throws Exception {
 
-        Long companyId = securityService.getLoggedInUser().getCompany().getId();
+        Long companyId = (companyService.getCompanyByLoggedInUser().getId());
         Invoice invoice = new Invoice();
         invoice.setInvoiceNo(InvoiceNo(invoiceType, companyId));
         invoice.setDate(LocalDate.now());
@@ -94,12 +88,11 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public InvoiceDto save(InvoiceDto invoiceDto, InvoiceType invoiceType) {
-
-        User user = mapperUtil.convert(securityService.getLoggedInUser(), new User());
+        Company company=mapperUtil.convert(companyService.getCompanyByLoggedInUser(), new Company());;
         invoiceDto.setInvoiceType(invoiceType);
         invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
         Invoice invoice = mapperUtil.convert(invoiceDto, new Invoice());
-        invoice.setCompany(user.getCompany());
+        invoice.setCompany(company);
         invoice.setIsDeleted(false);
         invoiceRepository.save(invoice);
         invoiceDto.setId(invoice.getId());
@@ -126,9 +119,9 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public InvoiceDto printInvoice(Long id) {
-        InvoiceDto invoiceDto = mapperUtil.convert(invoiceRepository.findInvoiceById(id), new InvoiceDto());
-        invoiceDto.setInvoiceProducts(invoiceProductService.getInvoiceProductsOfInvoice(id));
+    public InvoiceDto printInvoice(Long invoiceId) {
+        InvoiceDto invoiceDto = mapperUtil.convert(invoiceRepository.findInvoiceById(invoiceId), new InvoiceDto());
+        invoiceDto.setInvoiceProducts(invoiceProductService.getInvoiceProductsOfInvoice(invoiceId));
         invoiceDto.setTax(getTotalTaxOfInvoice(invoiceDto.getId()));
         invoiceDto.setTotal(getTotalPriceOfInvoice(invoiceDto.getId()));
         invoiceDto.setPrice(invoiceDto.getTotal().subtract(invoiceDto.getTax()));
@@ -148,8 +141,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public List<InvoiceDto> getLastThreeInvoices() { //my changes ilhan
-
-        Company company = mapperUtil.convert(securityService.getLoggedInUser().getCompany(), new Company());
+        Company company=mapperUtil.convert(companyService.getCompanyByLoggedInUser(), new Company());
         return invoiceRepository.findInvoicesByCompanyAndInvoiceStatusAndIsDeletedOrderByDateDesc(company, InvoiceStatus.APPROVED, false)
                 .stream()
                 .limit(3)
@@ -202,16 +194,17 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public BigDecimal getProfitLossOfInvoice(Long id) {
-       InvoiceDto invoiceDto= findInvoiceById(id);
-     return invoiceProductService.getInvoiceProductsOfInvoice(invoiceDto.getId()).stream()
-               .map(InvoiceProductDto::getProfitLoss)
-               .reduce(BigDecimal.ZERO,BigDecimal::add);
+        InvoiceDto invoiceDto = findInvoiceById(id);
+        return invoiceProductService.getInvoiceProductsOfInvoice(invoiceDto.getId()).stream()
+                .map(InvoiceProductDto::getProfitLoss)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     @Override
     public boolean checkIfInvoiceExist(Long clientVendorId) {
-        List<Invoice> invoiceList = invoiceRepository.findAll();
-        return invoiceList.stream().anyMatch(invoice -> invoice.getClientVendor().getId().equals(clientVendorId));
+        Company company=mapperUtil.convert(companyService.getCompanyByLoggedInUser(), new Company());
+        Integer count = invoiceRepository.countAllByCompanyAndClientVendor_Id(company, clientVendorId);
+        return count >= 1;
     }
 
 
