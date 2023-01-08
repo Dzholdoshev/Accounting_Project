@@ -24,9 +24,10 @@ public interface InvoiceProductService {
 
     void completeApprovalProcedures(Long invoiceId, InvoiceType type) throws NotEnoughProductException;
 
-    boolean checkProductQuantity(InvoiceProductDto salesInvoiceProduct, Long invoiceId);
+    boolean checkProductQuantityBeforeAddingToInvoice(InvoiceProductDto salesInvoiceProduct, Long invoiceId);
 
     List<InvoiceProduct> findNotSoldProduct(Product product);
 
     List<InvoiceProductDto> findAllInvoiceProductsByProductId(Long id);
+    public Boolean stockCheckBeforeApproval(Long invoiceId);
 }

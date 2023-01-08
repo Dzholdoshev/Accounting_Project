@@ -40,7 +40,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public InvoiceDto findInvoiceById(long id) {
         Invoice invoice = invoiceRepository.findInvoiceById(id);
-        return mapperUtil.convert(invoice, new InvoiceDto());
+       InvoiceDto invoiceDto= mapperUtil.convert(invoice, new InvoiceDto());
+      List<InvoiceProductDto> invoiceProductList= invoiceProductService.getInvoiceProductsOfInvoice(id);
+       invoiceDto.setInvoiceProducts(invoiceProductList);
+        return invoiceDto;
     }
 
     @Override
@@ -93,7 +96,6 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
         Invoice invoice = mapperUtil.convert(invoiceDto, new Invoice());
         invoice.setCompany(company);
-        invoice.setIsDeleted(false);
         invoiceRepository.save(invoice);
         invoiceDto.setId(invoice.getId());
         return invoiceDto;

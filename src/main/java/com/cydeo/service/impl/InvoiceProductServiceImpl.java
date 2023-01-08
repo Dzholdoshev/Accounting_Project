@@ -93,6 +93,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
                     //calculate profit/loss and update remaining quantity values
                     setProfitLossOfInvoiceProductsForSalesInvoice(salesInvoiceProduct);
                 } else {
+                   // delete(salesInvoiceProduct.getId());
                     throw new NotEnoughProductException("This sale cannot be completed due to insufficient quantity of product");
                 }
             }
@@ -165,7 +166,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
 
     @Override
-    public boolean checkProductQuantity(InvoiceProductDto salesInvoiceProduct, Long invoiceId) {
+    public boolean checkProductQuantityBeforeAddingToInvoice(InvoiceProductDto salesInvoiceProduct, Long invoiceId) {
 
         Integer contOfProductAlreadyInInvoice =
                 getInvoiceProductsOfInvoice(invoiceId).stream()
@@ -175,7 +176,6 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         if (salesInvoiceProduct.getQuantity() + contOfProductAlreadyInInvoice > salesInvoiceProduct.getProduct().getQuantityInStock()) {
             return false;
         }
-
         return salesInvoiceProduct.getProduct().getQuantityInStock() >= salesInvoiceProduct.getQuantity();
     }
 
@@ -185,6 +185,19 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         return invoiceProductRepository.findAllInvoiceProductByProductId(productId).stream()
                 .map(invoiceProduct -> mapperUtil.convert(invoiceProduct, new InvoiceProductDto()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Boolean stockCheckBeforeApproval(Long invoiceId){
+    InvoiceDto invoice= invoiceService.findInvoiceById(invoiceId);
+    List<InvoiceProductDto> invoiceProductDtoList= invoice.getInvoiceProducts();
+    boolean enoughStock =true;
+        for (InvoiceProductDto invoiceProductDto : invoiceProductDtoList) {
+        if (!(invoiceProductDto.getProduct().getQuantityInStock() >= invoiceProductDto.getQuantity())) {
+            enoughStock = false;
+        }
+        }
+        return enoughStock;
     }
 
 }

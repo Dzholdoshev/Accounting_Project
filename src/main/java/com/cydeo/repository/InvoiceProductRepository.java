@@ -17,12 +17,12 @@ public interface InvoiceProductRepository extends JpaRepository<InvoiceProduct, 
 
 
 
-    InvoiceProduct findInvoiceProductById(Long id);
+    InvoiceProduct findInvoiceProductById(Long productId);
     List<InvoiceProduct> findAllByInvoice(Invoice invoice);
     List<InvoiceProduct> findAllByInvoice_Id(Long id);
     List<InvoiceProduct> findAllByInvoice_InvoiceTypeAndInvoice_Company(InvoiceType invoiceType, Company company);
     List<InvoiceProduct> findAllByInvoice_InvoiceStatusAndInvoice_Company(InvoiceStatus invoiceStatus, Company company);
     List<InvoiceProduct> findInvoiceProductsByInvoiceInvoiceTypeAndProductAndRemainingQuantityNotOrderByIdAsc(InvoiceType invoiceType, Product product, Integer remainingQuantity);
-    List<InvoiceProduct> findAllInvoiceProductByProductId(Long id);
+    List<InvoiceProduct> findAllInvoiceProductByProductId(Long productId);
 
 }
