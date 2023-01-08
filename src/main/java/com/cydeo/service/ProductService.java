@@ -21,5 +21,6 @@ public interface ProductService {
 
     boolean isProductNameExist(ProductDto productDto);
 
+    List<ProductDto> findAllProductsInStock();
 
 }
