@@ -20,7 +20,7 @@ public class InvoiceProduct extends BaseEntity {
     private int quantity;
     private int remainingQuantity;
     private int tax;
-    @ManyToOne(fetch= FetchType.LAZY, cascade={ CascadeType.MERGE})
+    @ManyToOne(fetch= FetchType.LAZY, cascade= CascadeType.MERGE)
     private Invoice invoice;
     @ManyToOne(fetch = FetchType.LAZY)
     private Product product;
