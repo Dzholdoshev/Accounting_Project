@@ -2,6 +2,7 @@ package com.cydeo.controller;
 
 import com.cydeo.dto.InvoiceDto;
 import com.cydeo.dto.InvoiceProductDto;
+import com.cydeo.entity.Invoice;
 import com.cydeo.enums.ClientVendorType;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.service.ClientVendorService;
@@ -14,6 +15,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.validation.Valid;
+import java.util.List;
 
 @Controller
 @RequestMapping("/salesInvoices")
@@ -83,7 +85,7 @@ public class SalesInvoiceController {
 
         if (newInvoiceProduct.getProduct() != null) {
 
-            boolean enoughStock = invoiceProductService.checkProductQuantity(newInvoiceProduct, invoiceId);
+            boolean enoughStock = invoiceProductService.checkProductQuantityBeforeAddingToInvoice(newInvoiceProduct, invoiceId);
 
             if (!enoughStock) {
                 redirectAttributes.addFlashAttribute("error", "Not enough : "+ newInvoiceProduct.getProduct().getName()+" quantity to sell. Only "+newInvoiceProduct.getProduct().getQuantityInStock()+" in stock!");
@@ -117,7 +119,12 @@ public class SalesInvoiceController {
     }
 
     @GetMapping("/approve/{invoiceId}")
-    public String approve(@PathVariable("invoiceId") long invoiceId) throws Exception {
+    public String approve(@PathVariable("invoiceId") long invoiceId,RedirectAttributes redirectAttributes) throws Exception {
+      Boolean enoughStock= invoiceProductService.stockCheckBeforeApproval(invoiceId);
+        if (!enoughStock) {
+            redirectAttributes.addFlashAttribute("error", "Not enough quantity in stock to complete this sale.");
+            return "redirect:/salesInvoices/list";
+        }
         invoiceService.approve(invoiceId);
         return "redirect:/salesInvoices/list";
     }
