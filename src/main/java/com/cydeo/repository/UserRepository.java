@@ -23,7 +23,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByUsernameAndIsDeleted(Long id, boolean b);
 
-   // User findByEmail(String email);
+    //User findByEmail(String email);
+
+    Boolean existsByUsername (String username);
 
 
     List<User> findAllByRole_Description(String admin);
