@@ -43,6 +43,7 @@ public class InvoiceServiceImpl implements InvoiceService {
        InvoiceDto invoiceDto= mapperUtil.convert(invoice, new InvoiceDto());
       List<InvoiceProductDto> invoiceProductList= invoiceProductService.getInvoiceProductsOfInvoice(id);
        invoiceDto.setInvoiceProducts(invoiceProductList);
+
         return invoiceDto;
     }
 
@@ -66,6 +67,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     public List<InvoiceDto> getAllInvoicesByInvoiceStatus(InvoiceStatus status) {
         Company company = mapperUtil.convert(companyService.getCompanyByLoggedInUser(), new Company());
         List<Invoice> invoiceList = invoiceRepository.findInvoicesByCompanyAndInvoiceStatusAndIsDeleted(company, status, false);
+
 
         return invoiceList.stream().map(invoice -> {
             InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
@@ -106,7 +108,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         Invoice updatedInvoice = mapperUtil.convert(invoiceDto, new Invoice());
         Invoice invoice = invoiceRepository.findInvoiceById(id);
         invoice.setClientVendor(updatedInvoice.getClientVendor());
-        invoiceRepository.save(invoice);
+        Invoice invoice1=invoiceRepository.save(invoice);
         return invoiceDto;
     }
 
