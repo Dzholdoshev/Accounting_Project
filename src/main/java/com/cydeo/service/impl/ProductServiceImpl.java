@@ -99,4 +99,19 @@ public class ProductServiceImpl implements ProductService {
     public boolean isProductNameExist(ProductDto productDto) {
         return productRepository.existsByName(productDto.getName());
     }
+
+    @Override
+    public List<ProductDto> findAllProductsInStock() {
+
+        Company company = mapperUtil.convert(securityService.getLoggedInUser().getCompany(), new Company());
+
+        return productRepository.findAllByCategoryCompany(company).stream()
+                .filter(product -> product.getQuantityInStock() > 0)
+                .sorted(Comparator.comparing((Product product) -> product.getCategory().getDescription())
+                        .thenComparing(Product::getName))
+                .map(each-> mapperUtil.convert(each, new ProductDto()))
+                .collect(Collectors.toList());
+    }
+
+
 }

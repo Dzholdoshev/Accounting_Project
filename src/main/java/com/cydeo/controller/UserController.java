@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 
@@ -41,22 +42,22 @@ public class UserController {
         return "/user/user-update";
     }
 
-    @PostMapping("/update/{userId}")
-    public String updateUser(@PathVariable("userId") Long userId,UserDto userDto, BindingResult result, Model model){
-      userDto.setId(userId);
-      boolean emailExist=userService.emailExist(userDto);
-        if(result.hasErrors()||emailExist) {
-            if (emailExist) {
-                result.rejectValue("userName", " ", "User already exists. Please try  with different username");
-            }
-
-            return "/user/user-update";
-        }
-        userService.update(userDto);
-
-      return "redirect:/users/list";
-
-    }
+//    @PostMapping("/update/{userId}")
+//    public String updateUser(@PathVariable("userId") Long userId,UserDto userDto, BindingResult result, Model model){
+//      userDto.setId(userId);
+//      boolean emailExist=userService.emailExist(userDto);
+//        if(result.hasErrors()||emailExist) {
+//            if (emailExist) {
+//                result.rejectValue("userName", " ", "User already exists. Please try  with different username");
+//            }
+//
+//            return "/user/user-update";
+//        }
+//        userService.update(userDto);
+//
+//      return "redirect:/users/list";
+//
+//    }
 
     @GetMapping("/create")
     public String navigateToUserCreate(Model model) {
@@ -69,30 +70,31 @@ public class UserController {
     public String createNewUser(@Valid @ModelAttribute("newUser")UserDto userDto, BindingResult result, Model model){
 
         boolean emailExist = userService.emailExist(userDto);
-        if(result.hasErrors()||emailExist){
+        if(result.hasErrors()||emailExist) {
             if (emailExist) {
                 result.rejectValue("username"," ","User already exists. Please try  with different username");
-            }
-            return "user/user-create";
-        }
-        userService.save(userDto);
+            } return "user/user-create";}
+
+            userService.save(userDto);
 
         return "redirect:/users/list";
     }
 
-    @PostMapping("/update{userId}")
-    public String updateUser(@PathVariable("userId")Long userId, @Valid @ModelAttribute("user") UserDto userDto, BindingResult result) {
+    @PostMapping("/update/{userId}")
+    public String updateUser(@PathVariable("userId")Long userId, @Valid @ModelAttribute("user") UserDto userDto, BindingResult result,Model model) {
             userDto.setId(userId);
         boolean emailExist = userService.emailExist(userDto);
         if(result.hasErrors()||emailExist){
             if (emailExist) {
                 result.rejectValue("username"," ","User already exists. Please try  with different username");
             }
-
             return "user/user-update";
         }
+
         userService.update(userDto);
         return "redirect:/users/list";
+
+
     }
 
     @GetMapping("/delete/{userId}")
