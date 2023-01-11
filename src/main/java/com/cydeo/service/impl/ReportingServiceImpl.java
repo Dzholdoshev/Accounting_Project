@@ -29,7 +29,7 @@ public class ReportingServiceImpl implements ReportingService {
 
 
     @Override
-    public List<InvoiceProductDto> getAllInvoiceProductDto() {
+    public List<InvoiceProductDto> getStockData() {
         return invoiceProductService.getAllByInvoiceStatusApprovedForCompany();
 
     }
