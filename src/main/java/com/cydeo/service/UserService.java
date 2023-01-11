@@ -16,7 +16,15 @@ public interface UserService {
     void delete(Long id);
     Boolean emailExist(UserDto userDto);
 
-   // List<UserDto> listAllUsers();
+   // boolean userIsAdmin(UserDto userDto);
+
+    // boolean isEmailExist(String username);
+
+   // Boolean usernameExist(String username);
+
+    // List<UserDto> listAllUsers();
+
+    Boolean checkIfOnlyAdminForCompany(UserDto dto);
 
 
 }
