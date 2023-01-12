@@ -196,23 +196,6 @@ class InvoiceServiceImplTest {
 
     }
 
-//    @Override
-//    public BigDecimal getTotalTaxOfInvoice(Long invoiceId) { // Sum of the tax of the Invoice Product
-//
-//        List<InvoiceProductDto> listOfInvoiceProducts = invoiceProductService.getInvoiceProductsOfInvoice(invoiceId);
-//        if (listOfInvoiceProducts != null) {
-//
-//            return listOfInvoiceProducts.stream().map(invoiceProductDto -> {
-//                BigDecimal price = invoiceProductDto.getPrice();
-//                Integer quantityOfProduct = invoiceProductDto.getQuantity();
-//                price = price.multiply(BigDecimal.valueOf(quantityOfProduct));
-//                BigDecimal tax = BigDecimal.valueOf(invoiceProductDto.getTax()).divide(BigDecimal.valueOf(100));
-//                return price.multiply(tax);
-//            }).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_UP);
-//        }
-//        return BigDecimal.ZERO;
-//    }
-
     @Test
     void whenPriceAndQuantityAreXTotalPriceOfInvoiceShouldBeY() {
 
