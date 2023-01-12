@@ -19,7 +19,7 @@ public interface ProductService {
 
     List<ProductDto> findAllProductsWithCategoryId(Long categoryId);
 
-    boolean isProductNameExist(ProductDto productDto);
+    boolean isProductNameExist(ProductDto productDto, Long id);
 
     List<ProductDto> findAllProductsInStock();
 
