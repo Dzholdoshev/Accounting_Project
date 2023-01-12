@@ -214,7 +214,7 @@ class InvoiceServiceImplTest {
 //    }
 
     @Test
-    void whenPriceAndQuantityAreXTotalTaxOfInvoiceShouldBeY() {
+    void whenPriceAndQuantityAreXTotalPriceOfInvoiceShouldBeY() {
 
         InvoiceDto invoiceDto = new InvoiceDto();
         invoiceDto.setInvoiceNo("P-001");
@@ -244,6 +244,77 @@ class InvoiceServiceImplTest {
         BigDecimal total = invoiceService.getTotalPriceOfInvoice(invoiceDto.getId());
 
         assertEquals(BigDecimal.valueOf(3188.40).setScale(2), total);
+
+    }
+
+
+    @Test
+    void whenPriceAndQuantityAreXTotalTaxOfInvoiceShouldBeY() {
+
+        InvoiceDto invoiceDto = new InvoiceDto();
+        invoiceDto.setInvoiceNo("P-001");
+        invoiceDto.setInvoiceStatus(InvoiceStatus.APPROVED);
+        invoiceDto.setInvoiceType(InvoiceType.PURCHASE);
+        invoiceDto.setId(1L);
+        invoiceDto.setClientVendor(new ClientVendorDto());
+
+        InvoiceProductDto invoiceProductDto = new InvoiceProductDto();
+        invoiceProductDto.setId(2L);
+        invoiceProductDto.setPrice(BigDecimal.valueOf(100L));
+        invoiceProductDto.setTax(5);
+        invoiceProductDto.setQuantity(10);
+
+        InvoiceProductDto invoiceProductDto2 = new InvoiceProductDto();
+        invoiceProductDto2.setId(3L);
+        invoiceProductDto2.setPrice(BigDecimal.valueOf(110L));
+        invoiceProductDto2.setTax(8);
+        invoiceProductDto2.setQuantity(18);
+        List<InvoiceProductDto> invoiceProductList = new ArrayList<>() {{
+            add(invoiceProductDto);
+            add(invoiceProductDto2);
+        }};
+
+        when(invoiceProductService.getInvoiceProductsOfInvoice(invoiceDto.getId())).thenReturn(invoiceProductList);
+
+        BigDecimal total = invoiceService.getTotalTaxOfInvoice(invoiceDto.getId());
+
+        assertEquals(BigDecimal.valueOf(208.40).setScale(2), total);
+
+    }
+
+    @Test
+    void whenPriceAndQuantityAreXTotalProfitLossOfInvoiceShouldBeY() {
+
+        InvoiceDto invoiceDto = new InvoiceDto();
+        invoiceDto.setInvoiceNo("P-001");
+        invoiceDto.setInvoiceStatus(InvoiceStatus.APPROVED);
+        invoiceDto.setInvoiceType(InvoiceType.SALES);
+        invoiceDto.setId(1L);
+        invoiceDto.setClientVendor(new ClientVendorDto());
+
+        InvoiceProductDto invoiceProductDto = new InvoiceProductDto();
+        invoiceProductDto.setId(2L);
+        invoiceProductDto.setPrice(BigDecimal.valueOf(100L));
+        invoiceProductDto.setTax(5);
+        invoiceProductDto.setQuantity(10);
+        invoiceProductDto.setProfitLoss(BigDecimal.valueOf(123));
+
+        InvoiceProductDto invoiceProductDto2 = new InvoiceProductDto();
+        invoiceProductDto2.setId(3L);
+        invoiceProductDto2.setPrice(BigDecimal.valueOf(110L));
+        invoiceProductDto2.setTax(8);
+        invoiceProductDto2.setQuantity(18);
+        invoiceProductDto2.setProfitLoss(BigDecimal.valueOf(345.45));
+        List<InvoiceProductDto> invoiceProductList = new ArrayList<>() {{
+            add(invoiceProductDto);
+            add(invoiceProductDto2);
+        }};
+
+        when(invoiceProductService.getInvoiceProductsOfInvoice(invoiceDto.getId())).thenReturn(invoiceProductList);
+
+        BigDecimal total = invoiceService.getProfitLossOfInvoice(invoiceDto.getId());
+
+        assertEquals(BigDecimal.valueOf(468.45).setScale(2), total);
 
     }
 }

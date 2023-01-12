@@ -198,10 +198,14 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public BigDecimal getProfitLossOfInvoice(Long id) {
-        InvoiceDto invoiceDto = findInvoiceById(id);
-        return invoiceProductService.getInvoiceProductsOfInvoice(invoiceDto.getId()).stream()
+
+        List<InvoiceProductDto> listOfInvoiceProducts= invoiceProductService.getInvoiceProductsOfInvoice(id);
+        if (listOfInvoiceProducts != null) {
+           return listOfInvoiceProducts.stream()
                 .map(InvoiceProductDto::getProfitLoss)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
+        return BigDecimal.ZERO;
     }
 
     @Override
