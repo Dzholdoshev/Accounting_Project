@@ -36,7 +36,7 @@ public class ReportingController {
     @GetMapping("/stockData")
     public String listAllData(Model model){
 
-         model.addAttribute("invoiceProducts", reportingService.getAllInvoiceProductDto());
+         model.addAttribute("invoiceProducts", reportingService.getStockData());
         return "report/stock-report";
     }
 
