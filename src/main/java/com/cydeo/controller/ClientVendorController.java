@@ -4,6 +4,7 @@ import com.cydeo.dto.ClientVendorDto;
 import com.cydeo.dto.UserDto;
 import com.cydeo.repository.ClientVendorRepository;
 import com.cydeo.service.ClientVendorService;
+import com.cydeo.service.CompanyService;
 import com.cydeo.service.InvoiceService;
 import com.cydeo.service.SecurityService;
 import org.springframework.stereotype.Controller;
@@ -13,6 +14,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -24,12 +26,15 @@ public class ClientVendorController {
     private final SecurityService securityService;
     private final InvoiceService invoiceService;
     private final ClientVendorRepository clientVendorRepository;
+    private final CompanyService companyService;
 
-    public ClientVendorController(ClientVendorService clientVendorService, SecurityService securityService, InvoiceService invoiceService, ClientVendorRepository clientVendorRepository) {
+
+    public ClientVendorController(ClientVendorService clientVendorService, SecurityService securityService, InvoiceService invoiceService, ClientVendorRepository clientVendorRepository, CompanyService companyService) {
         this.clientVendorService = clientVendorService;
         this.securityService = securityService;
         this.invoiceService = invoiceService;
         this.clientVendorRepository = clientVendorRepository;
+        this.companyService = companyService;
     }
 
     @GetMapping("/list")
@@ -42,6 +47,7 @@ public class ClientVendorController {
     }
 
     @GetMapping("/update/{id}")
+    @RolesAllowed("Manager")
     public String editClientVendor(@PathVariable("id") Long id, Model model) {
 
         model.addAttribute("clientVendor", clientVendorService.findClientVendorById(id));
@@ -50,10 +56,11 @@ public class ClientVendorController {
     }
 
     @PostMapping("/update/{id}")
+
     public String updateClientVendor(@PathVariable("id") Long id,@Valid @ModelAttribute ("clientVendor")ClientVendorDto clientVendorDto,BindingResult bindingResult, Model model) throws Exception {
 
-
-        if(clientVendorRepository.existsByClientVendorName(clientVendorDto.getClientVendorName())&&!clientVendorDto.getClientVendorName().equals(clientVendorService.findClientVendorById(id).getClientVendorName())){
+        if(clientVendorService.existsByNameAndCompany(clientVendorDto.getClientVendorName(),companyService.getCompanyByLoggedInUser())
+                &&!clientVendorDto.getClientVendorName().equals(clientVendorService.findClientVendorById(id).getClientVendorName())){
             bindingResult.addError(new FieldError("clientVendor","clientVendorName","A client/vendor with this name already exists. Please try with different name."));
         }
         if (bindingResult.hasErrors()) {
@@ -66,6 +73,7 @@ public class ClientVendorController {
     }
 
     @GetMapping("/delete/{id}")
+
     public String deleteClientVendor(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) throws Exception {
         boolean invoiceExists = invoiceService.checkIfInvoiceExist(id);
         if(invoiceExists){
@@ -78,12 +86,14 @@ public class ClientVendorController {
 
 
     @GetMapping("/create")
+    @RolesAllowed("Manager")
     public String createClientVendor(Model model) {
         model.addAttribute("newClientVendor", new ClientVendorDto());
         model.addAttribute("clientVendorTypes", clientVendorService.getClientVendorType());
         return "/clientVendor/clientVendor-create";
     }
     @PostMapping("/create")
+    @RolesAllowed("Manager")
     public String insertClientVendor(@Valid @ModelAttribute("newClientVendor") ClientVendorDto clientVendor,BindingResult bindingResult,Model model) throws Exception {
 
         if(clientVendorRepository.existsByClientVendorName(clientVendor.getClientVendorName())){

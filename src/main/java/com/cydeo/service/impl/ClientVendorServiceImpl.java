@@ -121,6 +121,12 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     }
 
     @Override
+    public boolean existsByNameAndCompany(String name, CompanyDto companyDto) {
+        Company company = mapperUtil.convert(companyDto,new Company());
+        return clientVendorRepository.existsByClientVendorNameAndCompany(name,company);
+    }
+
+    @Override
     public void delete(Long id) throws Exception {
         Optional<ClientVendor> foundClientVendor = clientVendorRepository.findById(id);
         //       boolean invoiceExists = invoiceService.checkIfInvoiceExist(id);
@@ -134,10 +140,7 @@ public class ClientVendorServiceImpl implements ClientVendorService {
     }
 
 
-    @Override
-    public boolean companyNameExists(ClientVendorDto clientVendorDto) {
-        return clientVendorRepository.existsById(clientVendorDto.getId());
-    }
+
 
     @Override
     public List<ClientVendorType> getClientVendorType() {
