@@ -152,6 +152,7 @@ class InvoiceServiceImplTest {
         invoiceService.delete(1L);
         verify(invoiceRepository, never()).delete(any());
         verify(invoiceRepository, never()).save(isA(Invoice.class));
+        assertEquals(false, invoice.getIsDeleted());
     }
 
 
@@ -170,6 +171,7 @@ class InvoiceServiceImplTest {
         invoice.setInvoiceType(InvoiceType.PURCHASE);
         invoice.setId(1L);
         invoice.setClientVendor(new ClientVendor());
+        invoice.setIsDeleted(false);
 
         InvoiceProductDto invoiceProductDto= new InvoiceProductDto();
         invoiceProductDto.setId(2L);
@@ -181,11 +183,11 @@ class InvoiceServiceImplTest {
         when(invoiceRepository.findInvoiceById(invoiceDto.getId())).thenReturn(invoice);
         when(invoiceProductService.getInvoiceProductsOfInvoice(invoiceDto.getId())).thenReturn(invoiceProductList);
         doNothing().when(invoiceProductService).delete(invoiceProductDto.getId());
-       when(invoiceRepository.save(invoice)).thenReturn(invoice);
+        when(invoiceRepository.save(invoice)).thenReturn(invoice);
 
         invoiceService.delete(1L);
 
-        verify(invoiceRepository,calls(1)).delete(isA(Invoice.class));
+        assertEquals(true, invoice.getIsDeleted());
 
     }
 }
