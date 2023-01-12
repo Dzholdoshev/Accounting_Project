@@ -16,15 +16,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-//unit testing
+
 @ExtendWith(MockitoExtension.class)
 class InvoiceServiceImplTest {
     @Mock
@@ -144,10 +143,13 @@ class InvoiceServiceImplTest {
         invoice.setInvoiceType(InvoiceType.PURCHASE);
         invoice.setId(1L);
         invoice.setClientVendor(new ClientVendor());
+        invoice.setIsDeleted(false);
 
         when(invoiceRepository.findInvoiceById(invoiceDto.getId())).thenReturn(invoice);
-        // when(invoiceProductService.getInvoiceProductsOfInvoice(invoiceDto.getId())).thenReturn(any());
-        //  when(invoiceRepository.save(invoice)).thenReturn(invoice);
+        if (invoice.getInvoiceStatus().equals(InvoiceStatus.AWAITING_APPROVAL)) {
+            when(invoiceProductService.getInvoiceProductsOfInvoice(invoiceDto.getId())).thenReturn(any());
+            when(invoiceRepository.save(invoice)).thenReturn(invoice);
+        }
 
         invoiceService.delete(1L);
         verify(invoiceRepository, never()).delete(any());
@@ -173,21 +175,75 @@ class InvoiceServiceImplTest {
         invoice.setClientVendor(new ClientVendor());
         invoice.setIsDeleted(false);
 
-        InvoiceProductDto invoiceProductDto= new InvoiceProductDto();
+        InvoiceProductDto invoiceProductDto = new InvoiceProductDto();
         invoiceProductDto.setId(2L);
-        List<InvoiceProductDto> invoiceProductList=new ArrayList<>(){{
+        List<InvoiceProductDto> invoiceProductList = new ArrayList<>() {{
             add(invoiceProductDto);
         }};
         invoiceDto.setInvoiceProducts(invoiceProductList);
 
         when(invoiceRepository.findInvoiceById(invoiceDto.getId())).thenReturn(invoice);
-        when(invoiceProductService.getInvoiceProductsOfInvoice(invoiceDto.getId())).thenReturn(invoiceProductList);
-        doNothing().when(invoiceProductService).delete(invoiceProductDto.getId());
-        when(invoiceRepository.save(invoice)).thenReturn(invoice);
+        if (invoice.getInvoiceStatus().equals(InvoiceStatus.AWAITING_APPROVAL)) {
+            when(invoiceProductService.getInvoiceProductsOfInvoice(invoiceDto.getId())).thenReturn(invoiceProductList);
+            doNothing().when(invoiceProductService).delete(invoiceProductDto.getId());
+            when(invoiceRepository.save(invoice)).thenReturn(invoice);
+
+        }
 
         invoiceService.delete(1L);
 
         assertEquals(true, invoice.getIsDeleted());
+
+    }
+
+//    @Override
+//    public BigDecimal getTotalTaxOfInvoice(Long invoiceId) { // Sum of the tax of the Invoice Product
+//
+//        List<InvoiceProductDto> listOfInvoiceProducts = invoiceProductService.getInvoiceProductsOfInvoice(invoiceId);
+//        if (listOfInvoiceProducts != null) {
+//
+//            return listOfInvoiceProducts.stream().map(invoiceProductDto -> {
+//                BigDecimal price = invoiceProductDto.getPrice();
+//                Integer quantityOfProduct = invoiceProductDto.getQuantity();
+//                price = price.multiply(BigDecimal.valueOf(quantityOfProduct));
+//                BigDecimal tax = BigDecimal.valueOf(invoiceProductDto.getTax()).divide(BigDecimal.valueOf(100));
+//                return price.multiply(tax);
+//            }).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_UP);
+//        }
+//        return BigDecimal.ZERO;
+//    }
+
+    @Test
+    void whenPriceAndQuantityAreXTotalTaxOfInvoiceShouldBeY() {
+
+        InvoiceDto invoiceDto = new InvoiceDto();
+        invoiceDto.setInvoiceNo("P-001");
+        invoiceDto.setInvoiceStatus(InvoiceStatus.APPROVED);
+        invoiceDto.setInvoiceType(InvoiceType.PURCHASE);
+        invoiceDto.setId(1L);
+        invoiceDto.setClientVendor(new ClientVendorDto());
+
+        InvoiceProductDto invoiceProductDto = new InvoiceProductDto();
+        invoiceProductDto.setId(2L);
+        invoiceProductDto.setPrice(BigDecimal.valueOf(100L));
+        invoiceProductDto.setTax(5);
+        invoiceProductDto.setQuantity(10);
+
+        InvoiceProductDto invoiceProductDto2 = new InvoiceProductDto();
+        invoiceProductDto2.setId(3L);
+        invoiceProductDto2.setPrice(BigDecimal.valueOf(110L));
+        invoiceProductDto2.setTax(8);
+        invoiceProductDto2.setQuantity(18);
+        List<InvoiceProductDto> invoiceProductList = new ArrayList<>() {{
+            add(invoiceProductDto);
+            add(invoiceProductDto2);
+        }};
+
+        when(invoiceProductService.getInvoiceProductsOfInvoice(invoiceDto.getId())).thenReturn(invoiceProductList);
+
+        BigDecimal total = invoiceService.getTotalPriceOfInvoice(invoiceDto.getId());
+
+        assertEquals(BigDecimal.valueOf(3188.40).setScale(2), total);
 
     }
 }
