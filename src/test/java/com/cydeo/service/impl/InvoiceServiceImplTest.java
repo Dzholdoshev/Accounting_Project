@@ -9,25 +9,18 @@ import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceRepository;
 import com.cydeo.service.CompanyService;
 import com.cydeo.service.InvoiceProductService;
-import com.cydeo.service.SecurityService;
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -35,20 +28,19 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class InvoiceServiceImplTest {
     @Mock
-    private  InvoiceRepository invoiceRepository;
+    private InvoiceRepository invoiceRepository;
     @Mock
-    private  MapperUtil mapperUtil;
+    private MapperUtil mapperUtil;
     @Mock
-    private  InvoiceProductService invoiceProductService;
+    private InvoiceProductService invoiceProductService;
     @Mock
     private CompanyService companyService;
     InvoiceServiceImpl invoiceService;
 
 
-
     @BeforeEach
-    public void setUp(){
-        invoiceService= new InvoiceServiceImpl( invoiceRepository, mapperUtil, invoiceProductService, companyService);
+    public void setUp() {
+        invoiceService = new InvoiceServiceImpl(invoiceRepository, mapperUtil, invoiceProductService, companyService);
     }
 
     @Test
@@ -88,24 +80,23 @@ class InvoiceServiceImplTest {
         when(invoiceRepository.findInvoiceById(invoice.getId())).thenReturn(invoice);
         when(mapperUtil.convert(any(Invoice.class), any(InvoiceDto.class))).thenReturn(invoiceDto);
         when(invoiceProductService.getInvoiceProductsOfInvoice(invoice.getId())).thenReturn(invoiceProducts);
-       invoiceDto.setInvoiceProducts(invoiceProducts);
+        invoiceDto.setInvoiceProducts(invoiceProducts);
 
-       invoiceService.findInvoiceById(invoice.getId());
+        invoiceService.findInvoiceById(invoice.getId());
 
         assertEquals(1, invoiceDto.getId());
     }
 
 
-
     @Test
-    void givenAnUpdatedInvoiceAnInvoiceIsReturnedWithTheUpdatedFeilds() {
+    void givenAnUpdatedInvoiceAnInvoiceIsReturnedWithTheUpdatedFields() {
         Invoice invoice = new Invoice();
         invoice.setInvoiceNo("P-001");
         invoice.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
         invoice.setInvoiceType(InvoiceType.PURCHASE);
         invoice.setId(1L);
         invoice.setClientVendor(new ClientVendor("Staples", "234-234-2344", "www.staples.com", ClientVendorType.VENDOR
-        , new Address(), new Company()));
+                , new Address(), new Company()));
 
         Invoice invoiceUpdated = new Invoice();
         invoiceUpdated.setInvoiceNo("P-001");
@@ -120,9 +111,8 @@ class InvoiceServiceImplTest {
         invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
         invoiceDto.setInvoiceType(InvoiceType.PURCHASE);
         invoiceDto.setId(1L);
-        invoiceDto.setClientVendor(new ClientVendorDto(1L,"Walmart", "234-234-2344", "www.staples.com", ClientVendorType.VENDOR
+        invoiceDto.setClientVendor(new ClientVendorDto(1L, "Walmart", "234-234-2344", "www.staples.com", ClientVendorType.VENDOR
                 , new AddressDto(), new CompanyDto()));
-
 
 
         when(mapperUtil.convert(any(InvoiceDto.class), any(Invoice.class))).thenReturn(invoiceUpdated);
@@ -130,11 +120,72 @@ class InvoiceServiceImplTest {
         when(invoiceRepository.save(any())).thenReturn(invoiceUpdated);
 
 
-        InvoiceDto invoiceDto1=invoiceService.update(invoice.getId(), invoiceDto);
+        InvoiceDto invoiceDto1 = invoiceService.update(invoice.getId(), invoiceDto);
 
-        assertEquals(invoiceDto.getClientVendor().getClientVendorName(),invoiceUpdated.getClientVendor().getClientVendorName());
+        assertEquals(invoiceDto.getClientVendor().getClientVendorName(), invoiceUpdated.getClientVendor().getClientVendorName());
 
         assertNotNull(invoiceDto1);
 
     }
+
+
+    @Test
+    void whenAnInvoiceIsApprovedItShouldNotBeDeleted() {
+        InvoiceDto invoiceDto = new InvoiceDto();
+        invoiceDto.setInvoiceNo("P-001");
+        invoiceDto.setInvoiceStatus(InvoiceStatus.APPROVED);
+        invoiceDto.setInvoiceType(InvoiceType.PURCHASE);
+        invoiceDto.setId(1L);
+        invoiceDto.setClientVendor(new ClientVendorDto());
+
+        Invoice invoice = new Invoice();
+        invoice.setInvoiceNo("P-001");
+        invoice.setInvoiceStatus(InvoiceStatus.APPROVED);
+        invoice.setInvoiceType(InvoiceType.PURCHASE);
+        invoice.setId(1L);
+        invoice.setClientVendor(new ClientVendor());
+
+        when(invoiceRepository.findInvoiceById(invoiceDto.getId())).thenReturn(invoice);
+        // when(invoiceProductService.getInvoiceProductsOfInvoice(invoiceDto.getId())).thenReturn(any());
+        //  when(invoiceRepository.save(invoice)).thenReturn(invoice);
+
+        invoiceService.delete(1L);
+        verify(invoiceRepository, never()).delete(any());
+        verify(invoiceRepository, never()).save(isA(Invoice.class));
     }
+
+
+    @Test
+    void whenAnInvoiceIsAwaitingApprovalItShouldBeDeleted() {
+        InvoiceDto invoiceDto = new InvoiceDto();
+        invoiceDto.setInvoiceNo("P-001");
+        invoiceDto.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
+        invoiceDto.setInvoiceType(InvoiceType.PURCHASE);
+        invoiceDto.setId(1L);
+        invoiceDto.setClientVendor(new ClientVendorDto());
+
+        Invoice invoice = new Invoice();
+        invoice.setInvoiceNo("P-001");
+        invoice.setInvoiceStatus(InvoiceStatus.AWAITING_APPROVAL);
+        invoice.setInvoiceType(InvoiceType.PURCHASE);
+        invoice.setId(1L);
+        invoice.setClientVendor(new ClientVendor());
+
+        InvoiceProductDto invoiceProductDto= new InvoiceProductDto();
+        invoiceProductDto.setId(2L);
+        List<InvoiceProductDto> invoiceProductList=new ArrayList<>(){{
+            add(invoiceProductDto);
+        }};
+        invoiceDto.setInvoiceProducts(invoiceProductList);
+
+        when(invoiceRepository.findInvoiceById(invoiceDto.getId())).thenReturn(invoice);
+        when(invoiceProductService.getInvoiceProductsOfInvoice(invoiceDto.getId())).thenReturn(invoiceProductList);
+        doNothing().when(invoiceProductService).delete(invoiceProductDto.getId());
+       when(invoiceRepository.save(invoice)).thenReturn(invoice);
+
+        invoiceService.delete(1L);
+
+        verify(invoiceRepository,calls(1)).delete(isA(Invoice.class));
+
+    }
+}
