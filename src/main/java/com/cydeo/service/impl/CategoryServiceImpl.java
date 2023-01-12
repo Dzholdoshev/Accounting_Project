@@ -50,7 +50,8 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = mapperUtil.convert(categoryDto, new Category());
         Company company = mapperUtil.convert(securityService.getLoggedInUser().getCompany(), new Company());
         category.setCompany(company);
-        return mapperUtil.convert(categoryRepository.save(category), new CategoryDto());
+
+         return mapperUtil.convert(categoryRepository.save(category), new CategoryDto());
     }
 
     @Override
