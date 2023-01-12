@@ -36,18 +36,20 @@ public class ReportingServiceImpl implements ReportingService {
 
     @Override
     public Map<String, BigDecimal> getAllMonthlyProfitLossData(Integer month,Integer year)  {
-           Map<String,BigDecimal> MonthlyProfitLossDataMap = new HashMap<>();
 
+           Map<String,BigDecimal> MonthlyProfitLossDataMap = new HashMap<>();
 
             List<InvoiceDto> invoiceListByMonth = invoiceService.getAllInvoicesByInvoiceStatusAndMonth(InvoiceStatus.APPROVED, month,year);
 
-            Long profitLoss = 0L;
-            for (int J = 0; J < invoiceListByMonth.size(); J++) {
-                List<InvoiceProductDto> invoiceProductdtoList = invoiceListByMonth.get(J).getInvoiceProducts();
+            List<InvoiceProductDto> invoiceProductsByMonth = invoiceListByMonth.stream()
+                    .map(InvoiceDto::getInvoiceProducts)
+                    .flatMap(Collection::stream).collect(Collectors.toList());
 
-                for (int j = 0; j < invoiceProductdtoList.size(); j++) {
-                    profitLoss += invoiceProductdtoList.get(j).getProfitLoss().longValue();
-                }
+            long profitLoss = 0L;
+
+            for (InvoiceProductDto invoiceProductDto : invoiceProductsByMonth) {
+
+                    profitLoss += invoiceProductDto.getProfitLoss().longValue();
             }
 
             BigDecimal totalProfitLoss = BigDecimal.valueOf(profitLoss);
