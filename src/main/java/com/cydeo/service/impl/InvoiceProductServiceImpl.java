@@ -17,6 +17,7 @@ import com.cydeo.service.InvoiceService;
 import com.cydeo.service.ProductService;
 import com.cydeo.service.SecurityService;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -141,8 +142,8 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
                         BigDecimal.valueOf(purchasedProduct.getRemainingQuantity() * (toBeSoldProduct.getTax() + 100) / 100d));
 
                 BigDecimal profitLoss = toBeSoldProduct.getProfitLoss().add(salesTotalForQty.subtract(costForQty));
-                purchasedProduct.setRemainingQuantity(0);
                 toBeSoldProduct.setRemainingQuantity(toBeSoldProduct.getRemainingQuantity() - purchasedProduct.getRemainingQuantity());
+                purchasedProduct.setRemainingQuantity(0);
                 toBeSoldProduct.setProfitLoss(profitLoss);
 
                 invoiceProductRepository.save(purchasedProduct);
@@ -189,6 +190,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         return invoiceProductRepository.findAllInvoiceProductByProductId(productId).stream()
                 .map(invoiceProduct -> mapperUtil.convert(invoiceProduct, new InvoiceProductDto()))
                 .collect(Collectors.toList());
+
     }
 
     @Override
