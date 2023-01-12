@@ -4,6 +4,7 @@ import com.cydeo.dto.InvoiceDto;
 import com.cydeo.dto.InvoiceProductDto;
 import com.cydeo.entity.InvoiceProduct;
 import com.cydeo.entity.Product;
+import com.cydeo.enums.InvoiceStatus;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.exception.NotEnoughProductException;
 
@@ -29,5 +30,9 @@ public interface InvoiceProductService {
     List<InvoiceProduct> findNotSoldProduct(Product product);
 
     List<InvoiceProductDto> findAllInvoiceProductsByProductId(Long id);
-    public Boolean stockCheckBeforeApproval(Long invoiceId);
+    Boolean stockCheckBeforeApproval(Long invoiceId);
+
+    List<InvoiceProductDto> getAllByInvoiceStatusApprovedForCompany();
+
+
 }

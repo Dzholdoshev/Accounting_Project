@@ -19,5 +19,6 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     List<Invoice> findInvoicesByCompanyAndInvoiceStatusAndIsDeleted(Company company, InvoiceStatus invoiceStatus, boolean isDeleted);
     List<Invoice> findInvoicesByCompanyAndInvoiceStatusAndIsDeletedOrderByDateDesc(Company company, InvoiceStatus invoiceStatus, boolean isDeleted);
     Integer countAllByCompanyAndClientVendor_Id(Company company, Long clientVendorId);
-
+    @Query("select i from Invoice i where i.company=?1 AND i.invoiceStatus=?2 AND i.isDeleted=?3 AND   month(i.date)=?4 AND year(i.date)=?5")
+    List<Invoice> findInvoicesByCompanyAndInvoiceStatusAndIsDeletedAndMonth(Company company, InvoiceStatus invoiceStatus, boolean isDeleted,Integer month,Integer year);
 }

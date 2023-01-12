@@ -222,6 +222,26 @@ public class InvoiceServiceImpl implements InvoiceService {
         return InvoiceNo;
     }
 
+    @Override
+    public List<InvoiceDto> getAllInvoicesByInvoiceStatusAndMonth(InvoiceStatus status,Integer  month,Integer year){
+        Company company = mapperUtil.convert(companyService.getCompanyByLoggedInUser(), new Company());
+        List<Invoice> invoiceList = invoiceRepository.findInvoicesByCompanyAndInvoiceStatusAndIsDeletedAndMonth(company, status, false, month, year);
+
+        return invoiceList.stream()
+                .filter(invoice -> invoice.getInvoiceType().equals(InvoiceType.SALES))
+                .map(invoice -> {
+                    InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
+                    Long invoiceId = invoiceDto.getId();
+
+                    invoiceDto.setTax(getTotalTaxOfInvoice(invoiceId));
+                    invoiceDto.setTotal(getTotalPriceOfInvoice(invoiceId));
+                    invoiceDto.setPrice(invoiceDto.getTotal().subtract(invoiceDto.getTax()));
+                    invoiceDto.setInvoiceProducts(invoiceProductService.getInvoiceProductsOfInvoice(invoiceDto.getId()));
+
+                    return invoiceDto;
+                }).collect(Collectors.toList());
+    }
+
 
 }
 
