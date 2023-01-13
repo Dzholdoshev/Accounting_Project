@@ -37,5 +37,5 @@ public interface InvoiceService {
 
     boolean checkIfInvoiceExist(Long clientVendorId);
 
-
+    List<InvoiceDto> getAllInvoicesByInvoiceStatusAndMonth(InvoiceStatus status,Integer month,Integer year);
 }

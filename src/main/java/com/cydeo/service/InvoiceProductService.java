@@ -30,4 +30,5 @@ public interface InvoiceProductService {
 
     List<InvoiceProductDto> findAllInvoiceProductsByProductId(Long id);
     public Boolean stockCheckBeforeApproval(Long invoiceId);
+    List<InvoiceProductDto> getAllByInvoiceStatusApprovedForCompany();
 }

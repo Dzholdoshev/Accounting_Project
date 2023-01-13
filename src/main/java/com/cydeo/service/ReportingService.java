@@ -8,8 +8,9 @@ import java.util.Map;
 
 public interface ReportingService {
 
-    List<InvoiceProductDto> getAllInvoiceProductDto();
+    List<InvoiceProductDto> getStockData();
 
-    Map<String, BigDecimal> getAllMonthlyProfitLossData();
+    Map<String, BigDecimal> getAllMonthlyProfitLossData(Integer month,Integer year) ;
+    Map<String, BigDecimal> getProfitLossByMonth() ;
 
 }

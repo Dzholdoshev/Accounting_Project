@@ -43,6 +43,7 @@ public class InvoiceServiceImpl implements InvoiceService {
        InvoiceDto invoiceDto= mapperUtil.convert(invoice, new InvoiceDto());
       List<InvoiceProductDto> invoiceProductList= invoiceProductService.getInvoiceProductsOfInvoice(id);
        invoiceDto.setInvoiceProducts(invoiceProductList);
+
         return invoiceDto;
     }
 
@@ -66,6 +67,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     public List<InvoiceDto> getAllInvoicesByInvoiceStatus(InvoiceStatus status) {
         Company company = mapperUtil.convert(companyService.getCompanyByLoggedInUser(), new Company());
         List<Invoice> invoiceList = invoiceRepository.findInvoicesByCompanyAndInvoiceStatusAndIsDeleted(company, status, false);
+
 
         return invoiceList.stream().map(invoice -> {
             InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
@@ -106,7 +108,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         Invoice updatedInvoice = mapperUtil.convert(invoiceDto, new Invoice());
         Invoice invoice = invoiceRepository.findInvoiceById(id);
         invoice.setClientVendor(updatedInvoice.getClientVendor());
-        invoiceRepository.save(invoice);
+        Invoice invoice1=invoiceRepository.save(invoice);
         return invoiceDto;
     }
 
@@ -196,10 +198,14 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public BigDecimal getProfitLossOfInvoice(Long id) {
-        InvoiceDto invoiceDto = findInvoiceById(id);
-        return invoiceProductService.getInvoiceProductsOfInvoice(invoiceDto.getId()).stream()
+
+        List<InvoiceProductDto> listOfInvoiceProducts= invoiceProductService.getInvoiceProductsOfInvoice(id);
+        if (listOfInvoiceProducts != null) {
+           return listOfInvoiceProducts.stream()
                 .map(InvoiceProductDto::getProfitLoss)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+        }
+        return BigDecimal.ZERO;
     }
 
     @Override
@@ -221,7 +227,25 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
         return InvoiceNo;
     }
+      @Override
+      public List<InvoiceDto> getAllInvoicesByInvoiceStatusAndMonth(InvoiceStatus status,Integer  month,Integer year){
+        Company company = mapperUtil.convert(companyService.getCompanyByLoggedInUser(), new Company());
+        List<Invoice> invoiceList = invoiceRepository.findInvoicesByCompanyAndInvoiceStatusAndIsDeletedAndMonth(company, status, false, month, year);
 
+        return invoiceList.stream()
+                .filter(invoice -> invoice.getInvoiceType().equals(InvoiceType.SALES))
+                .map(invoice -> {
+                    InvoiceDto invoiceDto = mapperUtil.convert(invoice, new InvoiceDto());
+                    Long invoiceId = invoiceDto.getId();
+
+                    invoiceDto.setTax(getTotalTaxOfInvoice(invoiceId));
+                    invoiceDto.setTotal(getTotalPriceOfInvoice(invoiceId));
+                    invoiceDto.setPrice(invoiceDto.getTotal().subtract(invoiceDto.getTax()));
+                    invoiceDto.setInvoiceProducts(invoiceProductService.getInvoiceProductsOfInvoice(invoiceDto.getId()));
+
+                    return invoiceDto;
+                }).collect(Collectors.toList());
+      }
 
 }
 
