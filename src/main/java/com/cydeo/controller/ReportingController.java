@@ -18,6 +18,7 @@ import java.util.Set;
 public class ReportingController {
 
     private final ReportingService reportingService;
+
     private final InvoiceProductService invoiceProductService;
 
     public ReportingController(ReportingService reportingService, InvoiceProductService invoiceProductService) {
@@ -27,15 +28,15 @@ public class ReportingController {
 
     @GetMapping("/profitLossData")
     public String listLossData(Model model){
-        Map <String, BigDecimal> test = new HashMap<>();
-        test.put("month", BigDecimal.ZERO);
 
-       model.addAttribute("monthlyProfitLossDataMap",test);
+       model.addAttribute("monthlyProfitLossDataMap",reportingService.getProfitLossByMonth());
                 return "report/profit-loss-report";
     }
+
     @GetMapping("/stockData")
     public String listAllData(Model model){
-        // model.addAttribute("invoiceProducts",)
+
+         model.addAttribute("invoiceProducts", reportingService.getStockData());
         return "report/stock-report";
     }
 

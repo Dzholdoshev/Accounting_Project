@@ -43,7 +43,7 @@ public class ProductController {
     @PostMapping("/create")
     public String createNewProduct(@Valid @ModelAttribute("newProduct") ProductDto productDto, BindingResult bindingResult, Model model){
 
-        if (productService.isProductNameExist(productDto)){
+        if (productService.isProductNameExist(productDto, productDto.getId())){
             bindingResult.rejectValue("name", " ", "product name already exist");
         }
 
@@ -65,11 +65,11 @@ public class ProductController {
     }
 
     @PostMapping("/update/{productId}")
-    public String updateProduct(@ModelAttribute("product") ProductDto productDto, BindingResult bindingResult, @PathVariable(value = "productId") Long productId, Model model) throws Exception{
+    public String updateProduct(@PathVariable(value = "productId") Long productId, @Valid @ModelAttribute("product") ProductDto productDto, BindingResult bindingResult, Model model) throws Exception{
 
         productDto.setId(productId);
 
-        if (productService.isProductNameExist(productDto)){
+        if (productService.isProductNameExist(productDto, productId)){
             bindingResult.rejectValue("name", " ", "product name already exist");
         }
 

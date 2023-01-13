@@ -39,7 +39,7 @@ public class SalesInvoiceController {
         model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(invoiceId));
         model.addAttribute("newInvoiceProduct", new InvoiceProductDto());
         model.addAttribute("clients", clientVendorService.getAllClientVendorsOfCompany(ClientVendorType.CLIENT));
-        model.addAttribute("products", productService.getAllProducts());
+        model.addAttribute("products", productService.findAllProductsInStock());
         return "/invoice/sales-invoice-update";
     }
 
@@ -87,6 +87,7 @@ public class SalesInvoiceController {
 
             boolean enoughStock = invoiceProductService.checkProductQuantityBeforeAddingToInvoice(newInvoiceProduct, invoiceId);
 
+
             if (!enoughStock) {
                 redirectAttributes.addFlashAttribute("error", "Not enough : "+ newInvoiceProduct.getProduct().getName()+" quantity to sell. Only "+newInvoiceProduct.getProduct().getQuantityInStock()+" in stock!");
                 return "redirect:/salesInvoices/update/" + invoiceId;
@@ -95,7 +96,7 @@ public class SalesInvoiceController {
         if (result.hasErrors()) {
             model.addAttribute("invoice", invoiceService.findInvoiceById(invoiceId));
             model.addAttribute("invoiceProducts", invoiceProductService.getInvoiceProductsOfInvoice(invoiceId));
-            model.addAttribute("products", productService.getAllProducts());
+            model.addAttribute("products", productService.findAllProductsInStock());
             model.addAttribute("clients", clientVendorService.getAllClientVendorsOfCompany(ClientVendorType.CLIENT));
             return "/invoice/sales-invoice-update";
         }

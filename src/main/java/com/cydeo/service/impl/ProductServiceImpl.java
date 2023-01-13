@@ -96,9 +96,20 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public boolean isProductNameExist(ProductDto productDto) {
-        return productRepository.existsByName(productDto.getName());
-    }
+    public boolean isProductNameExist(ProductDto productDto, Long id) {
+
+        if (id != null){
+
+            Product product = productRepository.findById(id).get();
+
+            if (product.getName().equals(productDto.getName())) {
+                return false;
+            }
+        }
+
+            return productRepository.existsByName(productDto.getName());
+        }
+
 
     @Override
     public List<ProductDto> findAllProductsInStock() {
