@@ -1,5 +1,6 @@
 package com.cydeo.controller;
 
+import com.cydeo.annotation.ExecutionTime;
 import com.cydeo.dto.InvoiceDto;
 import com.cydeo.dto.InvoiceProductDto;
 import com.cydeo.enums.ClientVendorType;
@@ -50,7 +51,7 @@ public class PurchaseInvoiceController {
         invoiceService.delete(id);
         return "redirect:/purchaseInvoices/list";
     }
-
+    @ExecutionTime
     @GetMapping("/list")
     public String navigateToPurchaseInvoiceList(Model model) throws Exception {
         model.addAttribute("invoices", invoiceService.getAllInvoicesOfCompany(InvoiceType.PURCHASE));

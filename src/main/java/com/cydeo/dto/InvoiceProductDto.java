@@ -4,6 +4,7 @@ import lombok.*;
 import org.hibernate.validator.constraints.Range;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+@Builder
 @Setter
 @Getter
 @NoArgsConstructor
