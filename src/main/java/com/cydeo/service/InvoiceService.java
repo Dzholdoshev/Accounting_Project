@@ -17,11 +17,12 @@ public interface InvoiceService {
 
     InvoiceDto getNewInvoice(InvoiceType invoiceType) throws Exception;
 
-
     InvoiceDto save(InvoiceDto invoiceDto, InvoiceType invoiceType);
+
     InvoiceDto update(Long id, InvoiceDto invoiceDto);
 
     void approve(Long id) throws Exception;
+
     InvoiceDto printInvoice(Long id);
 
     void delete(Long id);
@@ -32,10 +33,9 @@ public interface InvoiceService {
 
     BigDecimal getTotalTaxOfInvoice(Long id);
 
-
     BigDecimal getProfitLossOfInvoice(Long id);
+
     boolean checkIfInvoiceExist(Long clientVendorId);
 
-
-
+    List<InvoiceDto> getAllInvoicesByInvoiceStatusAndMonth(InvoiceStatus status,Integer month,Integer year);
 }

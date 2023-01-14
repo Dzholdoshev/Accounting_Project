@@ -136,7 +136,7 @@
                                                                     <label>Role</label>
                                                                     <select class="custom-select" id="role" name="role"
                                                                             th:with="role=*{role}"
-                                                                            th:disabled="${user.isOnlyAdmin}">
+                                                                            th:readonly="${user.isOnlyAdmin}">
                                                                         <option th:each="role:${userRoles}"
                                                                                 th:value="${role.id}"
                                                                                 th:text="${role.description}"
@@ -160,7 +160,7 @@
                                                                     <label>Company</label>
                                                                     <select class="custom-select" id="company" name="company"
                                                                             th:with="company=*{company}"
-                                                                            th:disabled="${user.isOnlyAdmin}">
+                                                                            th:readonly="${user.isOnlyAdmin}">
                                                                         <option th:each="company:${companies}"
                                                                                 th:value="${company.id}"
                                                                                 th:text="${company.getTitle()}"
@@ -188,7 +188,9 @@
                                                             Reset
                                                         </button>
                                                     </div>
-                                                    <div th:if="${ user.isOnlyAdmin }" class="row">
+                                                     <div class="alert alert-danger text-center" role="alert" th:text="${error}" th:if="${error}"></div>
+                                                    <div class="col-12 d-flex flex-sm-row flex-column justify-content-end mt-3 mt-sm-2">
+                                                        <div   th:if="${ user.isOnlyAdmin }" class="row">
                                                         <div class="col-12 col-md-8">
                                                             <div class="form-group">
                                                                 <div class="controls">

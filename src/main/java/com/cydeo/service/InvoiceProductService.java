@@ -15,13 +15,20 @@ public interface InvoiceProductService {
 
 
     InvoiceProductDto findInvoiceProductById(long id);
+
     List<InvoiceProductDto> getInvoiceProductsOfInvoice(Long invoiceId);
+
     void save(Long invoiceId, InvoiceProductDto invoiceProductDto);
 
     void delete(Long invoiceProductId);
+
     void completeApprovalProcedures(Long invoiceId, InvoiceType type) throws NotEnoughProductException;
-    boolean checkProductQuantity(InvoiceProductDto salesInvoiceProduct);
-    List<InvoiceProduct> findInvoiceProductsByInvoiceTypeAndProductRemainingQuantity(InvoiceType type, Product product, Integer remainingQuantity);
+
+    boolean checkProductQuantityBeforeAddingToInvoice(InvoiceProductDto salesInvoiceProduct, Long invoiceId);
+
+    List<InvoiceProduct> findNotSoldProduct(Product product);
 
     List<InvoiceProductDto> findAllInvoiceProductsByProductId(Long id);
+    public Boolean stockCheckBeforeApproval(Long invoiceId);
+    List<InvoiceProductDto> getAllByInvoiceStatusApprovedForCompany();
 }

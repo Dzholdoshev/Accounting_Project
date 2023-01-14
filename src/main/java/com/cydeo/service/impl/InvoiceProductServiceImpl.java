@@ -1,10 +1,13 @@
 package com.cydeo.service.impl;
 
+import com.cydeo.dto.CompanyDto;
 import com.cydeo.dto.InvoiceDto;
 import com.cydeo.dto.InvoiceProductDto;
 import com.cydeo.dto.ProductDto;
+import com.cydeo.entity.Company;
 import com.cydeo.entity.InvoiceProduct;
 import com.cydeo.entity.Product;
+import com.cydeo.enums.InvoiceStatus;
 import com.cydeo.enums.InvoiceType;
 import com.cydeo.exception.NotEnoughProductException;
 import com.cydeo.mapper.MapperUtil;
@@ -12,16 +15,15 @@ import com.cydeo.repository.InvoiceProductRepository;
 import com.cydeo.service.InvoiceProductService;
 import com.cydeo.service.InvoiceService;
 import com.cydeo.service.ProductService;
+import com.cydeo.service.SecurityService;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.Valid;
-import javax.validation.constraints.AssertTrue;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,19 +35,19 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     private final ProductService productService;
 
 
-    public InvoiceProductServiceImpl(InvoiceProductRepository invoiceProductRepository, @Lazy InvoiceService invoiceService, MapperUtil mapperUtil, ProductService productService) {
+    public InvoiceProductServiceImpl(InvoiceProductRepository invoiceProductRepository, @Lazy InvoiceService invoiceService, MapperUtil mapperUtil, ProductService productService, SecurityService securityService) {
         this.invoiceProductRepository = invoiceProductRepository;
         this.invoiceService = invoiceService;
         this.mapperUtil = mapperUtil;
         this.productService = productService;
+        this.securityService = securityService;
     }
 
     @Override
-    public InvoiceProductDto findInvoiceProductById(long id) {
-        InvoiceProduct invoiceProduct = invoiceProductRepository.findById(id).orElseThrow();
+    public InvoiceProductDto findInvoiceProductById(long invoiceProductId) {
+        InvoiceProduct invoiceProduct = invoiceProductRepository.findById(invoiceProductId).orElseThrow();
         return mapperUtil.convert(invoiceProduct, new InvoiceProductDto());
     }
-
 
     @Override
     public List<InvoiceProductDto> getInvoiceProductsOfInvoice(Long invoiceId) {
@@ -65,6 +67,9 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     public void save(Long invoiceId, InvoiceProductDto invoiceProductDto) {
         InvoiceDto invoiceDto = mapperUtil.convert(invoiceService.findInvoiceById(invoiceId), new InvoiceDto());
         invoiceProductDto.setInvoice(invoiceDto);
+        if (invoiceProductDto.getProfitLoss() == null) {
+            invoiceProductDto.setProfitLoss(BigDecimal.ZERO);
+        }
         invoiceProductRepository.save(mapperUtil.convert(invoiceProductDto, new InvoiceProduct()));
     }
 
@@ -91,8 +96,8 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
                     invoiceProductRepository.save(salesInvoiceProduct);
                     //calculate profit/loss and update remaining quantity values
                     setProfitLossOfInvoiceProductsForSalesInvoice(salesInvoiceProduct);
-
                 } else {
+                   // delete(salesInvoiceProduct.getId());
                     throw new NotEnoughProductException("This sale cannot be completed due to insufficient quantity of product");
                 }
             }
@@ -107,6 +112,7 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         }
     }
 
+    private final SecurityService securityService;
 
     private void setProfitLossOfInvoiceProductsForSalesInvoice(InvoiceProduct toBeSoldProduct) {
         List<InvoiceProduct> purchasedProductList = findNotSoldProduct(toBeSoldProduct.getProduct());
@@ -127,17 +133,17 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
                 invoiceProductRepository.save(purchasedProduct);
                 invoiceProductRepository.save(toBeSoldProduct);
                 break;
-            }else{
 
+            } else {
                 BigDecimal costForQty = purchasedProduct.getPrice().multiply(
-                        BigDecimal.valueOf(toBeSoldProduct.getRemainingQuantity() * (purchasedProduct.getTax() + 100) / 100d));
+                        BigDecimal.valueOf(purchasedProduct.getRemainingQuantity() * (purchasedProduct.getTax() + 100) / 100d));
 
                 BigDecimal salesTotalForQty = toBeSoldProduct.getPrice().multiply(
-                        BigDecimal.valueOf(toBeSoldProduct.getRemainingQuantity() * (toBeSoldProduct.getTax() + 100) / 100d));
+                        BigDecimal.valueOf(purchasedProduct.getRemainingQuantity() * (toBeSoldProduct.getTax() + 100) / 100d));
 
                 BigDecimal profitLoss = toBeSoldProduct.getProfitLoss().add(salesTotalForQty.subtract(costForQty));
+                toBeSoldProduct.setRemainingQuantity(toBeSoldProduct.getRemainingQuantity() - purchasedProduct.getRemainingQuantity());
                 purchasedProduct.setRemainingQuantity(0);
-                toBeSoldProduct.setRemainingQuantity(toBeSoldProduct.getRemainingQuantity()-purchasedProduct.getRemainingQuantity());
                 toBeSoldProduct.setProfitLoss(profitLoss);
 
                 invoiceProductRepository.save(purchasedProduct);
@@ -146,7 +152,8 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         }
     }
 
-    private List<InvoiceProduct> findNotSoldProduct(Product product) {
+    @Override
+    public List<InvoiceProduct> findNotSoldProduct(Product product) {
         return invoiceProductRepository
                 .findInvoiceProductsByInvoiceInvoiceTypeAndProductAndRemainingQuantityNotOrderByIdAsc(InvoiceType.PURCHASE, product, 0);
     }
@@ -164,20 +171,56 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
 
 
     @Override
-    public boolean checkProductQuantity(InvoiceProductDto salesInvoiceProduct) {
+    public boolean checkProductQuantityBeforeAddingToInvoice(InvoiceProductDto salesInvoiceProduct, Long invoiceId) {
+
+        Integer contOfProductAlreadyInInvoice =
+                getInvoiceProductsOfInvoice(invoiceId).stream()
+                        .filter(invoiceProductDto -> invoiceProductDto.getProduct().getId() == salesInvoiceProduct.getProduct().getId())
+                        .map(InvoiceProductDto::getQuantity).reduce(0, Integer::sum);
+
+        if (salesInvoiceProduct.getQuantity() + contOfProductAlreadyInInvoice > salesInvoiceProduct.getProduct().getQuantityInStock()) {
+            return false;
+        }
         return salesInvoiceProduct.getProduct().getQuantityInStock() >= salesInvoiceProduct.getQuantity();
     }
 
+
     @Override
-    public List<InvoiceProduct> findInvoiceProductsByInvoiceTypeAndProductRemainingQuantity(InvoiceType type, Product product, Integer remainingQuantity) {
-        return invoiceProductRepository.findInvoiceProductsByInvoiceInvoiceTypeAndProductAndRemainingQuantityNotOrderByIdAsc(type, product, remainingQuantity);
+    public List<InvoiceProductDto> findAllInvoiceProductsByProductId(Long productId) {
+        return invoiceProductRepository.findAllInvoiceProductByProductId(productId).stream()
+                .map(invoiceProduct -> mapperUtil.convert(invoiceProduct, new InvoiceProductDto()))
+                .collect(Collectors.toList());
+
     }
 
     @Override
-    public List<InvoiceProductDto> findAllInvoiceProductsByProductId(Long id) {
-        return invoiceProductRepository.findAllInvoiceProductByProductId(id).stream()
+    public Boolean stockCheckBeforeApproval(Long invoiceId){
+    InvoiceDto invoice= invoiceService.findInvoiceById(invoiceId);
+    List<InvoiceProductDto> invoiceProductDtoList= invoice.getInvoiceProducts();
+    boolean enoughStock =true;
+        for (InvoiceProductDto invoiceProductDto : invoiceProductDtoList) {
+        if (!(invoiceProductDto.getProduct().getQuantityInStock() >= invoiceProductDto.getQuantity())) {
+            enoughStock = false;
+        }
+        }
+        return enoughStock;
+    }
+
+    @Override
+    public List<InvoiceProductDto> getAllByInvoiceStatusApprovedForCompany() {
+
+     Company company = mapperUtil.convert( securityService.getLoggedInUser().getCompany(),new Company());
+        return invoiceProductRepository
+                .findAllByInvoice_InvoiceStatusAndInvoice_Company( InvoiceStatus.APPROVED,company).stream()
                 .map(invoiceProduct -> mapperUtil.convert(invoiceProduct, new InvoiceProductDto()))
+                .peek(invoiceProductDto -> {
+                    if(invoiceProductDto.getInvoice().getInvoiceType().equals(InvoiceType.SALES)){
+                        invoiceProductDto.setQuantity(-invoiceProductDto.getQuantity());
+                    }
+                })
                 .collect(Collectors.toList());
     }
+
+
 
 }

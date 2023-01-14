@@ -52,7 +52,7 @@
                                                                                 selected></option>
                                                                         <option th:each="clientVendorType:${clientVendorTypes}"
                                                                                 th:value="${clientVendorType}"
-                                                                                th:text="${clientVendorType}"></option>
+                                                                                th:text="${clientVendorType.value}"></option>
                                                                     </select>
                                                                     <div th:if="${#fields.hasErrors('clientVendorType')}">
                                                                         <ul>
@@ -198,7 +198,7 @@
                                                                 <div class="controls">
                                                                     <label>Country</label>
                                                                     <input type="text" th:field="*{address.country}"
-                                                                           placeholder="State"
+                                                                           placeholder="Country"
                                                                            class="form-control">
                                                                     <div th:if="${#fields.hasErrors('address.country')}">
                                                                         <ul>
