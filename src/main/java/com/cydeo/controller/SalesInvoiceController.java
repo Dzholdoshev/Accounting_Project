@@ -133,9 +133,7 @@ public class SalesInvoiceController {
         //print(invoiceId,model);
 
         FileSystemResource fileSystemResource = new FileSystemResource("src/main/resources/templates/invoice/invoice_print.html");
-
         String str = print(invoiceId, model);
-
 
 //emailSenderService.sendMail(new EmailContext().setAttachment(););
         FileSystemResource file= new FileSystemResource(ResourceUtils.getFile("src/main/resources/templates/invoice/invoice_print.html"));
