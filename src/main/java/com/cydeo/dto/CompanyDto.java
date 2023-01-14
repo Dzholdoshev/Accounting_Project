@@ -2,7 +2,7 @@ package com.cydeo.dto;
 
 import com.cydeo.enums.CompanyStatus;
 import lombok.*;
-
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
