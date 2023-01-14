@@ -210,8 +210,9 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
     public List<InvoiceProductDto> getAllByInvoiceStatusApprovedForCompany() {
 
      Company company = mapperUtil.convert( securityService.getLoggedInUser().getCompany(),new Company());
+
         return invoiceProductRepository
-                .findAllByInvoice_InvoiceStatusAndInvoice_Company( InvoiceStatus.APPROVED,company).stream()
+                .findAllByInvoice_InvoiceStatusAndInvoice_CompanyOrderByInvoice_DateDesc( InvoiceStatus.APPROVED,company).stream()
                 .map(invoiceProduct -> mapperUtil.convert(invoiceProduct, new InvoiceProductDto()))
                 .peek(invoiceProductDto -> {
                     if(invoiceProductDto.getInvoice().getInvoiceType().equals(InvoiceType.SALES)){
