@@ -240,23 +240,23 @@
                                             <tbody>
                                             <tr>
                                                 <td>Euro</td>
-                                                <td th:text="${exchangeRates.getEuro()}"></td>
+                                                <td th:text="${#numbers.formatCurrency(exchangeRates.getEuro()).replace('$','€')}"></td>
                                             </tr>
                                             <tr>
                                                 <td>British Pound</td>
-                                                <td th:text="${exchangeRates.getBritishPound()}"></td>
+                                                <td th:text="${#numbers.formatCurrency(exchangeRates.getBritishPound()).replace('$','£')}"></td>
                                             </tr>
                                             <tr>
                                                 <td>Canadian Dollar</td>
-                                                <td th:text="${exchangeRates.getCanadianDollar()}"></td>
+                                                <td th:text="${#numbers.formatCurrency(exchangeRates.getCanadianDollar())}"></td>
                                             </tr>
                                             <tr>
                                                 <td>Japanese Yen</td>
-                                                <td th:text="${exchangeRates.getJapaneseYen()}"></td>
+                                                <td th:text="${#numbers.formatCurrency(exchangeRates.getJapaneseYen()).replace('$','¥')}"></td>
                                             </tr>
                                             <tr>
                                                 <td>Indian Rupee</td>
-                                                <td th:text="${exchangeRates.getIndianRupee()}"></td>
+                                                <td th:text="${#numbers.formatCurrency(exchangeRates.getIndianRupee()).replace('$','₹')}"></td>
                                             </tr>
                                             </tbody>
                                         </table>
