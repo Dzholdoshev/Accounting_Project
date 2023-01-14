@@ -15,8 +15,12 @@ import org.springframework.web.util.HtmlUtils;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
+import javax.mail.Address;
+import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.NewsAddress;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 import java.io.File;
@@ -36,10 +40,10 @@ private final SecurityService securityService;
         this.securityService = securityService;
     }
 
-    public void sendEmail(String subject, String body){
-        SimpleMailMessage message = new SimpleMailMessage();
+    public void sendEmail(String subject, String body) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        //SimpleMailMessage message = new SimpleMailMessage();
         String toEmail= securityService.getLoggedInUser().getUsername();
-
 //        SimpleMailMessage sms = new SimpleMailMessage();
 //        String phone = securityService.getLoggedInUser().getPhone();
 //        String emailToSmsVerizon=phone + "@vtext.com";
@@ -50,12 +54,12 @@ private final SecurityService securityService;
 //        sms.setSubject(subject);
 //        mailSender.send(sms);
 
-
-        message.setFrom("javadevelopertest2000@googlemail.com");
-       // message.setTo(toEmail);
-        message.setTo("marklen86@gmail.com");
-        message.setText(body);
-        message.setSubject(subject);
+        MimeMessageHelper helper1 = new MimeMessageHelper(message,true);
+        helper1.setFrom("javadevelopertest2000@googlemail.com");
+        helper1.setTo("marklen86@gmail.com");
+        //helper1.setTo(toEmail);
+        helper1.setSubject(subject);
+        helper1.setText(body,true);
         mailSender.send(message);
 
     }
@@ -63,26 +67,9 @@ private final SecurityService securityService;
 
 
 
-    @Autowired
-    private SpringTemplateEngine templateEngine;
 
-    @Override
-    public void sendMail(EmailContext email) throws MessagingException {
-        MimeMessage message = mailSender.createMimeMessage();
 
-        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(message,
-                MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
-                StandardCharsets.UTF_8.name());
-        Context context = new Context();
-        context.setVariables(email.getContext());
-        String emailContent = templateEngine.process(email.getTemplateLocation(), context);
 
-        mimeMessageHelper.setTo(email.getTo());
-        mimeMessageHelper.setSubject(email.getSubject());
-        mimeMessageHelper.setFrom(email.getFrom());
-        mimeMessageHelper.setText(emailContent, true);
-        mailSender.send(message);
-    }
 
     @Override
     public void sendEmailAttach(String subject, String text, String pathToAttachment) throws MessagingException, IOException {

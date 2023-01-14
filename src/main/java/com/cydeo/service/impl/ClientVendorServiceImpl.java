@@ -74,13 +74,10 @@ public class ClientVendorServiceImpl implements ClientVendorService {
                 .collect(Collectors.toList());
     }
 
-
 //        @Override
 //        public ClientVendorDto create(ClientVendorDto clientVendorDto) throws Exception {
 //           ClientVendorDto newClientVendorDto = new ClientVendorDto();
 //           ClientVendor newClientVendor = mapperUtil.convert(newClientVendorDto,new ClientVendor());
-//
-//
 //            String username = SecurityContextHolder.getContext().getAuthentication().getName();
 //            UserDto loggedInUser = userService.findByUsername(username);
 //            clientVendorRepository.save(newClientVendor);
@@ -108,7 +105,7 @@ public class ClientVendorServiceImpl implements ClientVendorService {
 
             //  clientVendor.setCompany(companyRepository.findById(dto.getCompany().getId()).get());
             clientVendorRepository.save(clientVendor);
-            senderService.sendEmail("Notification","Client/Vendor was created");
+            senderService.sendEmail("Notification", "<h1>Client/Vendor " + dto.getClientVendorName() +" was created</h1>");
             return findClientVendorById(clientVendor.getId());
         }
         return dto;
