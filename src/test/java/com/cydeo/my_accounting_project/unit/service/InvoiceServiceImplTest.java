@@ -1,4 +1,4 @@
-package com.cydeo.service.impl;
+package com.cydeo.my_accounting_project.unit.service;
 
 import com.cydeo.dto.*;
 import com.cydeo.entity.*;
@@ -9,6 +9,7 @@ import com.cydeo.mapper.MapperUtil;
 import com.cydeo.repository.InvoiceRepository;
 import com.cydeo.service.CompanyService;
 import com.cydeo.service.InvoiceProductService;
+import com.cydeo.service.impl.InvoiceServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
