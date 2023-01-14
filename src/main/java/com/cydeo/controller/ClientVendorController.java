@@ -56,7 +56,6 @@ public class ClientVendorController {
     }
 
     @PostMapping("/update/{id}")
-
     public String updateClientVendor(@PathVariable("id") Long id,@Valid @ModelAttribute ("clientVendor")ClientVendorDto clientVendorDto,BindingResult bindingResult, Model model) throws Exception {
 
         if(clientVendorService.existsByNameAndCompany(clientVendorDto.getClientVendorName(),companyService.getCompanyByLoggedInUser())
@@ -67,13 +66,11 @@ public class ClientVendorController {
             model.addAttribute("clientVendorTypes", clientVendorService.getClientVendorType());
             return "clientVendor/clientVendor-update";
         }
-
         clientVendorService.update(id,clientVendorDto);
         return "redirect:/clientVendors/list";
     }
 
     @GetMapping("/delete/{id}")
-
     public String deleteClientVendor(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) throws Exception {
         boolean invoiceExists = invoiceService.checkIfInvoiceExist(id);
         if(invoiceExists){
@@ -86,14 +83,12 @@ public class ClientVendorController {
 
 
     @GetMapping("/create")
-    @RolesAllowed("Manager")
     public String createClientVendor(Model model) {
         model.addAttribute("newClientVendor", new ClientVendorDto());
         model.addAttribute("clientVendorTypes", clientVendorService.getClientVendorType());
         return "/clientVendor/clientVendor-create";
     }
     @PostMapping("/create")
-    @RolesAllowed("Manager")
     public String insertClientVendor(@Valid @ModelAttribute("newClientVendor") ClientVendorDto clientVendor,BindingResult bindingResult,Model model) throws Exception {
 
         if(clientVendorRepository.existsByClientVendorName(clientVendor.getClientVendorName())){
@@ -104,7 +99,6 @@ public class ClientVendorController {
             return "/clientVendor/clientVendor-create";
         }
         clientVendorService.save(clientVendor);
-
         return "redirect:/clientVendors/list";
     }
 

@@ -19,7 +19,7 @@ public class ClientVendorDtoConverter implements Converter<String, ClientVendorD
 
     @Override
     public ClientVendorDto convert(String source) {
-        if (source == null || source.equals("")) {
+        if (source == null || source.isBlank()) {
             return null;
         }
 
