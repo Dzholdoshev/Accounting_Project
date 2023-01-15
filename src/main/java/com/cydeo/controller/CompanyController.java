@@ -65,8 +65,13 @@ public class CompanyController {
     }
 
     @PostMapping("/create")
-    public String createCompanyFinish(@Valid @ModelAttribute("newCompany") CompanyDto companyDto, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
+    public String createCompanyFinish(@Valid @ModelAttribute("newCompany") CompanyDto companyDto, BindingResult bindingResult, Model model) {
+        boolean titleExists=companyService.isTitleExist(companyDto.getTitle(), companyDto.getId());
+       if(bindingResult.hasErrors() ||titleExists){
+
+        if (titleExists){
+            bindingResult.rejectValue("title", " ", "Company title name already exist");
+        }
             return "/company/company-create";
         }
         companyService.save(companyDto);
@@ -74,9 +79,13 @@ public class CompanyController {
     }
 
     @PostMapping("/update/{companyId}")
-    public String updateCompany(@PathVariable("companyId") Long companyId, @Valid @ModelAttribute("company") CompanyDto companyDto, BindingResult bindingResult) {
-
-        if (bindingResult.hasErrors()) {
+    public String updateCompany(@PathVariable("companyId") Long companyId, @Valid @ModelAttribute("company") CompanyDto companyDto, BindingResult bindingResult, Model model) {
+      boolean titleExists=companyService.isTitleExist(companyDto.getTitle(), companyId);
+        companyDto.setId(companyId);
+        if (bindingResult.hasErrors()|| titleExists) {
+            if (titleExists) {
+                bindingResult.rejectValue("title", " ", "Company title name already exist");
+            }
             return "/company/company-update";
         }
 

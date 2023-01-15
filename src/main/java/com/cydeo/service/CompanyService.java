@@ -27,9 +27,9 @@ public interface CompanyService {
 
     void deactivate(Long companyId);
 
-    boolean isTitleExist(String title);
+    boolean isTitleExist(String title, Long companyId);
 
-    void save(CompanyDto company);
+    CompanyDto save(CompanyDto company);
 
     CompanyDto updateCompany(CompanyDto companyDto);
 }
