@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:replace="fragments/head :: header"></head>
 
@@ -40,7 +40,7 @@
                                                                 <td th:text="${comStat.count}"></td>
                                                                 <td th:text="${category.description}"></td>
                                                                 <td class="actions">
-                                                                    <a th:href="@{/categories/update/{id}(id=${category.getId()})}"
+                                                                    <a sec:authorize="hasAnyAuthority('Manager')" th:href="@{/categories/update/{id}(id=${category.getId()})}"
                                                                        type="button">
                                                                         <button class="btn btn-primary mb-2 mb-sm-0 mr-sm-2">
                                                                             Edit
@@ -56,7 +56,7 @@
                                                                                 style="pointer-events: none;" disabled>Delete
                                                                         </button>
                                                                     </span>
-                                                                    <a th:unless="${category.hasProduct}"
+                                                                    <a sec:authorize="hasAnyAuthority('Manager')" th:unless="${category.hasProduct}"
                                                                        th:href="@{/categories/delete/{id}(id=${category.getId()})}"
                                                                        type="button">
                                                                         <button class="btn btn-danger mb-2 ml-2 mb-sm-0 mr-sm-2">
@@ -80,7 +80,7 @@
                         <div class="col-auto">
                             <form>
                                 <div class="col-12 col-sm-6 col-lg-3 d-flex align-items-right">
-                                    <a id="companyCreateLink" class="btn bg-dark text-light mb-1"
+                                    <a sec:authorize="hasAnyAuthority('Manager')" id="companyCreateLink" class="btn bg-dark text-light mb-1"
                                        th:href="@{/categories/create}"><i class="fa fa-plus mr-1"></i>
                                         Create Category</a>
                                 </div>
