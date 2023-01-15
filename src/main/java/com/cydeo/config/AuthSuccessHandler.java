@@ -24,7 +24,8 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
         } else if (roles.contains("Admin")) {
             response.sendRedirect("/users/list");
         } else if (roles.contains("Manager")) {
-            response.sendRedirect("/dashboard");
+            response.sendRedirect("/introVideo");
+           // response.sendRedirect("/dashboard");
         } else if (roles.contains("Employee")) {
             response.sendRedirect("/dashboard");
         }
