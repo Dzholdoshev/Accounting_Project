@@ -42,14 +42,13 @@ public class ClientVendorServiceImpl implements ClientVendorService {
         return clientVendorRepository.findAll()
                 .stream()
                 .map(clientVendor -> mapperUtil.convert(clientVendor, new ClientVendorDto()))
+                .sorted(Comparator.comparing(ClientVendorDto::getClientVendorName))
                 .collect(Collectors.toList());
     }
 
 
     @Override
     public ClientVendorDto create(ClientVendorDto clientVendorDto) throws Exception {
-
-
         return null;
     }
 
@@ -71,6 +70,7 @@ public class ClientVendorServiceImpl implements ClientVendorService {
         List<ClientVendor> clientVendorList = clientVendorRepository.findAllByCompany(mapperUtil.convert(companyDto, new Company()));
         return clientVendorList.stream()
                 .map(clientVendor -> mapperUtil.convert(clientVendor, new ClientVendorDto()))
+                .sorted(Comparator.comparing(ClientVendorDto::getClientVendorName))
                 .collect(Collectors.toList());
     }
 

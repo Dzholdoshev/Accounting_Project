@@ -10,5 +10,4 @@ public interface CurrencyExchangeClient {
     @GetMapping()
     Currencies getExchangeRates();
 
-
 }

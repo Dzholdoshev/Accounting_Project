@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.mail.MessagingException;
+import javax.swing.text.html.HTMLDocument;
 import javax.validation.Valid;
 import java.io.*;
 
@@ -128,20 +129,8 @@ public class SalesInvoiceController {
         model.addAttribute("invoice", invoice);
         model.addAttribute("invoiceProducts", invoice.getInvoiceProducts());
 
-
-
-
-        //print(invoiceId,model);
-
-        FileSystemResource fileSystemResource = new FileSystemResource("src/main/resources/templates/invoice/invoice_print.html");
-        String str = print(invoiceId, model);
-
-//emailSenderService.sendMail(new EmailContext().setAttachment(););
         FileSystemResource file= new FileSystemResource(ResourceUtils.getFile("src/main/resources/templates/invoice/invoice_print.html"));
-;
-emailSenderService.sendEmailAttach("Notification","<h1>Sales Invoice "+invoice.getInvoiceNo() +" is created </h1>",file.getPath());
-        fileSystemResource.getInputStream().close();
-
+        emailSenderService.sendEmailAttach("Notification","<h1>Invoice "+invoice.getInvoiceNo() +" in amount of $" + invoice.getTotal() + " has been approved </h1>",file.getPath());
 
         return "redirect:/salesInvoices/print/{invoiceId}/sent";
 
