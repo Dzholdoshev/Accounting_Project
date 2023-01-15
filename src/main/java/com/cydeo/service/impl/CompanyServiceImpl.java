@@ -114,14 +114,21 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public boolean isTitleExist(String title) {
+    public boolean isTitleExist(String title, Long companyId) {
+        if(companyId!=null) {
+             Company company= companyRepository.findById(companyId).get();
+             if(company.getTitle().equals(title))
+                return false;
+            }
         return companyRepository.existsByTitle(title);
     }
 
     @Override
-    public void save(CompanyDto companyDto) {
+    public CompanyDto save(CompanyDto companyDto) {
         if(companyDto.getCompanyStatus()==null) companyDto.setCompanyStatus(CompanyStatus.PASSIVE);
-        companyRepository.save(mapperUtil.convert(companyDto, new Company()));
+        Company company=companyRepository.save(mapperUtil.convert(companyDto, new Company()));
+        companyDto.setId(company.getId());
+        return companyDto;
     }
 
     @Override
