@@ -1,5 +1,6 @@
 package com.cydeo.controller;
 
+import com.cydeo.annotation.Activation;
 import com.cydeo.dto.CompanyDto;
 import com.cydeo.service.CompanyService;
 import org.springframework.stereotype.Controller;
@@ -37,6 +38,7 @@ public class CompanyController {
 
     }
 
+
     @GetMapping("/deactivate/{id}")
     public String deactivate(@PathVariable("id") Long id) {
 
@@ -66,12 +68,12 @@ public class CompanyController {
 
     @PostMapping("/create")
     public String createCompanyFinish(@Valid @ModelAttribute("newCompany") CompanyDto companyDto, BindingResult bindingResult, Model model) {
-        boolean titleExists=companyService.isTitleExist(companyDto.getTitle(), companyDto.getId());
-       if(bindingResult.hasErrors() ||titleExists){
+        boolean titleExists = companyService.isTitleExist(companyDto.getTitle(), companyDto.getId());
+        if (bindingResult.hasErrors() || titleExists) {
 
-        if (titleExists){
-            bindingResult.rejectValue("title", " ", "Company title name already exist");
-        }
+            if (titleExists) {
+                bindingResult.rejectValue("title", " ", "Company title name already exist");
+            }
             return "/company/company-create";
         }
         companyService.save(companyDto);
@@ -80,9 +82,9 @@ public class CompanyController {
 
     @PostMapping("/update/{companyId}")
     public String updateCompany(@PathVariable("companyId") Long companyId, @Valid @ModelAttribute("company") CompanyDto companyDto, BindingResult bindingResult, Model model) {
-      boolean titleExists=companyService.isTitleExist(companyDto.getTitle(), companyId);
+        boolean titleExists = companyService.isTitleExist(companyDto.getTitle(), companyId);
         companyDto.setId(companyId);
-        if (bindingResult.hasErrors()|| titleExists) {
+        if (bindingResult.hasErrors() || titleExists) {
             if (titleExists) {
                 bindingResult.rejectValue("title", " ", "Company title name already exist");
             }
@@ -93,7 +95,6 @@ public class CompanyController {
         companyService.updateCompany(companyDto);
         return "redirect:/companies/list";
     }
-
 
 
 }

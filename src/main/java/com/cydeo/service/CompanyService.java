@@ -1,6 +1,7 @@
 package com.cydeo.service;
 
 import com.cydeo.dto.CompanyDto;
+import com.cydeo.entity.Company;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,9 +24,9 @@ public interface CompanyService {
 
 //    CompanyDto update(Long companyId, CompanyDto companyDto) throws CloneNotSupportedException;
 
-    void activate(Long companyId);
+    Company activate(Long companyId);
 
-    void deactivate(Long companyId);
+    Company deactivate(Long companyId);
 
     boolean isTitleExist(String title, Long companyId);
 

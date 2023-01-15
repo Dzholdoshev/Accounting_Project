@@ -2,16 +2,14 @@ package com.cydeo.entity;
 
 import com.cydeo.entity.common.BaseEntity;
 import com.cydeo.enums.CompanyStatus;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
 @Getter
+@ToString
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor

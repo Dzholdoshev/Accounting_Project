@@ -1,5 +1,6 @@
 package com.cydeo.service.impl;
 
+import com.cydeo.annotation.Activation;
 import com.cydeo.dto.CompanyDto;
 
 import com.cydeo.entity.Company;
@@ -94,23 +95,23 @@ public class CompanyServiceImpl implements CompanyService {
 //        return null;
 //    }
 
-
+    @Activation
     @Override
-    public void activate(Long companyId) {
+    public Company activate(Long companyId) {
 
         Company company = companyRepository.findById(companyId).orElseThrow(); //future exception message?
         company.setCompanyStatus(CompanyStatus.ACTIVE);
         companyRepository.save(company);
-
+    return company;
     }
-
+    @Activation
     @Override
-    public void deactivate(Long companyId) {
+    public Company deactivate(Long companyId) {
 
         Company company = companyRepository.findById(companyId).orElseThrow(); //future exception message?
         company.setCompanyStatus(CompanyStatus.PASSIVE);
         companyRepository.save(company);
-
+    return company;
     }
 
     @Override
