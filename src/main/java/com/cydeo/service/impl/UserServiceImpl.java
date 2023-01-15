@@ -107,6 +107,7 @@ public class UserServiceImpl implements UserService {
         convertedUser.setPassword(user.getPassword());
         if (securityService.getLoggedInUser().getId().equals(userDto.getId())){
             convertedUser.setRole(user.getRole());
+            convertedUser.setUsername(user.getUsername());
         }
         convertedUser.setEnabled(true);
         userRepository.save(convertedUser);
