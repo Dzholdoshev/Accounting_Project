@@ -65,6 +65,7 @@ private final SecurityService securityService;
     }
 
     @Override
+    @Scope("prototype")
     public void sendEmailAttach(String subject, String text,String pathToAttachment) throws MessagingException, IOException {
         MimeMessage message2 = mailSender.createMimeMessage();
         message2.setContent("invoice_print.html","text/html");
