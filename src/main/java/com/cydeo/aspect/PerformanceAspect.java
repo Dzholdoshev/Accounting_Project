@@ -1,7 +1,9 @@
 package com.cydeo.aspect;
 
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -41,6 +43,16 @@ public class PerformanceAspect {
 
         return result;
 
+    }
+
+    @Pointcut("@annotation(org.springframework.web.bind.annotation.GetMapping) || @annotation(org.springframework.web.bind.annotation.PostMapping)")
+    public void afterReturningGetMappingAnnotation() {}
+
+        @AfterThrowing(pointcut = "afterReturningGetMappingAnnotation()", throwing = "exception")
+    public void afterThrowingGetMappingOperation(JoinPoint joinPoint, RuntimeException exception) {
+        log.error("After Throwing -> Method: {}, Exception: {}"
+                , joinPoint.getSignature().toShortString()
+                , exception.getMessage());
     }
 
 }
