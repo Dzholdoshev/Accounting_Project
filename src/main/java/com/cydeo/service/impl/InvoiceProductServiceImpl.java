@@ -176,14 +176,22 @@ public class InvoiceProductServiceImpl implements InvoiceProductService {
         Integer contOfProductAlreadyInInvoice =
                 getInvoiceProductsOfInvoice(invoiceId).stream()
                         .filter(invoiceProductDto -> invoiceProductDto.getProduct().getId() == salesInvoiceProduct.getProduct().getId())
-                        .map(InvoiceProductDto::getQuantity).reduce(0, Integer::sum);
+                        .map(invoiceProductDto -> {
+                            int quantity = 0;
+                            if (invoiceProductDto.getQuantity() != null) {
+                                quantity += invoiceProductDto.getQuantity();
+                            }
+                            return quantity;
+                        }).reduce(0, Integer::sum);
 
-        if (salesInvoiceProduct.getQuantity() + contOfProductAlreadyInInvoice > salesInvoiceProduct.getProduct().getQuantityInStock()) {
-            return false;
+        if (salesInvoiceProduct.getQuantity() != null) {
+            if (salesInvoiceProduct.getQuantity() + contOfProductAlreadyInInvoice > salesInvoiceProduct.getProduct().getQuantityInStock()) {
+                return false;
+            }
+            return salesInvoiceProduct.getProduct().getQuantityInStock() >= salesInvoiceProduct.getQuantity();
         }
-        return salesInvoiceProduct.getProduct().getQuantityInStock() >= salesInvoiceProduct.getQuantity();
+        return true;
     }
-
 
     @Override
     public List<InvoiceProductDto> findAllInvoiceProductsByProductId(Long productId) {
