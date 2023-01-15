@@ -5,15 +5,17 @@ import com.cydeo.dto.InvoiceDto;
 import com.cydeo.dto.InvoiceProductDto;
 import com.cydeo.enums.ClientVendorType;
 import com.cydeo.enums.InvoiceType;
-import com.cydeo.service.ClientVendorService;
-import com.cydeo.service.InvoiceProductService;
-import com.cydeo.service.InvoiceService;
-import com.cydeo.service.ProductService;
+import com.cydeo.service.*;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.ResourceUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import javax.mail.MessagingException;
 import javax.validation.Valid;
+import java.io.IOException;
 
 @Controller
 @RequestMapping("/purchaseInvoices")
@@ -22,12 +24,14 @@ public class PurchaseInvoiceController {
     private final InvoiceProductService invoiceProductService;
     private final ProductService productService;
     private final ClientVendorService clientVendorService;
+    private final EmailSenderService emailSenderService;
 
-    public PurchaseInvoiceController(InvoiceService invoiceService, InvoiceProductService invoiceProductService, ProductService productService, ClientVendorService clientVendorService) {
+    public PurchaseInvoiceController(InvoiceService invoiceService, InvoiceProductService invoiceProductService, ProductService productService, ClientVendorService clientVendorService, EmailSenderService emailSenderService) {
         this.invoiceService = invoiceService;
         this.invoiceProductService = invoiceProductService;
         this.productService = productService;
         this.clientVendorService = clientVendorService;
+        this.emailSenderService = emailSenderService;
     }
 
     @GetMapping("/update/{invoiceId}")
@@ -102,6 +106,19 @@ public class PurchaseInvoiceController {
         model.addAttribute("invoice", invoice);
         model.addAttribute("invoiceProducts", invoice.getInvoiceProducts());
         return "invoice/invoice_print";
+    }
+
+    @GetMapping("/print/{invoiceId}/sent")
+    public String sentEmail(@PathVariable("invoiceId") long invoiceId, Model model) throws MessagingException, IOException {
+        InvoiceDto invoice = invoiceService.printInvoice(invoiceId);
+        model.addAttribute("company", invoice.getCompany());
+        model.addAttribute("invoice", invoice);
+        model.addAttribute("invoiceProducts", invoice.getInvoiceProducts());
+
+        FileSystemResource file = new FileSystemResource(ResourceUtils.getFile("src/main/resources/templates/invoice/invoice_print.html"));
+        emailSenderService.sendEmailAttach("Notification", "<h1>Invoice " + invoice.getInvoiceNo() +" in amount of $" + invoice.getTotal() + " has been approved </h1>", file.getPath());
+
+        return "redirect:/purchaseInvoices/print/{invoiceId}/sent";
     }
 
     @GetMapping("/approve/{invoiceId}")

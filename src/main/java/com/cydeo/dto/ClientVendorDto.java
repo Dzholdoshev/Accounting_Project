@@ -27,10 +27,8 @@ public class ClientVendorDto {
     private String website;
     @NotNull(message = "Please select type.")
     private ClientVendorType clientVendorType;
-    // @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Valid
     private AddressDto address;
-    //  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private CompanyDto company;
 
 
