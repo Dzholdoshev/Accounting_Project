@@ -45,7 +45,7 @@
                                 <ul class="nav flex-column">
                                     <li class="nav-item" sec:authorize="hasAnyAuthority('Admin')">
                                         <a class="nav-link text-white" th:href="@{/users/list}">User Registration</a></li>
-                                    <li class="nav-item" sec:authorize="hasAnyAuthority('Admin', 'Manager','Employee')">
+                                    <li class="nav-item" sec:authorize="hasAnyAuthority('Manager')">
                                         <a class="nav-link text-white" th:href="@{/clientVendors/list}">Client/Vendor Registration</a></li>
                                 </ul>
                             </div>

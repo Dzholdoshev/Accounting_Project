@@ -132,7 +132,7 @@ public class SalesInvoiceController {
         FileSystemResource file= new FileSystemResource(ResourceUtils.getFile("src/main/resources/templates/invoice/invoice_print.html"));
         emailSenderService.sendEmailAttach("Notification","<h1>Invoice "+invoice.getInvoiceNo() +" in amount of $" + invoice.getTotal() + " has been approved </h1>",file.getPath());
 
-        return "redirect:/salesInvoices/print/{invoiceId}/sent";
+        return "invoice/invoice_print";
 
     }
 
