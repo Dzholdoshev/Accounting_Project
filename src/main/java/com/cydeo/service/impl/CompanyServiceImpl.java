@@ -65,7 +65,11 @@ public class CompanyServiceImpl implements CompanyService {
     public List<CompanyDto> getFilteredCompaniesForCurrentUser() {
 
         if(securityService.getLoggedInUser().getRole().getId()==1L){
-            return getAllCompanies(); //takes care of ROOT
+            return companyRepository.findAll().stream()
+                    .filter(company -> company.getId() != 1)
+                    .map(company -> mapperUtil.convert(company ,new CompanyDto()))
+                    .filter(company -> company.getCompanyStatus().equals(CompanyStatus.ACTIVE))
+                    .collect(Collectors.toList()); //takes care of ROOT
         }
         if(securityService.getLoggedInUser().getRole().getId()==2L){
             Long companyId = securityService.getLoggedInUser().getCompany().getId();
