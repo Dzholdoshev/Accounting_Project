@@ -28,12 +28,16 @@ public class UserDto {
     String phone;
 
     @NotBlank (message = "Password is a required field.")
-    @Pattern(regexp = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{4,}")
+    @Pattern(regexp = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{4,}",
+            message = "Password should be at least 4 characters long and need to contain  : " +
+                    "1 capital letter, " +
+                    "1 small letter, " +
+                    "1 special character or number, ")
     String password;
 
     @NotBlank (message = "Passwords should match.")
-    @Pattern(regexp = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{4,}")
     String confirmPassword;
+
     @Valid
     @NotNull (message = "Please select a role")
     RoleDto role;
